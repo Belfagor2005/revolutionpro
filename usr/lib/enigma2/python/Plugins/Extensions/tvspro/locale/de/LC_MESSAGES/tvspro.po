@@ -1,0 +1,232 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: exodus\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-05-04 23:18+0200\n"
+"PO-Revision-Date: \n"
+"Last-Translator: ))^^(( <>\n"
+"Language-Team: *\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Generator: Poedit 1.8.7\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Basepath: ../../..\n"
+"X-Poedit-SearchPath-0: plugin.py\n"
+
+#: plugin.py:160
+msgid "IPTV(4097)"
+msgstr ""
+
+#: plugin.py:161
+msgid "Dvb(1)"
+msgstr ""
+
+#: plugin.py:162
+msgid "eServiceUri(8193)"
+msgstr ""
+
+#: plugin.py:166
+msgid "Gstreamer(5001)"
+msgstr ""
+
+#: plugin.py:168
+msgid "Exteplayer3(5002)"
+msgstr ""
+
+#: plugin.py:173
+msgid "yes"
+msgstr ""
+
+#: plugin.py:173
+msgid "no"
+msgstr ""
+
+#: plugin.py:187
+msgid "SETUP PLUGIN"
+msgstr ""
+
+#: plugin.py:195
+msgid "Empty Cache"
+msgstr ""
+
+#: plugin.py:229
+msgid "All cache fold empty!"
+msgstr ""
+
+#: plugin.py:234 plugin.py:243
+msgid "Services Player Reference type"
+msgstr ""
+
+#: plugin.py:234 plugin.py:244
+msgid "Configure Service Player Reference, Enigma restart required"
+msgstr ""
+
+#: plugin.py:235 plugin.py:246
+msgid "Cache folder"
+msgstr ""
+
+#: plugin.py:235 plugin.py:247
+msgid "Configure Folder Cache Path (eg.: /media/hdd), Enigma restart required"
+msgstr ""
+
+#: plugin.py:236 plugin.py:252
+msgid "Show thumbpic ?"
+msgstr ""
+
+#: plugin.py:236 plugin.py:253
+msgid "Show Thumbpics ? Enigma restart required"
+msgstr ""
+
+#: plugin.py:249
+msgid "Skin resolution-(restart e2 after change)"
+msgstr ""
+
+#: plugin.py:250
+msgid "Configure Skin Resolution Screen, Enigma restart required"
+msgstr ""
+
+#: plugin.py:290
+msgid "Choose Directory:"
+msgstr ""
+
+#: plugin.py:291
+msgid "Choose Directory"
+msgstr ""
+
+#: plugin.py:311
+msgid "Settings saved correctly!"
+msgstr ""
+
+#: plugin.py:318
+msgid "Really close without saving the settings?"
+msgstr ""
+
+#: plugin.py:870 plugin.py:1270
+msgid "Filter this category..."
+msgstr ""
+
+#: plugin.py:1297 plugin.py:1351 plugin.py:1426 plugin.py:1509 plugin.py:1584
+#: plugin.py:1662 plugin.py:1744 plugin.py:1826 plugin.py:1907 plugin.py:1989
+msgid "Cancel"
+msgstr ""
+
+#: plugin.py:1298 plugin.py:1352 plugin.py:1427 plugin.py:1510 plugin.py:1585
+#: plugin.py:1663 plugin.py:1745 plugin.py:1827 plugin.py:1908 plugin.py:1990
+#: plugin.py:2058
+msgid "Select"
+msgstr "Wählen"
+
+#: plugin.py:1346 plugin.py:1421 plugin.py:1504 plugin.py:1579 plugin.py:1657
+#: plugin.py:1739 plugin.py:1821 plugin.py:1902
+msgid "TVS PRO"
+msgstr ""
+
+#: plugin.py:2005
+msgid ""
+"\n"
+"\n"
+"Error downloading Info!"
+msgstr ""
+
+#: plugin.py:2011
+msgid "==  WELCOME to WWW.TIVUSTREAM.COM ==\n"
+msgstr ""
+
+#: plugin.py:2012
+msgid "== SUPPORT ON: WWW.CORVOBOYS.COM http://t.me/tivustream ==\n"
+msgstr ""
+
+#: plugin.py:2013
+msgid "== thank's to @PCD and LINUXSAT-SUPPORT.COM \n"
+msgstr ""
+
+#: plugin.py:2014 plugin.py:2021 plugin.py:2028
+msgid "========================================\n"
+msgstr ""
+
+#: plugin.py:2015
+msgid "NOTA BENE:\n"
+msgstr ""
+
+#: plugin.py:2016
+msgid "Le liste create ad HOC contengono indirizzi liberamente e gratuitamente\n"
+msgstr ""
+
+#: plugin.py:2017
+msgid "trovati in rete e non protetti da sottoscrizione o abbonamento.\n"
+msgstr ""
+
+#: plugin.py:2018
+msgid "Il server di riferimento strutturale ai progetti rilasciati\n"
+msgstr ""
+
+#: plugin.py:2019
+msgid "non e' fonte di alcun stream/flusso.\n"
+msgstr ""
+
+#: plugin.py:2020
+msgid "Assolutamente VIETATO utilizzare queste liste senza autorizzazione.\n"
+msgstr ""
+
+#: plugin.py:2022
+msgid "DISCLAIMER: \n"
+msgstr ""
+
+#: plugin.py:2023
+msgid "The lists created at HOC contain addresses freely and freely found on\n"
+msgstr ""
+
+#: plugin.py:2024
+msgid "the net and not protected by subscription or subscription.\n"
+msgstr ""
+
+#: plugin.py:2025
+msgid "The structural reference server for projects released\n"
+msgstr ""
+
+#: plugin.py:2026
+msgid "is not a source of any stream/flow.\n"
+msgstr ""
+
+#: plugin.py:2027
+msgid "Absolutely PROHIBITED to use this lists without authorization\n"
+msgstr ""
+
+#: plugin.py:2057
+msgid "Exit"
+msgstr "Ausfahrt"
+
+#: plugin.py:2095 plugin.py:2439
+msgid "For Stream Youtube coming soon!"
+msgstr ""
+
+#: plugin.py:2339
+msgid "4:3 Letterbox"
+msgstr ""
+
+#: plugin.py:2340
+msgid "4:3 PanScan"
+msgstr ""
+
+#: plugin.py:2341
+msgid "16:9"
+msgstr ""
+
+#: plugin.py:2342
+msgid "16:9 always"
+msgstr ""
+
+#: plugin.py:2343
+msgid "16:10 Letterbox"
+msgstr ""
+
+#: plugin.py:2344
+msgid "16:10 PanScan"
+msgstr ""
+
+#: plugin.py:2345
+msgid "16:9 Letterbox"
+msgstr ""

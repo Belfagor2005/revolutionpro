@@ -1,0 +1,11 @@
+<screen name="AnimMain" position="center,center" size="1920,1080" title="AnimMain" flags="wfNoBorder" backgroundColor="#ff000000">
+	<widget name="title" position="125,775" size="1724,60" zPosition="3" halign="left" valign="center" foregroundColor="#389416" backgroundColor="#389416" font="Regular;38" transparent="1" />
+	<ePixmap position="0,775" zPosition="-2" size="1920,306" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/infobar2L.png" />
+	<widget name="pointer" position="890,808" size="150,225" zPosition="2" alphatest="on" />
+	<widget source="label1" render="Label" position="115,855" size="330,150" font="Regular;26" halign="center" valign="center" zPosition="2" noWrap="1" foregroundColor="#b3b3b9" backgroundColor="#b3b3b9" transparent="1" />
+	<widget source="label2" render="Label" position="445,855" size="330,150" font="Regular;26" halign="center" valign="center" zPosition="2" noWrap="1" foregroundColor="#b3b3b9" backgroundColor="#b3b3b9" transparent="1" />
+	<widget source="label3" render="Label" position="720,853" size="480,150" font="Regular;32" halign="center" valign="center" zPosition="3" noWrap="1" foregroundColor="#ffffff" backgroundColor="#ffffff" transparent="1" />
+	<widget source="label4" render="Label" position="1135,855" size="330,150" font="Regular;26" halign="center" valign="center" zPosition="2" noWrap="1" foregroundColor="#b3b3b9" backgroundColor="#b3b3b9" transparent="1" />
+	<widget source="label5" render="Label" position="1465,855" size="330,150" font="Regular;26" halign="center" valign="center" zPosition="2" noWrap="1" foregroundColor="#b3b3b9" backgroundColor="#b3b3b9" transparent="1" />
+	<widget name="info" position="119,8" zPosition="4" size="1681,256" font="Regular;33" foregroundColor="#ffff00" backgroundColor="#40000000" transparent="1" halign="left" valign="top" />
+</screen>
