@@ -1,6 +1,6 @@
 Tivustream Pro Revolution Best Version
 
-<img src="https://github.com/Belfagor2005/revolutionpro/blob/main/usr/lib/enigma2/python/Plugins/Extensions/tvspro/logo.png">
+<img src="https://github.com/Belfagor2005/revolutionpro/blob/main/usr/lib/enigma2/python/Plugins/Extensions/tvspro/icon.png">
 
 Enigma2 project
 Only Free Channels ( no Pay Tv ) 
