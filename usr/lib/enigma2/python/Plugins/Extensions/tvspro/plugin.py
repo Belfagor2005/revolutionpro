@@ -47,17 +47,13 @@ import sys
 # from Tools.LoadPixmap import LoadPixmap
 PY3 = sys.version_info[0] == 3
 if PY3:
-    from urllib.request import urlopen, Request
+    from urllib.request import urlopen, Request, urlretrieve
     from urllib.error import URLError, HTTPError
-    from urllib.parse import urlparse
-    from urllib.parse import urlencode, quote
-    from urllib.request import urlretrieve
+    from urllib.parse import urlparse, urlencode, quote
 else:
-    from urllib2 import urlopen, Request
-    from urllib2 import URLError, HTTPError
+    from urllib2 import urlopen, Request, URLError, HTTPError
     from urlparse import urlparse
-    from urllib import urlencode, quote
-    from urllib import urlretrieve
+    from urllib import urlencode, quote, urlretrieve
 
 print('Py3: ',PY3)
 
@@ -106,7 +102,6 @@ try:
     eDreamOS = True
 except:
     eDreamOS = False
-
 
 if HD.width() > 1280:
     skin_path = res_plugin_path + 'skins/fhd/'
@@ -390,9 +385,6 @@ def getpics(names, pics, tmpfold, picfold):
             name = name.replace(" ", "")
             name = name.replace("'", "")
             name = name.replace("/", "-")
-            # name = name.replace("ò", "o")
-            # name = name.replace("\u00f2","o")
-            # name = name.replace(".","")       #tester
         except:
             pass
         url = pics[j]
@@ -402,19 +394,9 @@ def getpics(names, pics, tmpfold, picfold):
         url = url.replace("ExQ", "=")
         # print("In getpics url =", url)
 #-----------------
-        # path = urlparse(url).path
-        # ext = splitext(path)[1]
         ext = str(os.path.splitext(url)[-1])
         picf = picfold + "/" + name + ext
         tpicf = tmpfold + "/" + name + ext
-        # temppic = tmpfold + "/" + name + ext
-#-----------------
-        # if ".png" in str(url):
-            # tpicf = tmpfold + "/" + name + ".png"
-            # picf = picfold + "/" + name + ".png"
-        # else:
-            # tpicf = tmpfold + "/" + name + ".jpg"
-            # picf = picfold + "/" + name + ".jpg"
 #-----------------
         if fileExists(picf):
             if ('Stagione') in str(name):
@@ -423,12 +405,11 @@ def getpics(names, pics, tmpfold, picfold):
             cmd = "cp " + picf + " " + tmpfold
             print("In getpics fileExists(picf) cmd =", cmd)
             os.system(cmd)
-
+#-----------------
         if fileExists(tpicf):
             if ('Stagione') in str(name):
                 cmd = "rm " + tpicf
                 os.system(cmd)
-
         if not fileExists(picf):
             if THISPLUG in url:
                 try:
@@ -461,7 +442,6 @@ def getpics(names, pics, tmpfold, picfold):
                     os.system(cmd)
 
         if not fileExists(tpicf):
-            # print("In getpics not fileExists(tpicf) tpicf=", tpicf)
             cmd = "cp " + defpic + " " + tpicf
             # print("In getpics not fileExists(tpicf) cmd=", cmd)
             os.system(cmd)
@@ -493,7 +473,6 @@ def getpics(names, pics, tmpfold, picfold):
                     im = im.resize((x,y), Image.ANTIALIAS)
                 im.save(tpicf, quality=100, optimize=True)
                 # im.save(tpicf)
-
 ##########################
         except:
             tpicf = defpic
@@ -524,13 +503,11 @@ class AnimMain(Screen):
         print("self.names =", names)
         print("self.urls =", urls)
         print("menuTitle =", menuTitle)
-        # print("infos =", infos)  
         print("nextmodule =", nextmodule)          
         nopic = len(names)
         self.pos = []
         self.index = 0
         title = menuTitle
-
         self["title"] = Button(title)
         self["pointer"] = Pixmap()
         self["info"] = Label()
@@ -539,9 +516,6 @@ class AnimMain(Screen):
         self["label3"] = StaticText()
         self["label4"] = StaticText()
         self["label5"] = StaticText()
-        # self["red"] = Button(_("Exit"))
-        # self["green"] = Button(_("Select"))
-        # self["yellow"] = Button(_("Config"))
         self["actions"] = NumberActionMap(["OkCancelActions", "EPGSelectActions", "MenuActions", "DirectionActions", "NumberActions", "ColorActions"],
         {
          "ok": self.okbuttonClick,
@@ -925,7 +899,6 @@ class GridMain(Screen):
         print("In Gridmain names 1= ", names)
         print("In Gridmain urls 1 = ", urls)
         print("In Gridmain pics 1= ", pics)
-        #print("In Gridmain infos 1= ", infos) 
         print("In Gridmain nextmodule = ", nextmodule)        
         title = menuTitle
         self["title"] = Button(title)
@@ -973,9 +946,7 @@ class GridMain(Screen):
         self["menu"] = List(list)
         for x in list:
            print("x in list =", x)
-
         self["frame"] = MovingPixmap()
-
         self["label1"] = StaticText()
         self["label2"] = StaticText()
         self["label3"] = StaticText()
@@ -992,7 +963,6 @@ class GridMain(Screen):
         self["label14"] = StaticText()
         self["label15"] = StaticText()
         self["label16"] = StaticText()
-
         self["pixmap1"] = Pixmap()
         self["pixmap2"] = Pixmap()
         self["pixmap3"] = Pixmap()
@@ -1009,7 +979,6 @@ class GridMain(Screen):
         self["pixmap14"] = Pixmap()
         self["pixmap15"] = Pixmap()
         self["pixmap16"] = Pixmap()
-
         self["actions"] = NumberActionMap(["OkCancelActions", "EPGSelectActions", "MenuActions", "DirectionActions", "NumberActions"],
             {
                 "ok": self.okClicked,
@@ -1124,7 +1093,6 @@ class GridMain(Screen):
         self.index = self.minentry
         print("self.minentry, self.index =", self.minentry, self.index)
         self.paintFrame()
-
 
     def key_left(self):
         self.index -= 1
@@ -1837,7 +1805,6 @@ class Videos4(Screen):
             "red": self.close,
             "green": self.okClicked,
         }, -1)
-
         self.name = name
         self.url = url
         self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
@@ -1931,7 +1898,6 @@ class nextVideos4(Screen):
             "red": self.close,
             "green": self.okClicked,
         }, -1)
-
         self.name = name
         self.url = url
         self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
@@ -2024,7 +1990,6 @@ class Videos5(Screen):
             "red": self.close,
             "green": self.okClicked,
         }, -1)
-
         self.name = name
         self.url = url
         self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
@@ -2517,12 +2482,11 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
             text_clear = self.name
             text = charRemove(text_clear)
             self.session.open(TMBD, text, False)
-        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+        elif fileExists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
             from Plugins.Extensions.IMDb.plugin import IMDB
             text_clear = self.name
             text = charRemove(text_clear)
-            HHHHH = text
-            self.session.open(IMDB, HHHHH)
+            self.session.open(IMDB, text)
         else:
             text_clear = self.name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
@@ -2660,10 +2624,10 @@ def charRemove(text):
 
 def main(session, **kwargs):
     _session = session
-    os.system("mkdir -p "+ config.plugins.tvspro.cachefold.value+"/tvspro")
-    os.system("mkdir -p "+ config.plugins.tvspro.cachefold.value+"/tvspro/vid")
-    os.system("mkdir -p "+ config.plugins.tvspro.cachefold.value+"/tvspro/pic")
-    os.system("mkdir -p "+ config.plugins.tvspro.cachefold.value+"/tvspro/tmp")
+    os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro")
+    os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro/vid")
+    os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro/pic")
+    os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro/tmp")
     exo = tvspromain(_session)
     exo.startSession()
 
