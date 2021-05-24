@@ -47,13 +47,13 @@ import sys
 # from Tools.LoadPixmap import LoadPixmap
 PY3 = sys.version_info[0] == 3
 if PY3:
-    from urllib.request import urlopen, Request, urlretrieve
+    from urllib.request import urlopen, Request
     from urllib.error import URLError, HTTPError
     from urllib.parse import urlparse, urlencode, quote
 else:
     from urllib2 import urlopen, Request, URLError, HTTPError
     from urlparse import urlparse
-    from urllib import urlencode, quote, urlretrieve
+    from urllib import urlencode, quote
 
 print('Py3: ',PY3)
 
@@ -1026,7 +1026,7 @@ class GridMain(Screen):
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
 
     def paintFrame(self):
-        inf = self.index
+        
         print("In paintFrame self.index, self.minentry, self.maxentry =", self.index, self.minentry, self.maxentry)
         # if self.maxentry < self.index or self.index < 0:
         #     return
@@ -1035,9 +1035,12 @@ class GridMain(Screen):
         print("ifr =", ifr)
         ipos = self.pos[ifr]
         print("ipos =", ipos)
-
-        self["info"].setText(self.infos[inf])
-        print('infos: ', inf)
+        
+        #key down crash end of list
+        inf = self.index
+        if inf is not None or inf != -1:
+            self["info"].setText(self.infos[inf])
+            print('infos: ', inf)
 
         self["frame"].moveTo( ipos[0], ipos[1], 1)
         self["frame"].startMoving()
@@ -1286,6 +1289,7 @@ class GridMain(Screen):
                 vid2 = nextVideos4(self.session, name, url)
                 vid2.startSession()
             except:
+                return
                 pass
 #-----------------
 #main exe
