@@ -885,7 +885,15 @@ class AnimMain(Screen):
                 vid2 = nextVideos4(self.session, name, url)
                 vid2.startSession()
             except:
-                pass
+                return
+                
+        else:
+            self.resetSearch()
+
+    def resetSearch(self):
+        global search
+        search = False
+       
 #-----------------
 #menupic
 class GridMain(Screen):
@@ -2457,7 +2465,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.setAspect(temp)
 
     def showinfo(self):
-        debug = True
+        # debug = True
         sTitle = ''
         sServiceref = ''
         try:
