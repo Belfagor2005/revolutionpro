@@ -55,14 +55,14 @@ else:
     from urlparse import urlparse
     from urllib import urlencode, quote
 
-print('Py3: ',PY3)
+# print('Py3: ',PY3)
 
 THISPLUG = '/usr/lib/enigma2/python/Plugins/Extensions/tvspro/'
 DESKHEIGHT = getDesktop(0).size().height()
 HD = getDesktop(0).size()
 
 def getversioninfo():
-    currversion = '1.0'
+    currversion = '1.1'
     version_file = THISPLUG + 'version'
     if os.path.exists(version_file):
         try:
@@ -74,7 +74,7 @@ def getversioninfo():
             pass
     return (currversion)
 currversion = getversioninfo()
-Version = currversion + ' - 15.05.2021'
+Version = currversion + ' - 08.06.2021'
 title_plug = '..:: TivuStream Pro Revolution V. %s ::..' % Version
 name_plug = 'TivuStream Pro Revolution'
 res_plugin_path = THISPLUG + 'res/'
@@ -137,6 +137,7 @@ if sslverify:
             return ctx
 
 def getUrl(url):
+    link = []
     print("Here in client2 getUrl url =", url)
     req = Request(url)
     req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
@@ -145,28 +146,8 @@ def getUrl(url):
     response.close()
     print("Here in client2 link =", link)
     return link
-
-# def getUrl(url):
-    # return[]
-    # try:
-        # import requests
-        # link = requests.get(url, headers = {'User-Agent': 'Mozilla/5.0'}).text
-        # return link
-    # except ImportError:
-        # req = Request(url)
-        # req.add_header('User-Agent', 'TVS')
-        # response = urlopen(req, None, 3)
-        # link = response.read()
-        # response.close()
-        # return link
-    # except:
-        # return
-    # return
-
 def getUrl2(url, referer):
-    # if PY3 == 3:
-        # # url = url.encode()
-        # url = six.binary_type(url,encoding="utf-8")
+    link = []
     print("Here in client2 getUrl2 url =", url)
     req = Request(url)
     req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
@@ -175,7 +156,6 @@ def getUrl2(url, referer):
     link=response.read()
     response.close()
     return link
-    # return checkStr(link)
 
 #config
 mdchoice = [
@@ -916,27 +896,27 @@ class GridMain(Screen):
         print("In Gridmain pics = ", pics)
         self.pos = []
         if HD.width() > 1280:
-            self.pos.append([48,94])
-            self.pos.append([408,94])
-            self.pos.append([778,94])
-            self.pos.append([1148,94])
-            self.pos.append([1516,94])
-            self.pos.append([48,544])
-            self.pos.append([408,544])
-            self.pos.append([778,544])
-            self.pos.append([1148,544])
-            self.pos.append([1516,544])
+            self.pos.append([30,24])
+            self.pos.append([396,24])
+            self.pos.append([764,24])
+            self.pos.append([1134,24])
+            self.pos.append([1504,24])
+            self.pos.append([30,468])
+            self.pos.append([396,468])
+            self.pos.append([764,468])
+            self.pos.append([1134,468])
+            self.pos.append([1504,468])
         else:
-            self.pos.append([20,50])
-            self.pos.append([266,50])
-            self.pos.append([510,50])
-            self.pos.append([750,50])
-            self.pos.append([990,50])
-            self.pos.append([20,350])
-            self.pos.append([266,350])
-            self.pos.append([510,350])
-            self.pos.append([750,350])
-            self.pos.append([990,350])
+            self.pos.append([14,5])
+            self.pos.append([260,5])
+            self.pos.append([504,5])
+            self.pos.append([744,5])
+            self.pos.append([984,5])
+            self.pos.append([14,305])
+            self.pos.append([260,305])
+            self.pos.append([504,305])
+            self.pos.append([744,305])
+            self.pos.append([984,305])
 
         print("self.pos =", self.pos)
 
@@ -1030,7 +1010,11 @@ class GridMain(Screen):
             HHHHH = text
             self.session.open(IMDB, HHHHH)
         else:
-            text_clear = name
+            inf = self.index
+            if inf is not None or inf != -1:
+                text_clear = self.infos[inf]
+            else:
+                text_clear = name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
 
     def paintFrame(self):
@@ -2188,10 +2172,24 @@ class Playstream1(Screen):
         self.name = self.names[idx]
         self.url = self.urls[idx]
 
+        # if "youtube" in str(self.url):
+            # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
+            # return
         if "youtube" in str(self.url):
-            self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
-            return
-
+            desc = self.name
+            # from youtube_dl import YoutubeDL
+            from Plugins.Extensions.tvspro.youtube_dl import YoutubeDL
+            '''
+            ydl_opts = {'format': 'best'}
+            ydl_opts = {'format': 'bestaudio/best'}
+            '''
+            ydl_opts = {'format': 'best'}
+            ydl = YoutubeDL(ydl_opts)
+            ydl.add_default_info_extractors()
+            result = ydl.extract_info(self.url, download=False)
+            url = result["url"]
+            self.session.open(Playstream2, self.name, url, desc)
+            
         if idx == 0:
             self.name = self.names[idx]
             self.url = self.urls[idx]
@@ -2517,24 +2515,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.servicetype = str(config.plugins.tvspro.services.value)# '4097'
         print('servicetype1: ', self.servicetype)
         url = str(self.url)
-
-        # if "youtube" in str(url):
-            # desc = self.name
-            # from youtube_dl import YoutubeDL
-            # '''
-            # ydl_opts = {'format': 'best'}
-            # ydl_opts = {'format': 'bestaudio/best'}
-            # '''
-            # ydl_opts = {'format': 'best'}
-            # ydl = YoutubeDL(ydl_opts)
-            # ydl.add_default_info_extractors()
-            # result = ydl.extract_info(url, download=False)
-            # url = result["url"]
-            # # self.session.open(Playstream2, name, url, desc)
-
-        if "youtube" in str(self.url):
-            self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
-            return
 
         currentindex = 0
         # streamtypelist = ["4097", "1"]
