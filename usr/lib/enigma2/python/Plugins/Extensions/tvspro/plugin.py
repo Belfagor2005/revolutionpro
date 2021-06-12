@@ -55,7 +55,7 @@ else:
     from urlparse import urlparse
     from urllib import urlencode, quote
 
-# print('Py3: ',PY3)
+print('Py3: ',PY3)
 
 THISPLUG = '/usr/lib/enigma2/python/Plugins/Extensions/tvspro/'
 DESKHEIGHT = getDesktop(0).size().height()
@@ -146,7 +146,28 @@ def getUrl(url):
     response.close()
     print("Here in client2 link =", link)
     return link
+
+# def getUrl(url):
+    # return[]
+    # try:
+        # import requests
+        # link = requests.get(url, headers = {'User-Agent': 'Mozilla/5.0'}).text
+        # return link
+    # except ImportError:
+        # req = Request(url)
+        # req.add_header('User-Agent', 'TVS')
+        # response = urlopen(req, None, 3)
+        # link = response.read()
+        # response.close()
+        # return link
+    # except:
+        # return
+    # return
+
 def getUrl2(url, referer):
+    # if PY3 == 3:
+        # # url = url.encode()
+        # url = six.binary_type(url,encoding="utf-8")
     link = []
     print("Here in client2 getUrl2 url =", url)
     req = Request(url)
@@ -156,6 +177,7 @@ def getUrl2(url, referer):
     link=response.read()
     response.close()
     return link
+    # return checkStr(link)
 
 #config
 mdchoice = [
@@ -2177,18 +2199,21 @@ class Playstream1(Screen):
             # return
         if "youtube" in str(self.url):
             desc = self.name
-            # from youtube_dl import YoutubeDL
-            from Plugins.Extensions.tvspro.youtube_dl import YoutubeDL
-            '''
-            ydl_opts = {'format': 'best'}
-            ydl_opts = {'format': 'bestaudio/best'}
-            '''
-            ydl_opts = {'format': 'best'}
-            ydl = YoutubeDL(ydl_opts)
-            ydl.add_default_info_extractors()
-            result = ydl.extract_info(self.url, download=False)
-            url = result["url"]
-            self.session.open(Playstream2, self.name, url, desc)
+            try:
+                # from youtube_dl import YoutubeDL
+                from Plugins.Extensions.tvspro.youtube_dl import YoutubeDL
+                '''
+                ydl_opts = {'format': 'best'}
+                ydl_opts = {'format': 'bestaudio/best'}
+                '''
+                ydl_opts = {'format': 'best'}
+                ydl = YoutubeDL(ydl_opts)
+                ydl.add_default_info_extractors()
+                result = ydl.extract_info(self.url, download=False)
+                self.url = result["url"]
+            except:
+                pass
+            self.session.open(Playstream2, self.name, self.url, desc)
             
         if idx == 0:
             self.name = self.names[idx]
