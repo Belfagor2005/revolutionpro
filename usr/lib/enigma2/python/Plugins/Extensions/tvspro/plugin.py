@@ -45,17 +45,16 @@ import six
 import sys
 # import urllib2
 # from Tools.LoadPixmap import LoadPixmap
-PY3 = sys.version_info[0] == 3
-if PY3:
-    from urllib.request import urlopen, Request
-    from urllib.error import URLError, HTTPError
-    from urllib.parse import urlparse, urlencode, quote
-else:
-    from urllib2 import urlopen, Request, URLError, HTTPError
-    from urlparse import urlparse
-    from urllib import urlencode, quote
-
+PY3 = sys.version_info.major >= 3
 print('Py3: ',PY3)
+from six.moves.urllib.request import urlopen
+from six.moves.urllib.request import Request
+from six.moves.urllib.error import HTTPError, URLError
+from six.moves.urllib.parse import urlparse
+from six.moves.urllib.parse import quote
+from six.moves.urllib.parse import urlencode
+import six.moves.urllib.request
+
 
 THISPLUG = '/usr/lib/enigma2/python/Plugins/Extensions/tvspro/'
 DESKHEIGHT = getDesktop(0).size().height()
@@ -80,7 +79,6 @@ name_plug = 'TivuStream Pro Revolution'
 res_plugin_path = THISPLUG + 'res/'
 skin_path = THISPLUG
 # Credits = 'Info http://t.me/tivustream'
-# Credits2 = 'Maintener @Lululla @Pcd'
 # dir_enigma2 = '/etc/enigma2/'
 # service_types_tv = '1:7:1:0:0:0:0:0:0:0:(type == 1) || (type == 17) || (type == 22) || (type == 25) || (type == 134) || (type == 195)'
 SREF = ""
@@ -121,11 +119,6 @@ except:
     sslverify = False
 
 if sslverify:
-    try:
-        from urlparse import urlparse
-    except:
-        from urllib.parse import urlparse
-
     class SNIFactory(ssl.ClientContextFactory):
         def __init__(self, hostname=None):
             self.hostname = hostname
@@ -165,9 +158,6 @@ def getUrl(url):
     # return
 
 def getUrl2(url, referer):
-    # if PY3 == 3:
-        # # url = url.encode()
-        # url = six.binary_type(url,encoding="utf-8")
     link = []
     print("Here in client2 getUrl2 url =", url)
     req = Request(url)
