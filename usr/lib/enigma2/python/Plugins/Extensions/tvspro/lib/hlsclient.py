@@ -29,23 +29,20 @@ import queue
 import os
 import re
 import operator
-
-PY3 = sys.version_info[0] == 3
-if PY3:
-    from urllib.request import urlopen, Request
-    from urllib.error import URLError, HTTPError
-    from urllib.parse import urlparse
-    from urllib.parse import urlencode, quote
-    from urllib.request import urlretrieve
-else:
-    from urllib2 import urlopen, Request
-    from urllib2 import URLError, HTTPError
-    from urlparse import urlparse
-    from urllib import urlencode, quote
-    from urllib import urlretrieve
-    
-# import urllib.parse, urllib.request, urllib.error, urllib.parse
-# import urlparse, urllib2
+import six
+from six.moves.urllib.request import urlopen
+from six.moves.urllib.request import Request
+from six.moves.urllib.error import HTTPError, URLError
+from six.moves.urllib.parse import urlparse
+from six.moves.urllib.parse import quote
+from six.moves.urllib.parse import urlencode
+from six.moves.urllib.parse import unquote
+from six.moves.urllib.parse import quote_plus
+from six.moves.urllib.parse import unquote_plus
+from six.moves.urllib.parse import parse_qs
+from six.moves.urllib.request import urlretrieve  
+from sys import version_info
+PY3 = sys.version_info.major >= 3
 
 
 SUPPORTED_VERSION = 3

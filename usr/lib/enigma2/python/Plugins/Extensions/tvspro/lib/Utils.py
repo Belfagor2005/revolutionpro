@@ -45,23 +45,27 @@ import os
 import re
 import socket
 import sys
+import six
+from six.moves.urllib.request import urlopen
+from six.moves.urllib.request import Request
+from six.moves.urllib.error import HTTPError, URLError
+from six.moves.urllib.parse import urlparse
+from six.moves.urllib.parse import quote
+from six.moves.urllib.parse import urlencode
+from six.moves.urllib.parse import unquote
+from six.moves.urllib.parse import quote_plus
+from six.moves.urllib.parse import unquote_plus
+from six.moves.urllib.parse import parse_qs
+from six.moves.urllib.request import urlretrieve  
+from sys import version_info
+PY3 = sys.version_info.major >= 3
 
-PY3 = sys.version_info[0] == 3
-if PY3:
+try
     from http.client import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
-    from urllib.parse import quote, unquote_plus, unquote
-    from urllib.request import Request, urlopen as urlopen2
-    from urllib.error import URLError
-    from urllib.request import urlopen
-    from urllib.parse import parse_qs
     import http.client
     import urllib.request, urllib.parse, urllib.error
-else:
+except:
     from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
-    from urllib import quote, unquote_plus, unquote
-    from urllib2 import Request, URLError, urlopen as urlopen2
-    from urllib2 import urlopen
-    from urlparse import parse_qs
     import httplib
     import urllib
     import urlparse

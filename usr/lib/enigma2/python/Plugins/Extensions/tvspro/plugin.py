@@ -686,7 +686,6 @@ class AnimMain(Screen):
                 dpointer = dblank
                 self["pointer"].instance.setPixmapFromFile(dpointer)
 
-
     def key_left(self):
         self.index -= 1
         if self.index < 1:
