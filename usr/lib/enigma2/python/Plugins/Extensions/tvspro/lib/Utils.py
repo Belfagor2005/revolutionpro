@@ -60,7 +60,7 @@ from six.moves.urllib.request import urlretrieve
 from sys import version_info
 PY3 = sys.version_info.major >= 3
 
-try
+try:
     from http.client import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
     import http.client
     import urllib.request, urllib.parse, urllib.error
@@ -945,8 +945,6 @@ class Playvid2X(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotificati
     def keyNumberGlobal(self, number):
         self["text"].number(number)
 
-
-
 class downloadJob(Job):
         def __init__(self, toolbox, cmdline, filename, filetitle):
                 Job.__init__(self, _("Saving Video"))
@@ -1019,7 +1017,6 @@ def RSListEntry(download):
     # col = 16777215
     # backcol = 0
     # blue = 4282611429
-
     white = 0xffffff
     grey = 0xb3b3b9
     green = 0x389416
@@ -1042,39 +1039,6 @@ def RSListEntry(download):
         res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=2, text=download, color=col, color_sel = colsel, backcolor = backcol, backcolor_sel = backcol))
         # res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=2, text=download, color = 0xa6d1fe, flags=RT_HALIGN_LEFT))# | RT_VALIGN_CENTER
     return res
-
-# class RSList(MenuList):
-	# def __init__(self, list):
-		# MenuList.__init__(self, list, True, eListboxPythonMultiContent)
-                # DESKHEIGHT = getDesktop(0).size().height()
-		# if DESKHEIGHT > 1000:
-		       # self.l.setItemHeight(100)
-		       # textfont = int(40)
-		# else:
-		       # self.l.setItemHeight(100)
-		       # textfont = int(25)
-                # self.l.setFont(0, gFont("Regular", textfont))
-
-# def RSListEntry(download):
-	# res = [(download)]
-
-        # white = 0xffffff
-        # grey = 0xb3b3b9
-        # green = 0x389416
-        # black = 0x000000
-        # yellow = 0xe5b243
-        # blue = 0x002d39
-        # red = 0xf07655
-        # col = int("0xffffff", 16)
-        # colsel = int("0xf07655", 16)
-        # backcol = int("0x000000", 16)
-        # backsel = int("0x000000", 16)
-# #        res.append(MultiContentEntryText(pos=(0, 0), size=(650, 40), text=download, color=col, color_sel = colsel, backcolor = backcol, backcolor_sel = backcol))
-# ##        res.append(MultiContentEntryText(pos=(0, 0), size=(1000, 40), text=download, color=col, color_sel = colsel, backcolor = backcol, backcolor_sel = backcol))
-        # res.append(MultiContentEntryText(pos=(0, 0), size=(1700, 40), text=download, color=col, color_sel = colsel, backcolor = backcol, backcolor_sel = backcol))
-
-        # return res
-
 
 def showlist(data, list):
         icount = 0

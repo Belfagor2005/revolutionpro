@@ -47,21 +47,25 @@ import socket
 import sys
 
 PY3 = sys.version_info[0] == 3
-if PY3:
+import six
+from six.moves.urllib.request import urlopen
+from six.moves.urllib.request import Request
+from six.moves.urllib.error import HTTPError, URLError
+from six.moves.urllib.parse import urlparse
+from six.moves.urllib.parse import quote
+from six.moves.urllib.parse import urlencode
+from six.moves.urllib.parse import unquote
+from six.moves.urllib.parse import quote_plus
+from six.moves.urllib.parse import unquote_plus
+from six.moves.urllib.parse import parse_qs
+from six.moves.urllib.request import urlretrieve 
+
+try:
     from http.client import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
-    from urllib.parse import quote, unquote_plus, unquote
-    from urllib.request import Request, urlopen as urlopen2
-    from urllib.error import URLError
-    from urllib.request import urlopen
-    from urllib.parse import parse_qs
     import http.client
     import urllib.request, urllib.parse, urllib.error
-else:
+except:
     from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
-    from urllib import quote, unquote_plus, unquote
-    from urllib2 import Request, URLError, urlopen as urlopen2
-    from urllib2 import urlopen
-    from urlparse import parse_qs
     import httplib
     import urllib
     import urlparse
@@ -878,8 +882,6 @@ class Playvid2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotificatio
     def keyNumberGlobal(self, number):
         self["text"].number(number)
 
-
-
 class downloadJob(Job):
        def __init__(self, toolbox, cmdline, filename, filetitle):
               Job.__init__(self, _("Saving Video"))
@@ -924,7 +926,6 @@ class downloadTask(Task):
         def afterRun(self):
               pass
 
-#################
 class RSList(MenuList):
 
     def __init__(self, list):
@@ -952,7 +953,6 @@ def RSListEntry(download):
     # col = 16777215
     # backcol = 0
     # blue = 4282611429
-
     white = 0xffffff
     grey = 0xb3b3b9
     green = 0x389416
@@ -969,47 +969,12 @@ def RSListEntry(download):
     if DESKHEIGHT > 1000:
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(60, 0), size=(1200, 50), font=7, text=download, color=col, color_sel = colsel, backcolor = backcol, backcolor_sel = backcol))
-
         # res.append(MultiContentEntryText(pos=(60, 0), size=(1200, 50), font=7, text=download, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 6), size=(34, 25), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=2, text=download, color=col, color_sel = colsel, backcolor = backcol, backcolor_sel = backcol))
         # res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=2, text=download, color = 0xa6d1fe, flags=RT_HALIGN_LEFT))# | RT_VALIGN_CENTER
     return res
-
-
-# class RSList(MenuList):
-	# def __init__(self, list):
-		# MenuList.__init__(self, list, True, eListboxPythonMultiContent)
-                # DESKHEIGHT = getDesktop(0).size().height()
-		# if DESKHEIGHT > 1000:
-		       # self.l.setItemHeight(100)
-		       # textfont = int(40)
-		# else:
-		       # self.l.setItemHeight(100)
-		       # textfont = int(25)
-                # self.l.setFont(0, gFont("Regular", textfont))
-
-# def RSListEntry(download):
-	# res = [(download)]
-
-        # white = 0xffffff
-        # grey = 0xb3b3b9
-        # green = 0x389416
-        # black = 0x000000
-        # yellow = 0xe5b243
-        # blue = 0x002d39
-        # red = 0xf07655
-        # col = int("0xffffff", 16)
-        # colsel = int("0xf07655", 16)
-        # backcol = int("0x000000", 16)
-        # backsel = int("0x000000", 16)
-# #        res.append(MultiContentEntryText(pos=(0, 0), size=(650, 40), text=download, color=col, color_sel = colsel, backcolor = backcol, backcolor_sel = backcol))
-# ##        res.append(MultiContentEntryText(pos=(0, 0), size=(1000, 40), text=download, color=col, color_sel = colsel, backcolor = backcol, backcolor_sel = backcol))
-        # res.append(MultiContentEntryText(pos=(0, 0), size=(1700, 40), text=download, color=col, color_sel = colsel, backcolor = backcol, backcolor_sel = backcol))
-
-        # return res
-
 
 def showlist(data, list):
          icount = 0
@@ -1020,9 +985,6 @@ def showlist(data, list):
               icount = icount+1
 
          list.setList(plist)
-
-
-
 
 def getserviceinfo(sref):## this def returns the current playing service name and stream_url from give sref
     try:
