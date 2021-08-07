@@ -5,7 +5,7 @@ Info http://t.me/tivustream
 ****************************************
 *        coded by Lululla              *
 *           thank's Pcd                *
-*             11/06/2021               *
+*             07/08/2021               *
 ****************************************
 '''
 from __future__ import print_function
@@ -43,10 +43,7 @@ import glob
 import json
 import six
 import sys
-# import urllib2
-# from Tools.LoadPixmap import LoadPixmap
 PY3 = sys.version_info.major >= 3
-print('Py3: ',PY3)
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.request import Request
 from six.moves.urllib.error import HTTPError, URLError
@@ -56,6 +53,8 @@ from six.moves.urllib.parse import urlencode
 import six.moves.urllib.request
 
 
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36',
+       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', 'Accept-Encoding': 'deflate'}
 THISPLUG = '/usr/lib/enigma2/python/Plugins/Extensions/tvspro/'
 DESKHEIGHT = getDesktop(0).size().height()
 HD = getDesktop(0).size()
@@ -72,27 +71,30 @@ def getversioninfo():
         except:
             pass
     return (currversion)
+global defpic, dblank
 currversion = getversioninfo()
-Version = currversion + ' - 08.06.2021'
+Version = currversion + ' - 07.08.2021'
 title_plug = '..:: TivuStream Pro Revolution V. %s ::..' % Version
 name_plug = 'TivuStream Pro Revolution'
 res_plugin_path = THISPLUG + 'res/'
 skin_path = THISPLUG
+folder_path = "/tmp/tvspro/"
+if not os.path.exists(folder_path):
+    os.makedirs(folder_path)
 # Credits = 'Info http://t.me/tivustream'
+# Credits2 = 'Maintener @Lululla @Pcd'
 # dir_enigma2 = '/etc/enigma2/'
 # service_types_tv = '1:7:1:0:0:0:0:0:0:0:(type == 1) || (type == 17) || (type == 22) || (type == 25) || (type == 134) || (type == 195)'
 SREF = ""
 
 def checkStr(txt):
-    if PY3:
+    if six.PY3:
         if isinstance(txt, type(bytes())):
             txt = txt.decode('utf-8')
     else:
         if isinstance(txt, type(six.text_type())):
             txt = txt.encode('utf-8')
     return txt
-######
-global defpic, dblank
 
 eDreamOS = False
 try:
@@ -117,8 +119,11 @@ try:
     sslverify = True
 except:
     sslverify = False
-
 if sslverify:
+    try:
+        from urlparse import urlparse
+    except:
+        from urllib.parse import urlparse
     class SNIFactory(ssl.ClientContextFactory):
         def __init__(self, hostname=None):
             self.hostname = hostname
@@ -129,33 +134,57 @@ if sslverify:
                 ClientTLSOptions(self.hostname, ctx)
             return ctx
 
+
+def getJsonURL(url):
+    # request = urllib2.Request(url)
+    request = Request(url)
+    # request.add_header('User-Agent', 'TVS PRO')
+    req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+    request.add_header('Accept-Encoding', 'gzip')
+    response = urlopen(request, timeout=30)
+    # response = checkStr(urlopen(request, timeout=ntimeout))
+    gzipped = response.info().get('Content-Encoding') == 'gzip'
+    data = '' #[]
+    dec_obj = zlib.decompressobj(16 + zlib.MAX_WBITS)
+    while True:
+        res_data = response.read()
+        if not res_data:
+            break
+        if gzipped:
+            """
+            data += dec_obj.decompress(res_data)
+        else:
+            data += res_data
+            """
+            data += dec_obj.decompress(res_data)
+        else:
+            data += res_data
+    return json.loads(data)
+
 def getUrl(url):
     link = []
-    print("Here in client2 getUrl url =", url)
-    req = Request(url)
-    req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-    response = urlopen(req)
-    link=response.read()
-    response.close()
-    print("Here in client2 link =", link)
-    return link
-
-# def getUrl(url):
-    # return[]
-    # try:
-        # import requests
-        # link = requests.get(url, headers = {'User-Agent': 'Mozilla/5.0'}).text
-        # return link
-    # except ImportError:
-        # req = Request(url)
+    try:
+        import requests
+        if six.PY3:
+            url = url.encode()
+        link = requests.get(url, headers = {'User-Agent': 'Mozilla/5.0'}).text
+        # link = requests.get(url, headers = headers).text
+        return link
+    except ImportError:
+        print("Here in client2 getUrl url =", url)
+        if six.PY3:
+            url = url.encode()
+        req = Request(url)
         # req.add_header('User-Agent', 'TVS')
-        # response = urlopen(req, None, 3)
-        # link = response.read()
-        # response.close()
-        # return link
-    # except:
-        # return
-    # return
+        req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+        response = urlopen(req, None, 3)
+        link=response.read()
+        response.close()
+        print("Here in client2 link =", link)
+        return link
+    except:
+        return
+    return
 
 def getUrl2(url, referer):
     link = []
@@ -167,8 +196,6 @@ def getUrl2(url, referer):
     link=response.read()
     response.close()
     return link
-    # return checkStr(link)
-
 #config
 mdchoice = [
             ("4097", _("IPTV(4097)")),
@@ -416,9 +443,9 @@ def getpics(names, pics, tmpfold, picfold):
                         n3 = url.find("|", 0)
                         n1 = url.find("Referer", n3)
                         n2 = url.find("=", n1)
-                        url1 = url[:n3]
+                        url = url[:n3]
                         referer = url[n2:]
-                        p = getUrl2(url1, referer)
+                        p = getUrl2(url, referer)
                         #-----------------
                         f1=open(tpicf,"wb")
                         f1.write(p)
@@ -495,7 +522,7 @@ class AnimMain(Screen):
         print("self.names =", names)
         print("self.urls =", urls)
         print("menuTitle =", menuTitle)
-        print("nextmodule =", nextmodule)          
+        print("nextmodule =", nextmodule)
         nopic = len(names)
         self.pos = []
         self.index = 0
@@ -624,10 +651,6 @@ class AnimMain(Screen):
         return namen
 
     def openTest(self):
-        # infos epg no work on play movie last click ok  !!! mistery!
-        # inf = self.index
-        # self["info"].setText(self.infos[inf])
-        
         print("Here in openTest self.index, self.names =", self.index, self.names)
         i = self.index
         print("Here in openTest i =", i)
@@ -675,7 +698,7 @@ class AnimMain(Screen):
                 dpointer = res_plugin_path + "pics/pointerL.png"
                 self["pointer"].instance.setPixmapFromFile(dpointer)
             else:
-                dpointer = dblank 
+                dpointer = dblank
                 self["pointer"].instance.setPixmapFromFile(dpointer)
         else:
             if self.nop > 5:
@@ -728,8 +751,6 @@ class AnimMain(Screen):
             return
 
     def keyNumberGlobal(self, number):
-        ##print "menu keyNumber:", number
-        # Calculate index
         number -= 1
         if len(self["menu"].list) > number:
             self["menu"].setIndex(number)
@@ -743,18 +764,11 @@ class AnimMain(Screen):
         else:
             idx = self.index - 1
         print("In AnimMain okbuttonClick idx =", idx)
-        """
-        selection = self.tlist[idx]
-        print "selection =", selection
-        if selection is not None:
-            selection[1]()
-        """
         name = self.names[idx]
         try:
             url = self.urls[idx]
         except:
             url = " "
-
         if name == "Config":
             self.session.open(ConfigEx)
 
@@ -829,6 +843,7 @@ class AnimMain(Screen):
         elif self.nextmodule == "Videos2":
             print("In animeMain Going in Videos2 name =", name)
             print("In animeMain Going in Videos2 url =", url)
+            print("In AnimMain Going in Nextmodule")
             try:
                 vid2 = Videos2(self.session, name, url)
                 vid2.startSession()
@@ -870,21 +885,20 @@ class AnimMain(Screen):
         if result:
             global search
             search = False
-            name = str(result) #self.namex
+            name = str(result)
             url = self.urlx + str(result)
             try:
                 vid2 = nextVideos4(self.session, name, url)
                 vid2.startSession()
             except:
                 return
-                
         else:
             self.resetSearch()
 
     def resetSearch(self):
         global search
         search = False
-       
+
 #-----------------
 #menupic
 class GridMain(Screen):
@@ -898,7 +912,7 @@ class GridMain(Screen):
         print("In Gridmain names 1= ", names)
         print("In Gridmain urls 1 = ", urls)
         print("In Gridmain pics 1= ", pics)
-        print("In Gridmain nextmodule = ", nextmodule)        
+        print("In Gridmain nextmodule = ", nextmodule)
         title = menuTitle
         self["title"] = Button(title)
         tmpfold = config.plugins.tvspro.cachefold.value + "/tvspro/tmp"
@@ -934,9 +948,9 @@ class GridMain(Screen):
         self.name = menuTitle
         self.nextmodule = nextmodule
 
-        self.urls1 = urls
+        self.urls = urls
         self.pics = pics
-        self.names1 = names
+        self.names = names
         self.infos = infos
         self["info"] = Label()
 
@@ -994,7 +1008,7 @@ class GridMain(Screen):
         self.index = 0
         self.ipage = 1
         self.icount = 0
-        ln = len(self.names1)
+        ln = len(self.names)
         self.npage = int(float(ln/10)) + 1
         print("self.npage =", self.npage)
         print("Going in openTest")
@@ -1008,7 +1022,7 @@ class GridMain(Screen):
 
     def showIMDB(self):
         itype = self.index
-        name = self.names1[itype]
+        name = self.names[itype]
         if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
             from Plugins.Extensions.TMBD.plugin import TMBD
             text_clear = name
@@ -1029,32 +1043,24 @@ class GridMain(Screen):
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
 
     def paintFrame(self):
-        
         print("In paintFrame self.index, self.minentry, self.maxentry =", self.index, self.minentry, self.maxentry)
-        # if self.maxentry < self.index or self.index < 0:
-        #     return
         print("In paintFrame self.ipage = ", self.ipage)
         ifr = self.index - (10*(self.ipage-1))
         print("ifr =", ifr)
         ipos = self.pos[ifr]
         print("ipos =", ipos)
-        
-        #key down crash end of list
         inf = self.index
         if inf is not None or inf != -1:
             self["info"].setText(self.infos[inf])
             print('infos: ', inf)
-
         self["frame"].moveTo( ipos[0], ipos[1], 1)
         self["frame"].startMoving()
-
 
     def openTest(self):
         print("self.index, openTest self.ipage, self.npage =", self.index, self.ipage, self.npage)
         if self.ipage < self.npage:
             self.maxentry = (10*self.ipage)-1
             self.minentry = (self.ipage-1)*10
-            #self.index 0-11
             print("self.ipage , self.minentry, self.maxentry =", self.ipage, self.minentry, self.maxentry)
 
         elif self.ipage == self.npage:
@@ -1063,7 +1069,7 @@ class GridMain(Screen):
             self.minentry = (self.ipage-1)*10
             print("self.ipage , self.minentry, self.maxentry B=", self.ipage, self.minentry, self.maxentry)
             i1 = 0
-            blpic = dblank #THISPLUG + "res/pics/blank.png"
+            blpic = dblank
             while i1 < 12:
                 self["label" + str(i1+1)].setText(" ")
                 self["pixmap" + str(i1+1)].instance.setPixmapFromFile(blpic)
@@ -1079,9 +1085,8 @@ class GridMain(Screen):
         while i < ln:
             idx = self.minentry + i
             print("i, idx =", i, idx)
-
-            print("self.names1[idx] B=", self.names1[idx])
-            self["label" + str(i+1)].setText(self.names1[idx])
+            print("self.names[idx] B=", self.names[idx])
+            self["label" + str(i+1)].setText(self.names[idx])
             print("idx, self.pics[idx]", idx, self.pics[idx])
             pic = self.pics[idx]
             print("pic =", pic)
@@ -1089,7 +1094,6 @@ class GridMain(Screen):
                 print("pic path exists")
             else:
                 print("pic path exists not")
-
             picd = defpic
             try:
                 self["pixmap" + str(i+1)].instance.setPixmapFromFile(pic) #ok
@@ -1120,25 +1124,17 @@ class GridMain(Screen):
     def key_up(self):
         print("keyup self.index, self.minentry = ", self.index, self.minentry)
         self.index = self.index - 5
-        #   if self.index < 0:
-        #       self.index = self.maxentry
-        #       self.paintFrame()
         print("keyup self.index, self.minentry 2 = ", self.index, self.minentry)
         print("keyup self.ipage = ", self.ipage)
         if self.index < (self.minentry):
             if self.ipage > 1:
                 self.ipage = self.ipage - 1
                 self.openTest()
-        ##  self.paintFrame()
             elif self.ipage == 1:
-        #   self.close()
-                return #edit lululla
-                # self.paintFrame()
+                return
             else:
-                # return
                self.paintFrame()
         else:
-            # return
            self.paintFrame()
 
     def key_down(self):
@@ -1146,17 +1142,14 @@ class GridMain(Screen):
         self.index = self.index + 5
         print("keydown self.index, self.maxentry 2= ", self.index, self.maxentry)
         print("keydown self.ipage = ", self.ipage)
-
         if self.index > (self.maxentry):
             if self.ipage < self.npage:
                 self.ipage = self.ipage + 1
                 self.openTest()
-
             elif self.ipage == self.npage:
                 self.index = 0
                 self.ipage = 1
                 self.openTest()
-
             else:
                 print("keydown self.index, self.maxentry 3= ", self.index, self.maxentry)
                 self.paintFrame()
@@ -1165,8 +1158,8 @@ class GridMain(Screen):
 
     def okClicked(self):
         itype = self.index
-        url = self.urls1[itype]
-        name = self.names1[itype]
+        url = self.urls[itype]
+        name = self.names[itype]
         print("In GridMain name =", name)
         print("In GridMain self.nextmodule =", self.nextmodule)
 
@@ -1178,19 +1171,18 @@ class GridMain(Screen):
 
         elif 'Search' in str(name):
             search = True
-            # from Screens.VirtualKeyBoard import VirtualKeyBoard
             print('Search go movie: ', search)
             self.search_text(name, url)
 
         elif '&page' in str(url) and self.nextmodule == 'Videos1':
-            print("In AnimMain Going in Videos1")
+            print("In GridMain Going in Videos1")
             try:
                 vid2 = nextVideos1(self.session, name, url)
                 vid2.startSession()
             except:
                 pass
         elif '&page' not in str(url) and self.nextmodule == 'Videos1':
-            print('video1 and play next sss  ', self.nextmodule)
+            print('In GridMain video1 and play next sss  ', self.nextmodule)
             if 'tvseriesId' in str(url):
                 try:
                     vid2 = Videos6(self.session, name, url) #atv 6.5
@@ -1198,11 +1190,11 @@ class GridMain(Screen):
                 except:
                     pass
             else:
-                print('video1 and play next xx : ', self.nextmodule)
+                print('In GridMain video1 and play next xx : ', self.nextmodule)
                 self.session.open(Playstream1, name, url)
 
         elif '&page' in str(url) and self.nextmodule == 'Videos4' :
-                print("AnimMain Going in nextVideos4")
+                print("In GridMain Going in nextVideos4")
                 try:
                     vid2 = nextVideos4(self.session, name, url)
                     vid2.startSession()
@@ -1210,7 +1202,7 @@ class GridMain(Screen):
                     pass
 
         elif 'listMovie' in str(url) and self.nextmodule == 'Videos4':
-            print("AnimMain Going listmovie in Videos4")
+            print("In GridMain Going listmovie in Videos4")
             try:
                 vid2 = Videos4(self.session, name, url)
                 vid2.startSession()
@@ -1218,7 +1210,7 @@ class GridMain(Screen):
                 pass
 
         elif 'movieId' in str(url) : # and self.nextmodule == 'Videos4':
-            print('AnimMain videos5 moveid')
+            print('In GridMain videos5 moveid')
             try:
                 vid2 = Videos5(self.session, name, url)
                 vid2.startSession()
@@ -1226,7 +1218,7 @@ class GridMain(Screen):
                 pass
 
         elif self.nextmodule == "Play":
-            print("In AnimMain Going in Playstream1")
+            print("In GridMain Going in Playstream1")
             try:
                 desc = " "
                 self.session.open(Playstream1, name, url)
@@ -1234,7 +1226,7 @@ class GridMain(Screen):
                 pass
 
         elif self.nextmodule == "PlaySeries":
-            print("In AnimMain Going in PlaySeries")
+            print("In GridMain Going in PlaySeries")
             try:
                 desc = " "
                 vid2 = Videos4(self.session, name, url)
@@ -1243,8 +1235,9 @@ class GridMain(Screen):
                 pass
 
         elif self.nextmodule == "Videos2":
-            print("In animeMain Going in Videos2 name =", name)
-            print("In animeMain Going in Videos2 url =", url)
+            print("In GridMain Going in Videos2 name =", name)
+            print("In GridMain Going in Videos2 url =", url)
+            print("In GridMain Going in Nextmodule")
             try:
                 vid2 = Videos2(self.session, name, url)
                 vid2.startSession()
@@ -1252,7 +1245,7 @@ class GridMain(Screen):
                 pass
 
         elif self.nextmodule == "Videos3":
-            print("In AnimMain Going in Videos3")
+            print("In GridMain Going in Videos3")
             try:
                 vid2 = Videos3(self.session, name, url)
                 vid2.startSession()
@@ -1260,7 +1253,7 @@ class GridMain(Screen):
                 pass
 
         elif self.nextmodule == "Videos4":
-            print("in AnimMain Going in Videos4")
+            print("In GridMain Going in Videos4")
             try:
                 vid2 = Videos4(self.session, name, url)
                 vid2.startSession()
@@ -1268,7 +1261,7 @@ class GridMain(Screen):
                 pass
 
         elif self.nextmodule == "Videos5":
-            print("In AnimMain Going in Videos5")
+            print("In GridMain Going in Videos5")
             try:
                 vid2 = Videos5(self.session, name, url)
                 vid2.startSession()
@@ -1359,6 +1352,108 @@ class tvspromain(Screen):
             self.session.nav.playService(SREF)
             self.close()
 
+class Videos2(Screen):
+    def __init__(self, session, name, url):
+        Screen.__init__(self, session)
+        self.list = []
+        self["menu"] = List(self.list)
+        self["menu"] = RSList([])
+        self["title"] = Button(name)
+        self["info"] = Label()
+        self["info"].setText(title_plug)
+        self["pixmap"] = Pixmap()
+        self["key_red"] = Button(_("Cancel"))
+        self["key_green"] = Button(_("Select"))
+        self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
+        {
+            "ok": self.okClicked,
+            "back": self.close,
+            "red": self.close,
+            "green": self.okClicked,
+        }, -1)
+        self.name = name
+        self.url = url
+        self.onLayoutFinish.append(self.startSession)
+
+    def startSession(self):
+        # if "Live" in self.name:
+            # nextmodule = "Videos3"
+        # elif "Film" in self.name:
+            # nextmodule = "Videos4"
+        # elif "Serie" in self.name:
+            # nextmodule = "Videos1"
+        # print('nextmodule video 2 = ', nextmodule)               
+        # title = name_plug
+        self.names = []
+        self.urls = []
+        self.pics = []
+        self.infos = []
+        url = self.url
+        print("Videos2 url =", url)
+
+
+
+
+        content = getUrl(url)
+        if six.PY3:
+            content = six.ensure_str(content)
+            print("In Videos2 content =", content)
+        #content = six.ensure_str(content)
+
+
+
+
+
+
+
+        # print("In Videos2 content =", content)
+        y = json.loads(content)
+        i = 0
+        while i<100:
+            try:
+                print('In Videos2 y["items"][i]["title"] =', y["items"][i]["title"])
+                name = (y["items"][i]["title"])
+                n1 = name.find("]", 0)
+                n2 = name.find("[", n1)
+                name = name[(n1+1):n2]
+                print("In Videos2 name =", name)
+                url = (y["items"][i]["externallink"])
+                url = url.replace("\\", "")
+                pic = (y["items"][i]["thumbnail"])
+                info = (y["items"][i]["info"])
+                # print("In Videos2 info =", info)
+                # print('name', name)
+                # print('url', url)
+                # print('pic', pic)
+                info = info.replace("\r\n","")
+                self.names.append(checkStr(name))
+                self.urls.append(checkStr(url))
+                self.pics.append(checkStr(pic))
+                self.infos.append(checkStr(info))
+                i = i+1
+            except:
+                break
+        title = name_plug
+        if "Live" in self.name:
+            nextmodule = "Videos3"
+        elif "Film" in self.name:
+            nextmodule = "Videos4"
+        elif "Serie" in self.name:
+            nextmodule = "Videos1"
+
+        print("In Videos2 config.plugins.tvspro.thumb.value =", config.plugins.tvspro.thumb.value)
+        if config.plugins.tvspro.thumb.value == "True":
+            print("In Videos2 Going in GridMain")
+            self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics = self.pics)
+        else:
+            self.session.open(AnimMain, title, nextmodule, self.names, self.urls, self.infos, pics = self.pics)
+
+    def okClicked(self):
+        pass
+
+
+
+
 class Videos6(Screen):
     def __init__(self, session, name, url):
         Screen.__init__(self, session)
@@ -1383,27 +1478,32 @@ class Videos6(Screen):
         self.onLayoutFinish.append(self.startSession)
 
     def startSession(self):
-        url = self.url
-        print("Videos1 url =", url)
+        title = name_plug
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
+        url = self.url
+        print("Videos1 url =", url)
         content = getUrl(url)
-        ###py3
         #content = six.ensure_str(content)
-        # print("In Videos1 content =", content)
+
+
+
+
+
+
+        # print("In Videos6 content =", content)
         y = json.loads(content)
         i = 0
-        #[COLOR yellow]Umbria[\/COLOR]
         while i<100:
             try:
-                print('In getVideos y["items"][i]["title"] =', y["items"][i]["title"])
+                print('In Videos6 y["items"][i]["title"] =', y["items"][i]["title"])
                 name = (y["items"][i]["title"])
                 n1 = name.find("]", 0)
                 n2 = name.find("[", n1)
                 name = name[(n1+1):n2]
-                print("In Videos1 name =", name)
+                print("In Videos6 name =", name)
                 try:
                     url = (y["items"][i]["link"])
                 except:
@@ -1412,31 +1512,23 @@ class Videos6(Screen):
                 url = url.replace("\\", "")
                 pic = (y["items"][i]["thumbnail"])
                 info = (y["items"][i]["info"])
-                print("In Videos4 info =", info)
-                # name = name.encode('ascii','ignore')
-                # url = url.encode('ascii','ignore')
-                # pic = pic.encode('ascii','ignore')
-                # if PY3:
-                    # name = name.decode("utf-8")
-                    # url = url.decode("utf-8")
-                    # pic = pic.decode("utf-8")
-                    # print('name', name)
-                    # print('url', url)
-                    # print('pic', pic)
+                # print("In Videos6 info =", info)
+                # print('name', name)
+                # print('url', url)
+                # print('pic', pic)
                 info = info.replace("\r\n","")
-                self.names.append(str(name))
-                self.urls.append(str(url))
-                self.pics.append(str(pic))
-                self.infos.append(str(info))
+                self.names.append(checkStr(name))
+                self.urls.append(checkStr(url))
+                self.pics.append(checkStr(pic))
+                self.infos.append(checkStr(info))
                 i = i+1
             except:
                 break
-        title = name_plug
         # nextmodule = "Play"
         nextmodule = "Videos1"
-        print("In Videos1 config.plugins.tvspro.thumb.value =", config.plugins.tvspro.thumb.value)
+        print("In Videos6 config.plugins.tvspro.thumb.value =", config.plugins.tvspro.thumb.value)
         if config.plugins.tvspro.thumb.value == "True":
-            print("In Videos1 Going in GridMain")
+            print("In Videos6 Going in GridMain")
             self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics = self.pics)
         else:
             self.session.open(AnimMain, title, nextmodule, self.names, self.urls, self.infos, pics = self.pics)
@@ -1468,19 +1560,17 @@ class Videos1(Screen):
         self.onLayoutFinish.append(self.startSession)
 
     def startSession(self):
-        url = self.url
-        print("Videos1 url =", url)
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
+        url = self.url
+        print("Videos1 url =", url)
         content = getUrl(url)
-        ###py3
         #content = six.ensure_str(content)
         # print("In Videos1 content =", content)
         y = json.loads(content)
         i = 0
-        #[COLOR yellow]Umbria[\/COLOR]
         while i<100:
             try:
                 print('In getVideos y["items"][i]["title"] =', y["items"][i]["title"])
@@ -1497,22 +1587,15 @@ class Videos1(Screen):
                 url = url.replace("\\", "")
                 pic = (y["items"][i]["thumbnail"])
                 info = (y["items"][i]["info"])
-                print("In Videos4 info =", info)
-                # name = name.encode('ascii','ignore')
-                # url = url.encode('ascii','ignore')
-                # pic = pic.encode('ascii','ignore')
-                # if PY3:
-                    # name = name.decode("utf-8")
-                    # url = url.decode("utf-8")
-                    # pic = pic.decode("utf-8")
-                    # print('name', name)
-                    # print('url', url)
-                    # print('pic', pic)
+                # print("In Videos1 info =", info)
+                # print('name', name)
+                # print('url', url)
+                # print('pic', pic)
                 info = info.replace("\r\n","")
-                self.names.append(str(name))
-                self.urls.append(str(url))
-                self.pics.append(str(pic))
-                self.infos.append(str(info))
+                self.names.append(checkStr(name))
+                self.urls.append(checkStr(url))
+                self.pics.append(checkStr(pic))
+                self.infos.append(checkStr(info))
                 i = i+1
             except:
                 break
@@ -1553,26 +1636,25 @@ class nextVideos1(Screen):
         self.onLayoutFinish.append(self.startSession)
 
     def startSession(self):
-        url = self.url
-        print("Videos1 url =", url)
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
+        url = self.url
+        print("nextVideos1 url =", url)
         content = getUrl(url)
-        #py3
         #content = six.ensure_str(content)
-        # print("In Videos1 content =", content)
+        # print("In nextVideos1 content =", content)
         y = json.loads(content)
         i = 0
         while i<100:
             try:
-                print('In getVideos y["items"][i]["title"] =', y["items"][i]["title"])
+                print('In nextVideos1 y["items"][i]["title"] =', y["items"][i]["title"])
                 name = (y["items"][i]["title"])
                 n1 = name.find("]", 0)
                 n2 = name.find("[", n1)
                 name = name[(n1+1):n2]
-                print("In Videos1 name =", name)
+                print("In nextVideos1 name =", name)
                 try:
                     url = (y["items"][i]["link"])
                 except:
@@ -1581,117 +1663,24 @@ class nextVideos1(Screen):
                 url = url.replace("\\", "")
                 pic = (y["items"][i]["thumbnail"])
                 info = (y["items"][i]["info"])
-                print("In Videos4 info =", info)
-                # name = name.encode('ascii','ignore')
-                # url = url.encode('ascii','ignore')
-                # pic = pic.encode('ascii','ignore')
-                # if PY3:
-                    # name = name.decode("utf-8")
-                    # url = url.decode("utf-8")
-                    # pic = pic.decode("utf-8")
-                    # print('name', name)
-                    # print('url', url)
-                    # print('pic', pic)
+                # print("In nextVideos1 info =", info)
+                # print('name', name)
+                # print('url', url)
+                # print('pic', pic)
                 info = info.replace("\r\n","")
-                self.names.append(str(name))
-                self.urls.append(str(url))
-                self.pics.append(str(pic))
-                self.infos.append(str(info))
+                self.names.append(checkStr(name))
+                self.urls.append(checkStr(url))
+                self.pics.append(checkStr(pic))
+                self.infos.append(checkStr(info))
                 i = i+1
             except:
                 break
         title = name_plug
         # nextmodule = "Play"
         nextmodule = "Videos1"
-        print("In Videos1 config.plugins.tvspro.thumb.value =", config.plugins.tvspro.thumb.value)
+        print("In nextVideos1 config.plugins.tvspro.thumb.value =", config.plugins.tvspro.thumb.value)
         if config.plugins.tvspro.thumb.value == "True":
-            print("In Videos1 Going in GridMain")
-            self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics = self.pics)
-        else:
-            self.session.open(AnimMain, title, nextmodule, self.names, self.urls, self.infos, pics = self.pics)
-
-    def okClicked(self):
-        pass
-
-class Videos2(Screen):
-    def __init__(self, session, name, url):
-        Screen.__init__(self, session)
-        self.list = []
-        self["menu"] = List(self.list)
-        self["menu"] = RSList([])
-        self["title"] = Button(name)
-        self["info"] = Label()
-        self["info"].setText(title_plug)
-        self["pixmap"] = Pixmap()
-        self["key_red"] = Button(_("Cancel"))
-        self["key_green"] = Button(_("Select"))
-        self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
-        {
-            "ok": self.okClicked,
-            "back": self.close,
-            "red": self.close,
-            "green": self.okClicked,
-        }, -1)
-        self.name = name
-        self.url = url
-        self.onLayoutFinish.append(self.startSession)
-
-    def startSession(self):
-        url = self.url
-        print("Videos2 url =", url)
-        self.names = []
-        self.urls = []
-        self.pics = []
-        self.infos = []
-        content = getUrl(url)
-        #py3
-        #content = six.ensure_str(content)
-        # print("In Videos2 content =", content)
-        y = json.loads(content)
-        i = 0
-        #[COLOR yellow]Umbria[\/COLOR]
-        while i<100:
-            try:
-                print('In getVideos y["items"][i]["title"] =', y["items"][i]["title"])
-                name = (y["items"][i]["title"])
-                n1 = name.find("]", 0)
-                n2 = name.find("[", n1)
-                name = name[(n1+1):n2]
-                print("In Videos2 name =", name)
-                url = (y["items"][i]["externallink"])
-                url = url.replace("\\", "")
-                pic = (y["items"][i]["thumbnail"])
-                info = (y["items"][i]["info"])
-                print("In Videos4 info =", info)
-                # name = name.encode('ascii','ignore')
-                # url = url.encode('ascii','ignore')
-                # pic = pic.encode('ascii','ignore')
-                # if PY3:
-                    # name = name.decode("utf-8")
-                    # url = url.decode("utf-8")
-                    # pic = pic.decode("utf-8")
-                # print('name', name)
-                # print('url', url)
-                # print('pic', pic)
-                info = info.replace("\r\n","")
-                self.names.append(str(name))
-                self.urls.append(str(url))
-                self.pics.append(str(pic))
-                self.infos.append(str(info))
-                i = i+1
-            except:
-                break
-        title = name_plug
-        if "Live" in self.name:
-            nextmodule = "Videos3"
-        elif "Film" in self.name:
-            nextmodule = "Videos4"
-        elif "Serie" in self.name:
-            nextmodule = "Videos1"
-
-        print("In Videos2 config.plugins.tvspro.thumb.value =", config.plugins.tvspro.thumb.value)
-        if config.plugins.tvspro.thumb.value == "True":
-            print("In Videos2 Going in GridMain")
+            print("In nextVideos1 Going in GridMain")
             self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics = self.pics)
         else:
             self.session.open(AnimMain, title, nextmodule, self.names, self.urls, self.infos, pics = self.pics)
@@ -1729,22 +1718,20 @@ class Videos3(Screen):
         self.onLayoutFinish.append(self.startSession)
 
     def startSession(self):
-        url = self.url
-        print("Videos3 url =", url)
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
+        url = self.url
+        print("Videos3 url =", url)
         content = getUrl(url)
-        #py3
         #content = six.ensure_str(content)
         # print("In Videos3 content =", content)
         y = json.loads(content)
         i = 0
-        #[COLOR yellow]Umbria[\/COLOR]
         while i<100:
             try:
-                print('In getVideos y["items"][i]["title"] =', y["items"][i]["title"])
+                print('In Videos3 y["items"][i]["title"] =', y["items"][i]["title"])
                 name = (y["items"][i]["title"])
                 n1 = name.find("]", 0)
                 n2 = name.find("[", n1)
@@ -1759,22 +1746,15 @@ class Videos3(Screen):
                 pic = (y["items"][i]["thumbnail"])
                 pic = pic.replace("\\", "")
                 info = (y["items"][i]["info"])
-                print("In Videos4 info =", info)
-                # name = name.encode('ascii','ignore')
-                # url = url.encode('ascii','ignore')
-                # pic = pic.encode('ascii','ignore')
-                # if PY3:
-                    # name = name.decode("utf-8")
-                    # url = url.decode("utf-8")
-                    # pic = pic.decode("utf-8")
-                    # print('name', name)
-                    # print('url', url)
-                    # print('pic', pic)
+                # print("In Videos3 info =", info)
+                # print('name', name)
+                # print('url', url)
+                # print('pic', pic)
                 info = info.replace("\r\n","")
-                self.names.append(str(name))
-                self.urls.append(str(url))
-                self.pics.append(str(pic))
-                self.infos.append(str(info))
+                self.names.append(checkStr(name))
+                self.urls.append(checkStr(url))
+                self.pics.append(checkStr(pic))
+                self.infos.append(checkStr(info))
                 i = i+1
             except:
                 break
@@ -1821,20 +1801,22 @@ class Videos4(Screen):
 #       self.onClose.append(self.__onClose)
 
     def startSession(self):
-        # self["info"].setText(self.name)
-        url = self.url
-        print("Videos4 url =", url)
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
+        url = self.url
+        print("Videos4 url =", url)
+
         content = getUrl(url)
-        ## py3
-        #content = six.ensure_str(content)
         # print("In Videos4 content =", content)
+        if six.PY3:
+            content = six.ensure_str(content)
+
+
+            print("In Videos4 content =", content)
         y = json.loads(content)
         i = 0
-        #[COLOR yellow]Umbria[\/COLOR]
         while i<100:
             try:
                 print('In Videos4 y["items"][i]["title"] =', y["items"][i]["title"])
@@ -1851,23 +1833,15 @@ class Videos4(Screen):
                 print("In Videos4 pic =", pic)
 
                 info = (y["items"][i]["info"])
-                print("In Videos4 info =", info)
-
-                # name = name.encode('ascii','ignore')
-                # url = url.encode('ascii','ignore')
-                # pic = pic.encode('ascii','ignore')
-                # if PY3:
-                    # name = name.decode("utf-8")
-                    # url = url.decode("utf-8")
-                    # pic = pic.decode("utf-8")
-                    # print('name', name)
-                    # print('url', url)
-                    # print('pic', pic)
+                # print("In Videos4 info =", info)
+                # print('name', name)
+                # print('url', url)
+                # print('pic', pic)
                 info = info.replace("\r\n","")
-                self.names.append(str(name))
-                self.urls.append(str(url))
-                self.pics.append(str(pic))
-                self.infos.append(str(info))
+                self.names.append(checkStr(name))
+                self.urls.append(checkStr(url))
+                self.pics.append(checkStr(pic))
+                self.infos.append(checkStr(info))
                 i = i+1
             except:
                 break
@@ -1876,7 +1850,7 @@ class Videos4(Screen):
         print("In Videos4 config.plugins.tvspro.thumb.value =", config.plugins.tvspro.thumb.value)
         print("In Videos4 nextmodule =", nextmodule)
         if config.plugins.tvspro.thumb.value == "True":
-            print("In Videos3 Going in GridMain")
+            print("In Videos4 Going in GridMain")
             self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics = self.pics)
         else:
             self.session.open(AnimMain, title, nextmodule, self.names, self.urls, self.infos, pics = self.pics)
@@ -1914,20 +1888,17 @@ class nextVideos4(Screen):
 #       self.onClose.append(self.__onClose)
 
     def startSession(self):
-        # self["info"].setText(self.name)
-        url = self.url
-        print("nextVideos4 url =", url)
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
+        url = self.url
+        print("nextVideos4 url =", url)
         content = getUrl(url)
-        #py3
         #content = six.ensure_str(content)
         # print("In nextVideos4 content =", content)
         y = json.loads(content)
         i = 0
-        #[COLOR yellow]Umbria[\/COLOR]
         while i<100:
             try:
                 print('In nextVideos4 y["items"][i]["title"] =', y["items"][i]["title"])
@@ -1944,23 +1915,15 @@ class nextVideos4(Screen):
                 print("In nextVideos4 pic =", pic)
 
                 info = (y["items"][i]["info"])
-                print("In Videos4 info =", info)
-
-                # name = name.encode('ascii','ignore')
-                # url = url.encode('ascii','ignore')
-                # pic = pic.encode('ascii','ignore')
-                # if PY3:
-                    # name = name.decode("utf-8")
-                    # url = url.decode("utf-8")
-                    # pic = pic.decode("utf-8")
-                    # print('name', name)
-                    # print('url', url)
-                    # print('pic', pic)
+                # print("In Videos4 info =", info)
+                # print('name', name)
+                # print('url', url)
+                # print('pic', pic)
                 info = info.replace("\r\n","")
-                self.names.append(str(name))
-                self.urls.append(str(url))
-                self.pics.append(str(pic))
-                self.infos.append(str(info))
+                self.names.append(checkStr(name))
+                self.urls.append(checkStr(url))
+                self.pics.append(checkStr(pic))
+                self.infos.append(checkStr(info))
                 i = i+1
             except:
                 break
@@ -1969,7 +1932,7 @@ class nextVideos4(Screen):
         print("In nextVideos4 config.plugins.tvspro.thumb.value =", config.plugins.tvspro.thumb.value)
         print("In nextVideos4 nextmodule =", nextmodule)
         if config.plugins.tvspro.thumb.value == "True":
-            print("In Videos3 Going in GridMain")
+            print("In nextVideos4 Going in GridMain")
             self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics = self.pics)
         else:
             self.session.open(AnimMain, title, nextmodule, self.names, self.urls, self.infos, pics = self.pics)
@@ -2005,19 +1968,18 @@ class Videos5(Screen):
         self.onLayoutFinish.append(self.startSession)
 
     def startSession(self):
-        url = self.url
-        print("Videos5 url =", url)
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
+        url = self.url
+        print("Videos5 url =", url)
         content = getUrl(url)
         #py3
         #content = six.ensure_str(content)
         # print("In Videos5 content =", content)
         y = json.loads(content)
         i = 0
-        #[COLOR yellow]Umbria[\/COLOR]
         while i<1:
             try:
                 print('In Videos5 y["items"][i]["title"] =', y["items"][i]["title"])
@@ -2034,22 +1996,15 @@ class Videos5(Screen):
                 pic = (y["items"][i]["thumbnail"])
                 pic = pic.replace("\\", "")
                 info = (y["items"][i]["info"])
-                print("In Videos5 info =", info)
-                # name = name.encode('ascii','ignore')
-                # url = url.encode('ascii','ignore')
-                # pic = pic.encode('ascii','ignore')
-                # if PY3:
-                    # name = name.decode("utf-8")
-                    # url = url.decode("utf-8")
-                    # pic = pic.decode("utf-8")
-                    # print('name', name)
-                    # print('url', url)
-                    # print('pic', pic)
+                # print("In Videos5 info =", info)
+                # print('name', name)
+                # print('url', url)
+                # print('pic', pic)
                 info = info.replace("\r\n","")
-                self.names.append(str(name))
-                self.urls.append(str(url))
-                self.pics.append(str(pic))
-                self.infos.append(str(info))
+                self.names.append(checkStr(name))
+                self.urls.append(checkStr(url))
+                self.pics.append(checkStr(pic))
+                self.infos.append(checkStr(info))
                 i = i+1
             except:
                 break
@@ -2167,13 +2122,13 @@ class Playstream1(Screen):
         self.names = []
         self.urls = []
         self.names.append('Play Now')
-        self.urls.append(str(url))
+        self.urls.append(checkStr(url))
         self.names.append('Play HLS')
-        self.urls.append(str(url))
+        self.urls.append(checkStr(url))
         self.names.append('Play TS')
-        self.urls.append(str(url))
+        self.urls.append(checkStr(url))
         # self.names.append('Preview')
-        # self.urls.append(str(url))
+        # self.urls.append(checkStr(url))
         showlist(self.names, self['list'])
 
     def okClicked(self):
@@ -2203,7 +2158,7 @@ class Playstream1(Screen):
             except:
                 pass
             self.session.open(Playstream2, self.name, self.url, desc)
-            
+
         if idx == 0:
             self.name = self.names[idx]
             self.url = self.urls[idx]
@@ -2394,7 +2349,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         Screen.__init__(self, session)
         self.session = session
         self.skinName = 'MoviePlayer'
-        title = 'Play Stream'
+        title = name
         InfoBarMenu.__init__(self)
         InfoBarNotifications.__init__(self)
         InfoBarBase.__init__(self, steal_current_service=True)
@@ -2630,10 +2585,10 @@ def charRemove(text):
 
 def main(session, **kwargs):
     _session = session
-    os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro")
-    os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro/vid")
-    os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro/pic")
-    os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro/tmp")
+    os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "tvspro")
+    os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "tvspro/vid")
+    os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "tvspro/pic")
+    os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "tvspro/tmp")
     exo = tvspromain(_session)
     exo.startSession()
 
