@@ -59,6 +59,8 @@ headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/
 THISPLUG = '/usr/lib/enigma2/python/Plugins/Extensions/tvspro/'
 DESKHEIGHT = getDesktop(0).size().height()
 HD = getDesktop(0).size()
+
+streamlink = False
 try:       
     if os.path.exists('/usr/lib/python2.7/site-packages/streamlink'):
         if fileExists('/usr/lib/python2.7/site-packages/streamlink/plugin/plugin.pyo'):
@@ -2147,7 +2149,7 @@ class Playstream1(Screen):
         self.close()
 
     def play2(self):
-        if streamlink==True:
+        if os.path.exists("/usr/sbin/streamlinksrv"):
             desc = self.desc
             name = self.name1
             # if os.path.exists("/usr/sbin/streamlinksrv"):
@@ -2439,8 +2441,8 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         # if "youtube" in str(self.url):
             # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
             # return
-        # if streamlink==True:
-            # streamtypelist.append("5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/") #ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
+        if os.path.exists("/usr/sbin/streamlinksrv"):
+            streamtypelist.append("5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/") #ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
         if os.path.exists("/usr/bin/gstplayer"):
             streamtypelist.append("5001:0:1:0:0:0:0:0:0:0:")
         if os.path.exists("/usr/bin/exteplayer3"):
