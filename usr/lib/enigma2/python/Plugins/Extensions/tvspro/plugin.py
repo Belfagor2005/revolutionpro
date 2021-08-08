@@ -60,7 +60,7 @@ DESKHEIGHT = getDesktop(0).size().height()
 HD = getDesktop(0).size()
 
 def getversioninfo():
-    currversion = '1.1'
+    currversion = '1.2'
     version_file = THISPLUG + 'version'
     if os.path.exists(version_file):
         try:
@@ -102,7 +102,10 @@ try:
     eDreamOS = True
 except:
     eDreamOS = False
-
+try:
+    from urlparse import urlparse
+except:
+    from urllib.parse import urlparse
 if HD.width() > 1280:
     skin_path = res_plugin_path + 'skins/fhd/'
     defpic = res_plugin_path + "pics/defaultL.png"
@@ -120,10 +123,6 @@ try:
 except:
     sslverify = False
 if sslverify:
-    try:
-        from urlparse import urlparse
-    except:
-        from urllib.parse import urlparse
     class SNIFactory(ssl.ClientContextFactory):
         def __init__(self, hostname=None):
             self.hostname = hostname
@@ -136,13 +135,10 @@ if sslverify:
 
 
 def getJsonURL(url):
-    # request = urllib2.Request(url)
     request = Request(url)
-    # request.add_header('User-Agent', 'TVS PRO')
     req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
     request.add_header('Accept-Encoding', 'gzip')
     response = urlopen(request, timeout=30)
-    # response = checkStr(urlopen(request, timeout=ntimeout))
     gzipped = response.info().get('Content-Encoding') == 'gzip'
     data = '' #[]
     dec_obj = zlib.decompressobj(16 + zlib.MAX_WBITS)
@@ -151,11 +147,6 @@ def getJsonURL(url):
         if not res_data:
             break
         if gzipped:
-            """
-            data += dec_obj.decompress(res_data)
-        else:
-            data += res_data
-            """
             data += dec_obj.decompress(res_data)
         else:
             data += res_data
@@ -175,7 +166,6 @@ def getUrl(url):
         if six.PY3:
             url = url.encode()
         req = Request(url)
-        # req.add_header('User-Agent', 'TVS')
         req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
         response = urlopen(req, None, 3)
         link=response.read()
@@ -196,6 +186,7 @@ def getUrl2(url, referer):
     link=response.read()
     response.close()
     return link
+
 #config
 mdchoice = [
             ("4097", _("IPTV(4097)")),
@@ -627,7 +618,11 @@ class AnimMain(Screen):
             HHHHH = text
             self.session.open(IMDB, HHHHH)
         else:
-            text_clear = name
+            inf = idx
+            if inf and inf != '':
+                text_clear = self.infos[inf]
+            else:
+                text_clear = name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
 
     def cancel(self):
@@ -883,8 +878,6 @@ class AnimMain(Screen):
 
     def filterChannels(self, result):
         if result:
-            # global search
-            # search = False
             name = str(result)
             url = self.urlx + str(result)
             try:
@@ -1278,8 +1271,6 @@ class GridMain(Screen):
 
     def filterChannels(self, result):
         if result:
-            # global search
-            # search = False
             name = str(result)
             url = self.urlx + str(result)
             try:
@@ -1383,37 +1374,15 @@ class Videos2(Screen):
         self.onLayoutFinish.append(self.startSession)
 
     def startSession(self):
-        # if "Live" in self.name:
-            # nextmodule = "Videos3"
-        # elif "Film" in self.name:
-            # nextmodule = "Videos4"
-        # elif "Serie" in self.name:
-            # nextmodule = "Videos1"
-        # print('nextmodule video 2 = ', nextmodule)               
-        # title = name_plug
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
         url = self.url
         print("Videos2 url =", url)
-
-
-
-
         content = getUrl(url)
         if six.PY3:
             content = six.ensure_str(content)
-            print("In Videos2 content =", content)
-        #content = six.ensure_str(content)
-
-
-
-
-
-
-
-        # print("In Videos2 content =", content)
         y = json.loads(content)
         i = 0
         while i<100:
@@ -1428,10 +1397,6 @@ class Videos2(Screen):
                 url = url.replace("\\", "")
                 pic = (y["items"][i]["thumbnail"])
                 info = (y["items"][i]["info"])
-                # print("In Videos2 info =", info)
-                # print('name', name)
-                # print('url', url)
-                # print('pic', pic)
                 info = info.replace("\r\n","")
                 self.names.append(checkStr(name))
                 self.urls.append(checkStr(url))
@@ -1457,9 +1422,6 @@ class Videos2(Screen):
 
     def okClicked(self):
         pass
-
-
-
 
 class Videos6(Screen):
     def __init__(self, session, name, url):
@@ -1493,14 +1455,8 @@ class Videos6(Screen):
         url = self.url
         print("Videos1 url =", url)
         content = getUrl(url)
-        #content = six.ensure_str(content)
-
-
-
-
-
-
-        # print("In Videos6 content =", content)
+        if six.PY3:
+            content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
         while i<100:
@@ -1515,14 +1471,9 @@ class Videos6(Screen):
                     url = (y["items"][i]["link"])
                 except:
                     url = (y["items"][i]["yatse"])
-                # url = (y["items"][i]["link"])
                 url = url.replace("\\", "")
                 pic = (y["items"][i]["thumbnail"])
                 info = (y["items"][i]["info"])
-                # print("In Videos6 info =", info)
-                # print('name', name)
-                # print('url', url)
-                # print('pic', pic)
                 info = info.replace("\r\n","")
                 self.names.append(checkStr(name))
                 self.urls.append(checkStr(url))
@@ -1574,8 +1525,8 @@ class Videos1(Screen):
         url = self.url
         print("Videos1 url =", url)
         content = getUrl(url)
-        #content = six.ensure_str(content)
-        # print("In Videos1 content =", content)
+        if six.PY3:
+            content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
         while i<100:
@@ -1590,14 +1541,9 @@ class Videos1(Screen):
                     url = (y["items"][i]["link"])
                 except:
                     url = (y["items"][i]["yatse"])
-                # url = (y["items"][i]["link"])
                 url = url.replace("\\", "")
                 pic = (y["items"][i]["thumbnail"])
                 info = (y["items"][i]["info"])
-                # print("In Videos1 info =", info)
-                # print('name', name)
-                # print('url', url)
-                # print('pic', pic)
                 info = info.replace("\r\n","")
                 self.names.append(checkStr(name))
                 self.urls.append(checkStr(url))
@@ -1650,8 +1596,8 @@ class nextVideos1(Screen):
         url = self.url
         print("nextVideos1 url =", url)
         content = getUrl(url)
-        #content = six.ensure_str(content)
-        # print("In nextVideos1 content =", content)
+        if six.PY3:
+            content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
         while i<100:
@@ -1666,14 +1612,9 @@ class nextVideos1(Screen):
                     url = (y["items"][i]["link"])
                 except:
                     url = (y["items"][i]["yatse"])
-                # url = (y["items"][i]["link"])
                 url = url.replace("\\", "")
                 pic = (y["items"][i]["thumbnail"])
                 info = (y["items"][i]["info"])
-                # print("In nextVideos1 info =", info)
-                # print('name', name)
-                # print('url', url)
-                # print('pic', pic)
                 info = info.replace("\r\n","")
                 self.names.append(checkStr(name))
                 self.urls.append(checkStr(url))
@@ -1732,8 +1673,8 @@ class Videos3(Screen):
         url = self.url
         print("Videos3 url =", url)
         content = getUrl(url)
-        #content = six.ensure_str(content)
-        # print("In Videos3 content =", content)
+        if six.PY3:
+            content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
         while i<100:
@@ -1748,15 +1689,10 @@ class Videos3(Screen):
                     url = (y["items"][i]["link"])
                 except:
                     url = (y["items"][i]["yatse"])
-                # url = (y["items"][i]["link"])
                 url = url.replace("\\", "")
                 pic = (y["items"][i]["thumbnail"])
                 pic = pic.replace("\\", "")
                 info = (y["items"][i]["info"])
-                # print("In Videos3 info =", info)
-                # print('name', name)
-                # print('url', url)
-                # print('pic', pic)
                 info = info.replace("\r\n","")
                 self.names.append(checkStr(name))
                 self.urls.append(checkStr(url))
@@ -1814,14 +1750,9 @@ class Videos4(Screen):
         self.infos = []
         url = self.url
         print("Videos4 url =", url)
-
         content = getUrl(url)
-        # print("In Videos4 content =", content)
         if six.PY3:
             content = six.ensure_str(content)
-
-
-            print("In Videos4 content =", content)
         y = json.loads(content)
         i = 0
         while i<100:
@@ -1838,12 +1769,7 @@ class Videos4(Screen):
                 pic = (y["items"][i]["thumbnail"])
                 pic = pic.replace("\\", "")
                 print("In Videos4 pic =", pic)
-
                 info = (y["items"][i]["info"])
-                # print("In Videos4 info =", info)
-                # print('name', name)
-                # print('url', url)
-                # print('pic', pic)
                 info = info.replace("\r\n","")
                 self.names.append(checkStr(name))
                 self.urls.append(checkStr(url))
@@ -1868,7 +1794,6 @@ class Videos4(Screen):
 class nextVideos4(Screen):
 
     def __init__(self, session, name, url):
-
         Screen.__init__(self, session)
         self.list = []
         self["menu"] = List(self.list)
@@ -1888,7 +1813,6 @@ class nextVideos4(Screen):
         }, -1)
         self.name = name
         self.url = url
-        
         self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
         global SREF
         SREF = self.srefOld
@@ -1903,8 +1827,8 @@ class nextVideos4(Screen):
         url = self.url
         print("nextVideos4 url =", url)
         content = getUrl(url)
-        #content = six.ensure_str(content)
-        # print("In nextVideos4 content =", content)
+        if six.PY3:
+            content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
         while i<100:
@@ -1915,27 +1839,16 @@ class nextVideos4(Screen):
                 n2 = name.find("[", n1)
                 name = name[(n1+1):n2]
                 print("In nextVideos4 name =", name)
-                
-                # if 'NO FOUND' in str(name).lower:
-                    # return
-
                 try:
                     url = (y["items"][i]["externallink"])
                 except:
                     url = (y["items"][i]["link"])
-                
-                # url = (y["items"][i]["externallink"])
                 url = url.replace("\\", "")
                 print("In nextVideos4 url =", url)
                 pic = (y["items"][i]["thumbnail"])
                 pic = pic.replace("\\", "")
                 print("In nextVideos4 pic =", pic)
-
                 info = (y["items"][i]["info"])
-                # print("In Videos4 info =", info)
-                # print('name', name)
-                # print('url', url)
-                # print('pic', pic)
                 info = info.replace("\r\n","")
                 self.names.append(checkStr(name))
                 self.urls.append(checkStr(url))
@@ -1992,9 +1905,8 @@ class Videos5(Screen):
         url = self.url
         print("Videos5 url =", url)
         content = getUrl(url)
-        #py3
-        #content = six.ensure_str(content)
-        # print("In Videos5 content =", content)
+        if six.PY3:
+            content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
         while i<1:
@@ -2008,15 +1920,10 @@ class Videos5(Screen):
                     url = (y["items"][i]["link"])
                 except:
                     url = (y["items"][i]["yatse"])
-                # url = (y["items"][i]["link"])
                 url = url.replace("\\", "")
                 pic = (y["items"][i]["thumbnail"])
                 pic = pic.replace("\\", "")
                 info = (y["items"][i]["info"])
-                # print("In Videos5 info =", info)
-                # print('name', name)
-                # print('url', url)
-                # print('pic', pic)
                 info = info.replace("\r\n","")
                 self.names.append(checkStr(name))
                 self.urls.append(checkStr(url))
