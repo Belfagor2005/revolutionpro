@@ -883,8 +883,8 @@ class AnimMain(Screen):
 
     def filterChannels(self, result):
         if result:
-            global search
-            search = False
+            # global search
+            # search = False
             name = str(result)
             url = self.urlx + str(result)
             try:
@@ -898,6 +898,7 @@ class AnimMain(Screen):
     def resetSearch(self):
         global search
         search = False
+        return
 
 #-----------------
 #menupic
@@ -1277,16 +1278,22 @@ class GridMain(Screen):
 
     def filterChannels(self, result):
         if result:
-            global search
-            search = False
-            name = self.namex
+            # global search
+            # search = False
+            name = str(result)
             url = self.urlx + str(result)
             try:
                 vid2 = nextVideos4(self.session, name, url)
                 vid2.startSession()
             except:
                 return
-                pass
+        else:
+            self.resetSearch()
+
+    def resetSearch(self):
+        global search
+        search = False
+        return
 #-----------------
 #main exe
 class tvspromain(Screen):
@@ -1881,6 +1888,7 @@ class nextVideos4(Screen):
         }, -1)
         self.name = name
         self.url = url
+        
         self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
         global SREF
         SREF = self.srefOld
@@ -1907,7 +1915,16 @@ class nextVideos4(Screen):
                 n2 = name.find("[", n1)
                 name = name[(n1+1):n2]
                 print("In nextVideos4 name =", name)
-                url = (y["items"][i]["externallink"])
+                
+                # if 'NO FOUND' in str(name).lower:
+                    # return
+
+                try:
+                    url = (y["items"][i]["externallink"])
+                except:
+                    url = (y["items"][i]["link"])
+                
+                # url = (y["items"][i]["externallink"])
                 url = url.replace("\\", "")
                 print("In nextVideos4 url =", url)
                 pic = (y["items"][i]["thumbnail"])
