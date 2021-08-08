@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/python
+from __future__ import print_function                                     
 '''
 Info http://t.me/tivustream
 ****************************************
@@ -8,7 +9,7 @@ Info http://t.me/tivustream
 *             07/08/2021               *
 ****************************************
 '''
-from __future__ import print_function
+
 try:
        from Plugins.Extensions.SubsSupport import SubsSupport, initSubsSettings
        from Plugins.Extensions.tvspro.lib.Utils2 import *
@@ -58,6 +59,12 @@ headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/
 THISPLUG = '/usr/lib/enigma2/python/Plugins/Extensions/tvspro/'
 DESKHEIGHT = getDesktop(0).size().height()
 HD = getDesktop(0).size()
+try:       
+    if os.path.exists('/usr/lib/python2.7/site-packages/streamlink'):
+        if fileExists('/usr/lib/python2.7/site-packages/streamlink/plugin/plugin.pyo'):
+            streamlink = True
+except:
+    streamlink = False            
 
 def getversioninfo():
     currversion = '1.2'
@@ -2051,84 +2058,83 @@ class Playstream1(Screen):
         self.urls.append(checkStr(url))
         self.names.append('Play TS')
         self.urls.append(checkStr(url))
-        # self.names.append('Preview')
-        # self.urls.append(checkStr(url))
+        self.names.append('Streamlink')
+        self.urls.append(checkStr(url))
         showlist(self.names, self['list'])
 
     def okClicked(self):
         idx = self['list'].getSelectionIndex()
-        if idx is None:
+        if idx is not None or idx != -1:
+            self.name = self.names[idx]
+            self.url = self.urls[idx]
+
+            # if "youtube" in str(self.url):
+                # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
+                # return
+            if "youtube" in str(self.url):
+                desc = self.name
+                try:
+                    # from youtube_dl import YoutubeDL
+                    from Plugins.Extensions.tvspro.youtube_dl import YoutubeDL
+                    '''
+                    ydl_opts = {'format': 'best'}
+                    ydl_opts = {'format': 'bestaudio/best'}
+                    '''
+                    ydl_opts = {'format': 'best'}
+                    ydl = YoutubeDL(ydl_opts)
+                    ydl.add_default_info_extractors()
+                    result = ydl.extract_info(self.url, download=False)
+                    self.url = result["url"]
+                except:
+                    pass
+                self.session.open(Playstream2, self.name, self.url, desc)
+
+            if idx == 0:
+                self.name = self.names[idx]
+                self.url = self.urls[idx]
+                print('In playVideo url D=', self.url)
+                self.play()
+            elif idx == 1:
+                print('In playVideo url B=', self.url)
+                self.name = self.names[idx]
+                self.url = self.urls[idx]
+                try:
+                    os.remove('/tmp/hls.avi')
+                except:
+                    pass
+                header = ''
+                cmd = 'python "/usr/lib/enigma2/python/Plugins/Extensions/tvspro/lib/hlsclient.py" "' + self.url + '" "1" "' + header + '" + &'
+                print('In playVideo cmd =', cmd)
+                os.system(cmd)
+                os.system('sleep 3')
+                self.url = '/tmp/hls.avi'
+                self.play()
+            elif idx == 2:
+                print('In playVideo url A=', self.url)
+                url = self.url
+                try:
+                    os.remove('/tmp/hls.avi')
+                except:
+                    pass
+                cmd = 'python "/usr/lib/enigma2/python/Plugins/Extensions/tvspro/l/tsclient.py" "' + url + '" "1" + &'
+                print('hls cmd = ', cmd)
+                os.system(cmd)
+                os.system('sleep 3')
+                self.url = '/tmp/hls.avi'
+                self.name = self.names[idx]
+                self.play()
+
+            elif idx == 3:
+                self.name = self.names[idx]
+                self.url = self.urls[idx]
+                print('In playVideo url D=', self.url)
+                self.play2()
+            else:
+                self.name = self.names[idx]
+                self.url = self.urls[idx]
+                print('In playVideo url D=', self.url)
+                self.play()
             return
-        self.name = self.names[idx]
-        self.url = self.urls[idx]
-
-        # if "youtube" in str(self.url):
-            # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
-            # return
-        if "youtube" in str(self.url):
-            desc = self.name
-            try:
-                # from youtube_dl import YoutubeDL
-                from Plugins.Extensions.tvspro.youtube_dl import YoutubeDL
-                '''
-                ydl_opts = {'format': 'best'}
-                ydl_opts = {'format': 'bestaudio/best'}
-                '''
-                ydl_opts = {'format': 'best'}
-                ydl = YoutubeDL(ydl_opts)
-                ydl.add_default_info_extractors()
-                result = ydl.extract_info(self.url, download=False)
-                self.url = result["url"]
-            except:
-                pass
-            self.session.open(Playstream2, self.name, self.url, desc)
-
-        if idx == 0:
-            self.name = self.names[idx]
-            self.url = self.urls[idx]
-            print('In playVideo url D=', self.url)
-            self.play()
-        elif idx == 1:
-            print('In playVideo url B=', self.url)
-            self.name = self.names[idx]
-            self.url = self.urls[idx]
-            try:
-                os.remove('/tmp/hls.avi')
-            except:
-                pass
-            header = ''
-            cmd = 'python "/usr/lib/enigma2/python/Plugins/Extensions/tvspro/lib/hlsclient.py" "' + self.url + '" "1" "' + header + '" + &'
-            print('In playVideo cmd =', cmd)
-            os.system(cmd)
-            os.system('sleep 3')
-            self.url = '/tmp/hls.avi'
-            self.play()
-        elif idx == 2:
-            print('In playVideo url A=', self.url)
-            url = self.url
-            try:
-                os.remove('/tmp/hls.avi')
-            except:
-                pass
-            cmd = 'python "/usr/lib/enigma2/python/Plugins/Extensions/tvspro/l/tsclient.py" "' + url + '" "1" + &'
-            print('hls cmd = ', cmd)
-            os.system(cmd)
-            os.system('sleep 3')
-            self.url = '/tmp/hls.avi'
-            self.name = self.names[idx]
-            self.play()
-
-        elif idx == 3:
-            self.name = self.names[idx]
-            self.url = self.urls[idx]
-            print('In playVideo url D=', self.url)
-            self.play2()
-        else:
-            self.name = self.names[idx]
-            self.url = self.urls[idx]
-            print('In playVideo url D=', self.url)
-            self.play()
-        return
 
     def playfile(self, serverint):
         self.serverList[serverint].play(self.session, self.url, self.name)
@@ -2138,22 +2144,25 @@ class Playstream1(Screen):
         url = self.url
         name = self.name1
         self.session.open(Playstream2, name, url, desc)
-        # return
         self.close()
 
     def play2(self):
-        desc = ' '
-        self['info'].setText(self.name)
-
-        url = self.url
-        url = url.replace(':', '%3a')
-        print('In tvspro url =', url)
-        ref = '4097:0:1:0:0:0:0:0:0:0:' + url
-        sref = eServiceReference(ref)
-        print('SREF: ', sref)
-        sref.setName(self.name1)
-        self.session.nav.playService(sref)
-
+        if streamlink==True:
+            desc = self.desc
+            name = self.name1
+            # if os.path.exists("/usr/sbin/streamlinksrv"):
+            url = self.url
+            url = url.replace(':', '%3a')
+            print('In revolution url =', url)
+            ref = '5002:0:1:0:0:0:0:0:0:0:' + 'http%3a//127.0.0.1%3a8088/' + str(url)
+            # ref = '4097:0:1:0:0:0:0:0:0:0:' + url
+            sref = eServiceReference(ref)
+            print('SREF: ', sref)
+            sref.setName(self.name1)
+            self.session.open(Playstream2, name, sref, desc)
+            self.close()
+        else:
+            self.mbox = self.session.open(MessageBox, _('Install Streamlink first'), MessageBox.TYPE_INFO, timeout=5)
 
     def cancel(self):
         try:
@@ -2307,8 +2316,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.service = None
         service = None
         InfoBarSeek.__init__(self, actionmap='InfobarSeekActions')
-        url = url.replace(':', '%3a')
-        url = url.replace(' ','%20')
         self.icount = 0
         self.desc = desc
         self.pcip = 'None'
@@ -2317,7 +2324,10 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.state = self.STATE_PLAYING
         self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
         SREF = self.srefOld
-        self.onLayoutFinish.append(self.cicleStreamType)
+        if '8088' in str(self.url):
+            self.onLayoutFinish.append(self.slinkPlay)
+        else:
+            self.onLayoutFinish.append(self.cicleStreamType) 
         self.onClose.append(self.cancel)
         return
 
@@ -2391,18 +2401,32 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
             text = charRemove(text_clear)
             self.session.open(IMDB, text)
         else:
-            text_clear = self.name
-            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
-
-    def openPlay(self,servicetype, url):
-        url = url
-        ref = str(servicetype) +':0:1:0:0:0:0:0:0:0:' + str(url)
-        print('final reference :   ', ref)
+            inf = self.desc
+            if inf and inf != '':
+                text_clear = self.infos[inf]
+            else:
+                text_clear = name
+            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)    
+            
+    def slinkPlay(self, url):
+        ref = str(url)
+        ref = ref.replace(':', '%3a')
+        ref = ref.replace(' ','%20')
+        print('final reference:   ', ref)
         sref = eServiceReference(ref)
         sref.setName(self.name)
         self.session.nav.stopService()
         self.session.nav.playService(sref)
-
+        
+    def openPlay(self, servicetype, url):
+        url = url.replace(':', '%3a')
+        url = url.replace(' ','%20')
+        ref = str(servicetype) + str(url) #+':0:1:0:0:0:0:0:0:0:' + str(url)
+        print('final reference:   ', ref)
+        sref = eServiceReference(ref)
+        sref.setName(self.name)
+        self.session.nav.stopService()
+        self.session.nav.playService(sref)              
     def cicleStreamType(self):
         from itertools import cycle, islice
         self.servicetype = str(config.plugins.tvspro.services.value)# '4097'
@@ -2412,21 +2436,25 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         currentindex = 0
         # streamtypelist = ["4097", "1"]
         streamtypelist = ["4097"]
+        # if "youtube" in str(self.url):
+            # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
+            # return
+        # if streamlink==True:
+            # streamtypelist.append("5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/") #ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
         if os.path.exists("/usr/bin/gstplayer"):
-            streamtypelist.append("5001")
+            streamtypelist.append("5001:0:1:0:0:0:0:0:0:0:")
         if os.path.exists("/usr/bin/exteplayer3"):
-            streamtypelist.append("5002")
+            streamtypelist.append("5002:0:1:0:0:0:0:0:0:0:")
         if os.path.exists("/usr/bin/apt-get"):
-            streamtypelist.append("8193")
+            streamtypelist.append("8193:0:1:0:0:0:0:0:0:0:")
         for index, item in enumerate(streamtypelist, start=0):
             if str(item) == str(self.servicetype):
                 currentindex = index
                 break
         nextStreamType = islice(cycle(streamtypelist), currentindex + 1, None)
-        self.servicetype = int(next(nextStreamType))
+        self.servicetype = str(next(nextStreamType))
         print('servicetype2: ', self.servicetype)
         self.openPlay(self.servicetype, url)
-
     def cancel(self):
         if os.path.exists('/tmp/hls.avi'):
             os.remove('/tmp/hls.avi')
