@@ -2142,7 +2142,7 @@ class Playstream1(Screen):
         self.serverList[serverint].play(self.session, self.url, self.name)
 
     def play(self):
-        desc = self.desc
+        desc = self.name
         url = self.url
         name = self.name1
         self.session.open(Playstream2, name, url, desc)
@@ -2150,7 +2150,7 @@ class Playstream1(Screen):
 
     def play2(self):
         if os.path.exists("/usr/sbin/streamlinksrv"):
-            desc = self.desc
+            desc = self.name
             name = self.name1
             # if os.path.exists("/usr/sbin/streamlinksrv"):
             url = self.url
