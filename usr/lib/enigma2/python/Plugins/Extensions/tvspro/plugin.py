@@ -2142,7 +2142,7 @@ class Playstream1(Screen):
         self.serverList[serverint].play(self.session, self.url, self.name)
 
     def play(self):
-        desc = ' '
+        desc = self.desc
         url = self.url
         name = self.name1
         self.session.open(Playstream2, name, url, desc)
@@ -2164,7 +2164,7 @@ class Playstream1(Screen):
             self.session.open(Playstream2, name, sref, desc)
             self.close()
         else:
-            self.mbox = self.session.open(MessageBox, _('Install Streamlink first'), MessageBox.TYPE_INFO, timeout=5)
+            self.session.open(MessageBox, _('Install Streamlink first'), MessageBox.TYPE_INFO, timeout=5)
 
     def cancel(self):
         try:
@@ -2280,11 +2280,12 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
     screen_timeout = 4000
 
     def __init__(self, session, name, url, desc):
-        global SREF
+        global SREF, streaml
         Screen.__init__(self, session)
         self.session = session
         self.skinName = 'MoviePlayer'
         title = name
+        streaml = False
         InfoBarMenu.__init__(self)
         InfoBarNotifications.__init__(self)
         InfoBarBase.__init__(self, steal_current_service=True)
@@ -2419,36 +2420,40 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         sref.setName(self.name)
         self.session.nav.stopService()
         self.session.nav.playService(sref)
-        
+
     def openPlay(self, servicetype, url):
         url = url.replace(':', '%3a')
         url = url.replace(' ','%20')
-        ref = str(servicetype) + str(url) #+':0:1:0:0:0:0:0:0:0:' + str(url)
+        ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:' + str(url)
+        if streaml == True:
+            ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + str(url)        
         print('final reference:   ', ref)
         sref = eServiceReference(ref)
         sref.setName(self.name)
         self.session.nav.stopService()
-        self.session.nav.playService(sref)              
+        self.session.nav.playService(sref)
+
     def cicleStreamType(self):
+        global streml
+        streaml = False
         from itertools import cycle, islice
-        self.servicetype = str(config.plugins.tvspro.services.value)# '4097'
+        self.servicetype = str(config.plugins.tvspro.services.value) +':0:1:0:0:0:0:0:0:0:'#  '4097'
         print('servicetype1: ', self.servicetype)
         url = str(self.url)
-
         currentindex = 0
-        # streamtypelist = ["4097", "1"]
         streamtypelist = ["4097"]
         # if "youtube" in str(self.url):
             # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
             # return
         if os.path.exists("/usr/sbin/streamlinksrv"):
-            streamtypelist.append("5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/") #ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
+            streamtypelist.append("5002") #ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
+            streaml = True
         if os.path.exists("/usr/bin/gstplayer"):
-            streamtypelist.append("5001:0:1:0:0:0:0:0:0:0:")
+            streamtypelist.append("5001")
         if os.path.exists("/usr/bin/exteplayer3"):
-            streamtypelist.append("5002:0:1:0:0:0:0:0:0:0:")
+            streamtypelist.append("5002")
         if os.path.exists("/usr/bin/apt-get"):
-            streamtypelist.append("8193:0:1:0:0:0:0:0:0:0:")
+            streamtypelist.append("8193")
         for index, item in enumerate(streamtypelist, start=0):
             if str(item) == str(self.servicetype):
                 currentindex = index
@@ -2457,6 +2462,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.servicetype = str(next(nextStreamType))
         print('servicetype2: ', self.servicetype)
         self.openPlay(self.servicetype, url)
+
     def cancel(self):
         if os.path.exists('/tmp/hls.avi'):
             os.remove('/tmp/hls.avi')
@@ -2470,6 +2476,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
                 self.setAspect(self.init_aspect)
             except:
                 pass
+        streaml = False
         self.close()
 
     def leavePlayer(self):
