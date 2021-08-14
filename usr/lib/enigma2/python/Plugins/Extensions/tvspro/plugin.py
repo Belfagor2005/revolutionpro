@@ -1990,7 +1990,7 @@ class Abouttvr(Screen):
     def getinfo(self):
         continfo = _("==  WELCOME to WWW.TIVUSTREAM.COM ==\n")
         continfo += _("== SUPPORT ON: WWW.CORVOBOYS.COM http://t.me/tivustream ==\n")
-        continfo += _("== thank's to @PCD and LINUXSAT-SUPPORT.COM \n")
+        continfo += _("== thank's to @PCD and LINUXSAT-SUPPORT.COM\n")
         continfo += _("========================================\n")
         continfo += _("NOTA BENE:\n")
         continfo += _("Le liste create ad HOC contengono indirizzi liberamente e gratuitamente\n")
@@ -1999,7 +1999,7 @@ class Abouttvr(Screen):
         continfo += _("non e' fonte di alcun stream/flusso.\n")
         continfo += _("Assolutamente VIETATO utilizzare queste liste senza autorizzazione.\n")
         continfo += _("========================================\n")
-        continfo += _("DISCLAIMER: \n")
+        continfo += _("DISCLAIMER:\n")
         continfo += _("The lists created at HOC contain addresses freely and freely found on\n")
         continfo += _("the net and not protected by subscription or subscription.\n")
         continfo += _("The structural reference server for projects released\n")
