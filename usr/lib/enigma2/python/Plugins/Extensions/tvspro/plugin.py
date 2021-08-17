@@ -2437,7 +2437,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         global streml
         streaml = False
         from itertools import cycle, islice
-        self.servicetype = str(config.plugins.tvspro.services.value) +':0:1:0:0:0:0:0:0:0:'#  '4097'
+        self.servicetype = str(config.plugins.tvspro.services.value)# +':0:1:0:0:0:0:0:0:0:'#  '4097'
         print('servicetype1: ', self.servicetype)
         url = str(self.url)
         currentindex = 0
