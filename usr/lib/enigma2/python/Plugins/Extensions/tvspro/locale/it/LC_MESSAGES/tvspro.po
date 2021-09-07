@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: exodus\n"
-"POT-Creation-Date: 2021-04-20 20:24+0200\n"
+"POT-Creation-Date: 2021-09-07 19:46+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -10,296 +10,240 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.8.7\n"
-"X-Poedit-Basepath: ../../../..\n"
-"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-Basepath: ../../..\n"
+"X-Poedit-SearchPath-0: plugin.py\n"
 
-#: tvspro/lib/Utils.py:122 tvspro/lib/Utils2.py:123 tvspro/plugin - ~.py:451
-#: ~.py:1869 tvspro/plugin.py:620 tvspro/plugin.py:2089
-msgid "Exit"
-msgstr "Uscire"
-
-#: tvspro/lib/Utils.py:123 tvspro/lib/Utils2.py:124
-msgid "Download"
-msgstr ""
-
-#: tvspro/lib/Utils.py:124 tvspro/lib/Utils2.py:125
-msgid "Play"
-msgstr ""
-
-#: tvspro/lib/Utils.py:125 tvspro/lib/Utils2.py:126
-msgid "Stop Download"
-msgstr ""
-
-#: tvspro/lib/Utils.py:300 tvspro/lib/Utils2.py:306
-msgid "Download Complete...."
-msgstr ""
-
-#: tvspro/lib/Utils.py:304 tvspro/lib/Utils2.py:310
-msgid "Downloading...."
-msgstr ""
-
-#: tvspro/lib/Utils.py:496 tvspro/lib/Utils.py:735 tvspro/lib/Utils2.py:503
-#: tvspro/lib/Utils2.py:725
-msgid "Subtitles"
-msgstr ""
-
-#: tvspro/lib/Utils.py:546 tvspro/lib/Utils.py:785 tvspro/lib/Utils2.py:553
-#: tvspro/lib/Utils2.py:775 tvspro/plugin - ~.py:2133 tvspro/plugin.py:2353
-msgid "4:3 Letterbox"
-msgstr ""
-
-#: tvspro/lib/Utils.py:547 tvspro/lib/Utils.py:786 tvspro/lib/Utils2.py:554
-#: tvspro/lib/Utils2.py:776 tvspro/plugin - ~.py:2134 tvspro/plugin.py:2354
-msgid "4:3 PanScan"
-msgstr ""
-
-#: tvspro/lib/Utils.py:548 tvspro/lib/Utils.py:787 tvspro/lib/Utils2.py:555
-#: tvspro/lib/Utils2.py:777 tvspro/plugin - ~.py:2135 tvspro/plugin.py:2355
-msgid "16:9"
-msgstr ""
-
-#: tvspro/lib/Utils.py:549 tvspro/lib/Utils.py:788 tvspro/lib/Utils2.py:556
-#: tvspro/lib/Utils2.py:778 tvspro/plugin - ~.py:2136 tvspro/plugin.py:2356
-msgid "16:9 always"
-msgstr ""
-
-#: tvspro/lib/Utils.py:550 tvspro/lib/Utils.py:789 tvspro/lib/Utils2.py:557
-#: tvspro/lib/Utils2.py:779 tvspro/plugin - ~.py:2137 tvspro/plugin.py:2357
-msgid "16:10 Letterbox"
-msgstr ""
-
-#: tvspro/lib/Utils.py:551 tvspro/lib/Utils.py:790 tvspro/lib/Utils2.py:558
-#: tvspro/lib/Utils2.py:780 tvspro/plugin - ~.py:2138 tvspro/plugin.py:2358
-msgid "16:10 PanScan"
-msgstr ""
-
-#: tvspro/lib/Utils.py:552 tvspro/lib/Utils.py:791 tvspro/lib/Utils2.py:559
-#: tvspro/lib/Utils2.py:781 tvspro/plugin - ~.py:2139 tvspro/plugin.py:2359
-msgid "16:9 Letterbox"
-msgstr ""
-
-#: tvspro/lib/Utils.py:672 tvspro/lib/Utils.py:911 tvspro/lib/Utils2.py:900
-msgid ""
-"Subtitle Player plugin is not installed\n"
-"Please install it."
-msgstr ""
-
-#: tvspro/lib/Utils.py:683 tvspro/lib/Utils.py:922 tvspro/lib/Utils2.py:911
-msgid "Subtitle Player plugin Missing"
-msgstr ""
-
-#: tvspro/lib/Utils.py:688 tvspro/lib/Utils.py:927 tvspro/lib/Utils2.py:916
-msgid "Subtitle Player not working"
-msgstr ""
-
-#: tvspro/lib/Utils.py:963 tvspro/lib/Utils2.py:952
-msgid "Saving Video"
-msgstr "Salvataggio del video"
-
-#: tvspro/lib/Utils.py:1152 tvspro/lib/Utils2.py:1148
-msgid "Stream already added to bouquet"
-msgstr "Stream gi‡ aggiunto al bouquet"
-
-#: tvspro/lib/Utils.py:1159 tvspro/lib/Utils2.py:1155
-msgid "Adding to bouquet failed"
-msgstr "Aggiunta al bouquet non riuscita"
-
-#: tvspro/plugin - ~.py:135 tvspro/plugin.py:137
+#: plugin.py:201
 msgid "IPTV(4097)"
 msgstr ""
 
-#: tvspro/plugin - ~.py:136 tvspro/plugin.py:138
+#: plugin.py:202
 msgid "Dvb(1)"
 msgstr ""
 
-#: tvspro/plugin - ~.py:137 tvspro/plugin.py:139
+#: plugin.py:203
 msgid "eServiceUri(8193)"
 msgstr ""
 
-#: tvspro/plugin - ~.py:141 tvspro/plugin.py:143
+#: plugin.py:207
 msgid "Gstreamer(5001)"
 msgstr ""
 
-#: tvspro/plugin - ~.py:143 tvspro/plugin.py:145
+#: plugin.py:209
 msgid "Exteplayer3(5002)"
 msgstr ""
 
-#: tvspro/plugin - ~.py:148 tvspro/plugin.py:150
+#: plugin.py:213
 msgid "yes"
 msgstr ""
 
-#: tvspro/plugin - ~.py:148 tvspro/plugin.py:150
+#: plugin.py:213
 msgid "no"
 msgstr ""
 
-#: tvspro/plugin - ~.py:149
-msgid "Full-HD 1920x1080"
-msgstr ""
-
-#: tvspro/plugin - ~.py:149
-msgid "HD 1280x720"
-msgstr ""
-
-#: tvspro/plugin - ~.py:163 ~.py:453 tvspro/plugin.py:622
-msgid "Config"
-msgstr "Config"
-
-#: tvspro/plugin - ~.py:194 ~.py:204 tvspro/plugin.py:215 tvspro/plugin.py:225
-msgid "Services Player Reference type"
-msgstr ""
-
-#: tvspro/plugin - ~.py:195 ~.py:207 tvspro/plugin.py:216 tvspro/plugin.py:228
-msgid "Cache folder"
-msgstr "Cartella cache"
-
-#: tvspro/plugin - ~.py:196 ~.py:210 tvspro/plugin.py:231
-msgid "Skin resolution-(restart e2 after change)"
-msgstr "Risoluzione Skin (riavvia e2 dopo la modifica)"
-
-#: tvspro/plugin - ~.py:197 ~.py:213 tvspro/plugin.py:218 tvspro/plugin.py:234
-msgid "Show thumbpic ?"
-msgstr "Mostra thumbpic?"
-
-#: tvspro/plugin - ~.py:205 tvspro/plugin.py:226
-msgid "Configure Service Player Reference, Enigma restart required"
-msgstr "Configura Service Player Reference, Ë richiesto il riavvio di Enigma"
-
-#: tvspro/plugin - ~.py:208
-msgid "Configure Folder Cache Path, Enigma restart required"
-msgstr "Configurare il percorso della cache delle cartelle, Ë necessario il riavvio di Enigma"
-
-#: tvspro/plugin - ~.py:211 tvspro/plugin.py:232
-msgid "Configure Skin Reloution Screen, Enigma restart required"
-msgstr "Configura la Risoluzione della Skin, Ë necessario il riavvio di Enigma"
-
-#: tvspro/plugin - ~.py:214 tvspro/plugin.py:235
-msgid "Show Thumbpics ? Enigma restart required"
-msgstr "Mostra Thumbpics? » necessario riavviare Enigma"
-
-#: tvspro/plugin - ~.py:251 tvspro/plugin.py:272
-msgid "Choose Directory:"
-msgstr "Scegli cartella"
-
-#: tvspro/plugin - ~.py:252 tvspro/plugin.py:273
-msgid "Choose Directory"
-msgstr "Scegli percorso"
-
-#: tvspro/plugin - ~.py:275 tvspro/plugin.py:293
-msgid "Settings saved correctly!"
-msgstr "Settings salvati correttamente"
-
-#: tvspro/plugin - ~.py:282 tvspro/plugin.py:300
-msgid "Really close without saving the settings?"
-msgstr "Uscire senza salvare le impostazioni?"
-
-#: tvspro/plugin - ~.py:452 ~.py:1211 ~.py:1272 ~.py:1343 ~.py:1412 ~.py:1489
-#: ~.py:1567 ~.py:1646 ~.py:1726 ~.py:1802 ~.py:1870 tvspro/plugin.py:621
-#: tvspro/plugin.py:1434 tvspro/plugin.py:1495 tvspro/plugin.py:1565
-#: tvspro/plugin.py:1633 tvspro/plugin.py:1709 tvspro/plugin.py:1787
-#: tvspro/plugin.py:1866 tvspro/plugin.py:1946 tvspro/plugin.py:2022
-#: tvspro/plugin.py:2090
-msgid "Select"
-msgstr "Seleziona"
-
-#: tvspro/plugin - ~.py:1205 ~.py:1266 ~.py:1337 ~.py:1406 ~.py:1483 ~.py:1561
-#: ~.py:1640 ~.py:1720 ~.py:1796 tvspro/plugin.py:1489 tvspro/plugin.py:1559
-#: tvspro/plugin.py:1627 tvspro/plugin.py:1703 tvspro/plugin.py:1781
-#: tvspro/plugin.py:1860 tvspro/plugin.py:1940
-msgid "TVS PRO"
-msgstr ""
-
-#: tvspro/plugin - ~.py:1210 ~.py:1271 ~.py:1342 ~.py:1411 ~.py:1488 ~.py:1566
-#: ~.py:1645 ~.py:1725 ~.py:1801 tvspro/plugin.py:1433 tvspro/plugin.py:1494
-#: tvspro/plugin.py:1564 tvspro/plugin.py:1632 tvspro/plugin.py:1708
-#: tvspro/plugin.py:1786 tvspro/plugin.py:1865 tvspro/plugin.py:1945
-#: tvspro/plugin.py:2021
-msgid "Cancel"
-msgstr "Annulla"
-
-#: tvspro/plugin - ~.py:1817 tvspro/plugin.py:2037
-msgid ""
-"\n"
-"\n"
-"Error downloading News!"
-msgstr ""
-
-#: tvspro/plugin - ~.py:1823 tvspro/plugin.py:2043
-msgid "==  WELCOME to WWW.TIVUSTREAM.COM ==\n"
-msgstr ""
-
-#: tvspro/plugin - ~.py:1824 tvspro/plugin.py:2044
-msgid "== SUPPORT ON: WWW.CORVOBOYS.COM http://t.me/tivustream ==\n"
-msgstr ""
-
-#: tvspro/plugin - ~.py:1825 tvspro/plugin.py:2045
-msgid "== thank's to @PCD and LINUXSAT-SUPPORT.COM \n"
-msgstr ""
-
-#: tvspro/plugin - ~.py:1826 ~.py:1833 ~.py:1840 tvspro/plugin.py:2046
-#: tvspro/plugin.py:2053 tvspro/plugin.py:2060
-msgid "========================================\n"
-msgstr ""
-
-#: tvspro/plugin - ~.py:1827 tvspro/plugin.py:2047
-msgid "NOTA BENE:\n"
-msgstr ""
-
-#: tvspro/plugin - ~.py:1828 tvspro/plugin.py:2048
-msgid "Le liste create ad HOC contengono indirizzi liberamente e gratuitamente\n"
-msgstr ""
-
-#: tvspro/plugin - ~.py:1829 tvspro/plugin.py:2049
-msgid "trovati in rete e non protetti da sottoscrizione o abbonamento.\n"
-msgstr ""
-
-#: tvspro/plugin - ~.py:1830 tvspro/plugin.py:2050
-msgid "Il server di riferimento strutturale ai progetti rilasciati\n"
-msgstr ""
-
-#: tvspro/plugin - ~.py:1831 tvspro/plugin.py:2051
-msgid "non e' fonte di alcun stream/flusso.\n"
-msgstr ""
-
-#: tvspro/plugin - ~.py:1832 tvspro/plugin.py:2052
-msgid "Assolutamente VIETATO utilizzare queste liste senza autorizzazione.\n"
-msgstr ""
-
-#: tvspro/plugin - ~.py:1834 tvspro/plugin.py:2054
-msgid "DISCLAIMER: \n"
-msgstr ""
-
-#: tvspro/plugin - ~.py:1835 tvspro/plugin.py:2055
-msgid "The lists created at HOC contain addresses freely and freely found on\n"
-msgstr ""
-
-#: tvspro/plugin - ~.py:1836 tvspro/plugin.py:2056
-msgid "the net and not protected by subscription or subscription.\n"
-msgstr ""
-
-#: tvspro/plugin - ~.py:1837 tvspro/plugin.py:2057
-msgid "The structural reference server for projects released\n"
-msgstr ""
-
-#: tvspro/plugin - ~.py:1838 tvspro/plugin.py:2058
-msgid "is not a source of any stream/flow.\n"
-msgstr ""
-
-#: tvspro/plugin - ~.py:1839 tvspro/plugin.py:2059
-msgid "Absolutely PROHIBITED to use this lists without authorization\n"
-msgstr ""
-
-#: tvspro/plugin.py:165
+#: plugin.py:227
 msgid "SETUP PLUGIN"
 msgstr ""
 
-#: tvspro/plugin.py:173
+#: plugin.py:235
 msgid "Empty Cache"
 msgstr "Vuota Cache"
 
-#: tvspro/plugin.py:210
+#: plugin.py:269
 msgid "All cache fold empty!"
-msgstr "Tutta la cache Ë vuota!"
+msgstr "Tutta la cache √® vuota!"
 
-#: tvspro/plugin.py:229
+#: plugin.py:274 plugin.py:283
+msgid "Services Player Reference type"
+msgstr ""
+
+#: plugin.py:274 plugin.py:284
+msgid "Configure Service Player Reference, Enigma restart required"
+msgstr "Configura Service Player Reference, √® richiesto il riavvio di Enigma"
+
+#: plugin.py:275 plugin.py:286
+msgid "Cache folder"
+msgstr "Cartella cache"
+
+#: plugin.py:275 plugin.py:287
 msgid "Configure Folder Cache Path (eg.: /media/hdd), Enigma restart required"
-msgstr "Configurare il percorso della cache della cartella (es .: /media/hdd), Ë necessario il riavvio di Enigma"
+msgstr ""
+"Configurare il percorso della cache della cartella (es .: /media/hdd), √® "
+"necessario il riavvio di Enigma"
+
+#: plugin.py:276 plugin.py:292
+msgid "Show thumbpic ?"
+msgstr "Mostra thumbpic?"
+
+#: plugin.py:276 plugin.py:293
+msgid "Show Thumbpics ? Enigma restart required"
+msgstr "Mostra Thumbpics? √à necessario riavviare Enigma"
+
+#: plugin.py:289
+msgid "Skin resolution-(restart e2 after change)"
+msgstr "Risoluzione Skin (riavvia e2 dopo la modifica)"
+
+#: plugin.py:290
+msgid "Configure Skin Resolution Screen, Enigma restart required"
+msgstr ""
+
+#: plugin.py:330
+msgid "Choose Directory:"
+msgstr "Scegli cartella"
+
+#: plugin.py:331
+msgid "Choose Directory"
+msgstr "Scegli percorso"
+
+#: plugin.py:351
+msgid "Settings saved correctly!"
+msgstr "Settings salvati correttamente"
+
+#: plugin.py:358
+msgid "Really close without saving the settings?"
+msgstr "Uscire senza salvare le impostazioni?"
+
+#: plugin.py:886 plugin.py:1279
+msgid "Filter this category..."
+msgstr ""
+
+#: plugin.py:1311 plugin.py:1372 plugin.py:1445 plugin.py:1516 plugin.py:1587
+#: plugin.py:1660 plugin.py:1738 plugin.py:1814 plugin.py:1893 plugin.py:1969
+msgid "Cancel"
+msgstr "Annulla"
+
+#: plugin.py:1312 plugin.py:1373 plugin.py:1446 plugin.py:1517 plugin.py:1588
+#: plugin.py:1661 plugin.py:1739 plugin.py:1815 plugin.py:1894 plugin.py:1970
+#: plugin.py:2038
+msgid "Select"
+msgstr "Seleziona"
+
+#: plugin.py:1985
+msgid ""
+"\n"
+"\n"
+"Error downloading Info!"
+msgstr ""
+
+#: plugin.py:1991
+msgid "==  WELCOME to WWW.TIVUSTREAM.COM ==\n"
+msgstr ""
+
+#: plugin.py:1992
+msgid "== SUPPORT ON: WWW.CORVOBOYS.COM http://t.me/tivustream ==\n"
+msgstr ""
+
+#: plugin.py:1993
+msgid "== thank's to @PCD and LINUXSAT-SUPPORT.COM\n"
+msgstr ""
+
+#: plugin.py:1994 plugin.py:2001 plugin.py:2008
+msgid "========================================\n"
+msgstr ""
+
+#: plugin.py:1995
+msgid "NOTA BENE:\n"
+msgstr ""
+
+#: plugin.py:1996
+msgid ""
+"Le liste create ad HOC contengono indirizzi liberamente e gratuitamente\n"
+msgstr ""
+
+#: plugin.py:1997
+msgid "trovati in rete e non protetti da sottoscrizione o abbonamento.\n"
+msgstr ""
+
+#: plugin.py:1998
+msgid "Il server di riferimento strutturale ai progetti rilasciati\n"
+msgstr ""
+
+#: plugin.py:1999
+msgid "non e' fonte di alcun stream/flusso.\n"
+msgstr ""
+
+#: plugin.py:2000
+msgid "Assolutamente VIETATO utilizzare queste liste senza autorizzazione.\n"
+msgstr ""
+
+#: plugin.py:2002
+msgid "DISCLAIMER:\n"
+msgstr ""
+
+#: plugin.py:2003
+msgid ""
+"The lists created at HOC contain addresses freely and freely found on\n"
+msgstr ""
+
+#: plugin.py:2004
+msgid "the net and not protected by subscription or subscription.\n"
+msgstr ""
+
+#: plugin.py:2005
+msgid "The structural reference server for projects released\n"
+msgstr ""
+
+#: plugin.py:2006
+msgid "is not a source of any stream/flow.\n"
+msgstr ""
+
+#: plugin.py:2007
+msgid "Absolutely PROHIBITED to use this lists without authorization\n"
+msgstr ""
+
+#: plugin.py:2037
+msgid "Exit"
+msgstr "Uscire"
+
+#: plugin.py:2167
+msgid "Install Streamlink first"
+msgstr ""
+
+#: plugin.py:2341
+msgid "4:3 Letterbox"
+msgstr ""
+
+#: plugin.py:2342
+msgid "4:3 PanScan"
+msgstr ""
+
+#: plugin.py:2343
+msgid "16:9"
+msgstr ""
+
+#: plugin.py:2344
+msgid "16:9 always"
+msgstr ""
+
+#: plugin.py:2345
+msgid "16:10 Letterbox"
+msgstr ""
+
+#: plugin.py:2346
+msgid "16:10 PanScan"
+msgstr ""
+
+#: plugin.py:2347
+msgid "16:9 Letterbox"
+msgstr ""
+
+#~ msgid "Saving Video"
+#~ msgstr "Salvataggio del video"
+
+#~ msgid "Stream already added to bouquet"
+#~ msgstr "Stream gi√† aggiunto al bouquet"
+
+#~ msgid "Adding to bouquet failed"
+#~ msgstr "Aggiunta al bouquet non riuscita"
+
+#~ msgid "Config"
+#~ msgstr "Config"
+
+#~ msgid "Configure Folder Cache Path, Enigma restart required"
+#~ msgstr ""
+#~ "Configurare il percorso della cache delle cartelle, √® necessario il "
+#~ "riavvio di Enigma"
+
+#~ msgid "Configure Skin Reloution Screen, Enigma restart required"
+#~ msgstr ""
+#~ "Configura la Risoluzione della Skin, √® necessario il riavvio di Enigma"
