@@ -9,7 +9,7 @@ Info http://t.me/tivustream
 *             07/08/2021               *
 ****************************************
 '''
-
+from . import _
 try:
        from Plugins.Extensions.SubsSupport import SubsSupport, initSubsSettings
        from Plugins.Extensions.tvspro.lib.Utils2 import *
