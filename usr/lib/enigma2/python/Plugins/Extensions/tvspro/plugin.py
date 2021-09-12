@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/python
-from __future__ import print_function                                     
 '''
 Info http://t.me/tivustream
 ****************************************
@@ -9,6 +8,7 @@ Info http://t.me/tivustream
 *             07/08/2021               *
 ****************************************
 '''
+from __future__ import print_function
 from . import _
 try:
        from Plugins.Extensions.SubsSupport import SubsSupport, initSubsSettings
@@ -44,15 +44,24 @@ import glob
 import json
 import six
 import sys
-PY3 = sys.version_info.major >= 3
-from six.moves.urllib.request import urlopen
-from six.moves.urllib.request import Request
-from six.moves.urllib.error import HTTPError, URLError
-from six.moves.urllib.parse import urlparse
-from six.moves.urllib.parse import quote
-from six.moves.urllib.parse import urlencode
-import six.moves.urllib.request
-
+# PY3 = sys.version_info.major >= 3
+# from six.moves.urllib.request import urlopen
+# from six.moves.urllib.request import Request
+# from six.moves.urllib.error import HTTPError, URLError
+# from six.moves.urllib.parse import urlparse
+# from six.moves.urllib.parse import quote
+# from six.moves.urllib.parse import urlencode
+# # import six.moves.urllib.request
+PY3 = False
+try:
+    from urllib.request import urlopen, Request
+    from urllib.error import URLError, HTTPError
+    from urllib.parse import urlparse, urlencode, quote
+    PY3 = True; unicode = str; unichr = chr; long = int
+except:
+    from urllib2 import urlopen, Request, URLError, HTTPError
+    from urlparse import urlparse
+    from urllib import urlencode, quote
 
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36',
        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', 'Accept-Encoding': 'deflate'}
@@ -61,12 +70,12 @@ DESKHEIGHT = getDesktop(0).size().height()
 HD = getDesktop(0).size()
 
 streamlink = False
-try:       
+try:
     if os.path.exists('/usr/lib/python2.7/site-packages/streamlink'):
         if fileExists('/usr/lib/python2.7/site-packages/streamlink/plugin/plugin.pyo'):
             streamlink = True
 except:
-    streamlink = False            
+    streamlink = False
 
 def getversioninfo():
     currversion = '1.2'
@@ -82,7 +91,7 @@ def getversioninfo():
     return (currversion)
 global defpic, dblank
 currversion = getversioninfo()
-Version = currversion + ' - 07.08.2021'
+Version = currversion + ' - 12.09.2021'
 title_plug = '..:: TivuStream Pro Revolution V. %s ::..' % Version
 name_plug = 'TivuStream Pro Revolution'
 res_plugin_path = THISPLUG + 'res/'
@@ -90,31 +99,17 @@ skin_path = THISPLUG
 folder_path = "/tmp/tvspro/"
 if not os.path.exists(folder_path):
     os.makedirs(folder_path)
-# Credits = 'Info http://t.me/tivustream'
-# Credits2 = 'Maintener @Lululla @Pcd'
-# dir_enigma2 = '/etc/enigma2/'
-# service_types_tv = '1:7:1:0:0:0:0:0:0:0:(type == 1) || (type == 17) || (type == 22) || (type == 25) || (type == 134) || (type == 195)'
+
 SREF = ""
 
 def checkStr(txt):
-    if six.PY3:
+    if PY3:
         if isinstance(txt, type(bytes())):
             txt = txt.decode('utf-8')
     else:
         if isinstance(txt, type(six.text_type())):
             txt = txt.encode('utf-8')
     return txt
-
-eDreamOS = False
-try:
-    from enigma import eMediaDatabase
-    eDreamOS = True
-except:
-    eDreamOS = False
-try:
-    from urlparse import urlparse
-except:
-    from urllib.parse import urlparse
 if HD.width() > 1280:
     skin_path = res_plugin_path + 'skins/fhd/'
     defpic = res_plugin_path + "pics/defaultL.png"
@@ -123,7 +118,6 @@ else:
     skin_path = res_plugin_path + 'skins/hd/'
     defpic = res_plugin_path + "pics/default.png"
     dblank = res_plugin_path + "pics/blank.png"
-
 try:
     from OpenSSL import SSL
     from twisted.internet import ssl
@@ -132,6 +126,10 @@ try:
 except:
     sslverify = False
 if sslverify:
+    try:
+        from urlparse import urlparse
+    except:
+        from urllib.parse import urlparse
     class SNIFactory(ssl.ClientContextFactory):
         def __init__(self, hostname=None):
             self.hostname = hostname
@@ -142,50 +140,71 @@ if sslverify:
                 ClientTLSOptions(self.hostname, ctx)
             return ctx
 
+# def getUrl(url):
+    # link = []
+    # print("Here in client2 getUrl url =", url)
+    # req = Request(url)
+    # req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+    # response = urlopen(req)
+    # link=response.read()
+    # response.close()
+    # print("Here in client2 link =", link)
+    # return link
 
-def getJsonURL(url):
-    request = Request(url)
-    req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-    request.add_header('Accept-Encoding', 'gzip')
-    response = urlopen(request, timeout=30)
-    gzipped = response.info().get('Content-Encoding') == 'gzip'
-    data = '' #[]
-    dec_obj = zlib.decompressobj(16 + zlib.MAX_WBITS)
-    while True:
-        res_data = response.read()
-        if not res_data:
-            break
-        if gzipped:
-            data += dec_obj.decompress(res_data)
-        else:
-            data += res_data
-    return json.loads(data)
+# def getUrl2(url, referer):
+        # try:
+            # req =Request(url)
+        # except:
+            # req = Request(url)
+        # req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+        # req.add_header('Referer', referer)
+        # try:
+            # try:
+                # response = urlopen(req)
+            # except:
+                # response = urlopen(req)
+            # link=response.read()
+            # response.close()
+            # return link
+        # except:
+            # import ssl
+            # gcontext = ssl._create_unverified_context()
+            # try:
+                # response = urlopen(req)
+            # except:
+                # response = urlopen(req)
+            # link=response.read()
+            # response.close()
+            # return link
 
 def getUrl(url):
     link = []
+    url= checkStr(url)
     try:
-        import requests
-        if six.PY3:
-            url = url.encode()
-        link = requests.get(url, headers = {'User-Agent': 'Mozilla/5.0'}).text
-        # link = requests.get(url, headers = headers).text
+        print("Here in client1 getUrl url =", url)
+        req = Request(url)
+        req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+        response = urlopen(req)#.decode('utf-8')
+        link=response.read()#.decode('utf-8')
+        response.close()
+        print("Here in client1 link =", link)
         return link
     except ImportError:
         print("Here in client2 getUrl url =", url)
-        if six.PY3:
-            url = url.encode()
+        print("Here in client2 getUrl url =", url)        
         req = Request(url)
         req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
         response = urlopen(req, None, 3)
-        link=response.read()
+        link=response.read()#.decode('utf-8')
         response.close()
         print("Here in client2 link =", link)
         return link
     except:
-        return
+        return ''
     return
 
 def getUrl2(url, referer):
+    url= checkStr(url)
     link = []
     print("Here in client2 getUrl2 url =", url)
     req = Request(url)
@@ -214,12 +233,12 @@ config.plugins.tvspro.thumb = ConfigSelection(default = "True", choices = [("Tru
 cfg = config.plugins.tvspro
 
 class ConfigEx(Screen, ConfigListScreen):
-
     def __init__(self, session):
-        if eDreamOS:
+        skin = skin_path + 'Config.xml'    
+        if os.path.exists('/var/lib/dpkg/status'):
             skin = skin_path + 'ConfigOs.xml'
-        else:
-            skin = skin_path + 'Config.xml'
+        # else:
+            # skin = skin_path + 'Config.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
             f.close()
@@ -372,10 +391,6 @@ def getpics(names, pics, tmpfold, picfold):
     # print("In getpics tmpfold =", tmpfold)
     # print("In getpics picfold =", picfold)
     defpic = defpic
-    if HD.width() > 1280:
-        nw = 300
-    else:
-        nw = 200
     pix = []
     if config.plugins.tvspro.thumb.value == "False":
         defpic = defpic
@@ -412,7 +427,7 @@ def getpics(names, pics, tmpfold, picfold):
         url = url.replace(" ", "%20")
         url = url.replace("ExQ", "=")
         # print("In getpics url =", url)
-#-----------------
+#------- check image
         ext = str(os.path.splitext(url)[-1])
         picf = picfold + "/" + name + ext
         tpicf = tmpfold + "/" + name + ext
@@ -438,6 +453,7 @@ def getpics(names, pics, tmpfold, picfold):
                 except:
                     pass
             else:
+                # now download image
                 try:
                     if "|" in url:
                         n3 = url.find("|", 0)
@@ -465,34 +481,47 @@ def getpics(names, pics, tmpfold, picfold):
             # print("In getpics not fileExists(tpicf) cmd=", cmd)
             os.system(cmd)
         try:
-            if eDreamOS == False:
+            # now resise image
+            # if os.path.exists('/var/lib/dpkg/status'):
                 try:
-                    import Image
+                    from PIL import Image                
+
                 except:
-                    from PIL import Image
-                im = Image.open(tpicf)
-                # imode = im.mode
-                # if im.mode == "JPEG":
-                    # im.save("xxx.jpg")
-                    # in most case, resulting jpg file is resized small one
-                # if imode.mode in ["RGBA", "P"]:
-                    # imode = imode.convert("RGB")
-                    # rgb_im.save("xxx.jpg")
-                # if imode != "P":
-                    # im = im.convert("P")
-                # if im.mode != "P":
-                    # im = im.convert("P")
-                w = im.size[0]
-                d = im.size[1]
-                r = float(d)/float(w)
-                d1 = r*nw
-                if w != nw:
-                    x = int(nw)
-                    y = int(d1)
-                    im = im.resize((x,y), Image.ANTIALIAS)
-                im.save(tpicf, quality=100, optimize=True)
-                # im.save(tpicf)
-##########################
+                    import Image
+                if HD.width() > 1280:
+                    nw = 220
+                else:
+                    nw = 150        
+
+                if os.path.exists(tpicf):
+                    try:
+                        im = Image.open(tpicf)#.convert('RGBA')
+                        # imode = im.mode
+                        # if im.mode == "JPEG":
+                            # im.save(tpicf)
+                            # # in most case, resulting jpg file is resized small one
+                        # if imode.mode in ["RGBA", "P"]:
+                            # imode = imode.convert("RGB")
+                            # rgb_im.save(tpicf)
+                        # if imode != "P":
+                            # im = im.convert("P")
+                        # if im.mode != "P":
+                            # im = im.convert("P")
+                        w = im.size[0]
+                        d = im.size[1]
+                        r = float(d)/float(w)
+                        d1 = r*nw
+                        if w != nw:
+                            x = int(nw)
+                            y = int(d1)
+                            im = im.resize((x,y), Image.ANTIALIAS)
+                        im.save(tpicf, quality=100, optimize=True)
+                        # im.save(tpicf, 'JPG')
+                        # # im.save(tpicf)
+                    except Exception as e:
+                           print("******* picon resize failed *******")
+                           print(e)                            
+###
         except:
             tpicf = defpic
         pix.append(j)
@@ -502,7 +531,6 @@ def getpics(names, pics, tmpfold, picfold):
     print("In getpics final cmd1=", cmd1)
     os.system(cmd1)
     return pix
-#-----------------
 
 #menulist
 class AnimMain(Screen):
@@ -1026,12 +1054,12 @@ class GridMain(Screen):
     def showIMDB(self):
         itype = self.index
         name = self.names[itype]
-        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
+        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.py"):
             from Plugins.Extensions.TMBD.plugin import TMBD
             text_clear = name
             text = charRemove(text_clear)
             self.session.open(TMBD, text, False)
-        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.py"):
             from Plugins.Extensions.IMDb.plugin import IMDB
             text_clear = name
             text = charRemove(text_clear)
@@ -1346,7 +1374,6 @@ class tvspromain(Screen):
         self.infos.append("Film and Movie")
         self.infos.append("Series")
         self.infos.append("Search your Movie")
-
         self.session.open(AnimMain, name_plug, "Videos2", self.names, self.urls, self.infos, pics = [])
 
     def okClicked(self):
@@ -1390,7 +1417,7 @@ class Videos2(Screen):
         url = self.url
         print("Videos2 url =", url)
         content = getUrl(url)
-        if six.PY3:
+        if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -1464,7 +1491,7 @@ class Videos6(Screen):
         url = self.url
         print("Videos1 url =", url)
         content = getUrl(url)
-        if six.PY3:
+        if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -1534,7 +1561,7 @@ class Videos1(Screen):
         url = self.url
         print("Videos1 url =", url)
         content = getUrl(url)
-        if six.PY3:
+        if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -1605,7 +1632,7 @@ class nextVideos1(Screen):
         url = self.url
         print("nextVideos1 url =", url)
         content = getUrl(url)
-        if six.PY3:
+        if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -1682,7 +1709,7 @@ class Videos3(Screen):
         url = self.url
         print("Videos3 url =", url)
         content = getUrl(url)
-        if six.PY3:
+        if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -1726,7 +1753,6 @@ class Videos3(Screen):
 class Videos4(Screen):
 
     def __init__(self, session, name, url):
-
         Screen.__init__(self, session)
         self.list = []
         self["menu"] = List(self.list)
@@ -1760,7 +1786,7 @@ class Videos4(Screen):
         url = self.url
         print("Videos4 url =", url)
         content = getUrl(url)
-        if six.PY3:
+        if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -1801,7 +1827,6 @@ class Videos4(Screen):
         pass
 
 class nextVideos4(Screen):
-
     def __init__(self, session, name, url):
         Screen.__init__(self, session)
         self.list = []
@@ -1836,7 +1861,7 @@ class nextVideos4(Screen):
         url = self.url
         print("nextVideos4 url =", url)
         content = getUrl(url)
-        if six.PY3:
+        if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -1914,7 +1939,7 @@ class Videos5(Screen):
         url = self.url
         print("Videos5 url =", url)
         content = getUrl(url)
-        if six.PY3:
+        if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -2330,7 +2355,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         if '8088' in str(self.url):
             self.onLayoutFinish.append(self.slinkPlay)
         else:
-            self.onLayoutFinish.append(self.cicleStreamType) 
+            self.onLayoutFinish.append(self.cicleStreamType)
         self.onClose.append(self.cancel)
         return
 
@@ -2409,8 +2434,8 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
                 text_clear = self.infos[inf]
             else:
                 text_clear = name
-            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)    
-            
+            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+
     def slinkPlay(self, url):
         ref = str(url)
         ref = ref.replace(':', '%3a')
@@ -2426,7 +2451,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         url = url.replace(' ','%20')
         ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:' + str(url)
         if streaml == True:
-            ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + str(url)        
+            ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + str(url)
         print('final reference:   ', ref)
         sref = eServiceReference(ref)
         sref.setName(self.name)
@@ -2546,10 +2571,10 @@ def charRemove(text):
 
 def main(session, **kwargs):
     _session = session
-    os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "tvspro")
-    os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "tvspro/vid")
-    os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "tvspro/pic")
-    os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "tvspro/tmp")
+    os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro")
+    os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro/vid")
+    os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro/pic")
+    os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro/tmp")
     exo = tvspromain(_session)
     exo.startSession()
 

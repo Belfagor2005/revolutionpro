@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: exodus\n"
-"POT-Creation-Date: 2021-09-07 19:46+0200\n"
+"POT-Creation-Date: 2021-09-12 18:20+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -13,217 +13,217 @@ msgstr ""
 "X-Poedit-Basepath: ../../..\n"
 "X-Poedit-SearchPath-0: plugin.py\n"
 
-#: plugin.py:201
+#: plugin.py:220
 msgid "IPTV(4097)"
 msgstr ""
 
-#: plugin.py:202
+#: plugin.py:221
 msgid "Dvb(1)"
 msgstr ""
 
-#: plugin.py:203
+#: plugin.py:222
 msgid "eServiceUri(8193)"
 msgstr ""
 
-#: plugin.py:207
+#: plugin.py:226
 msgid "Gstreamer(5001)"
 msgstr ""
 
-#: plugin.py:209
+#: plugin.py:228
 msgid "Exteplayer3(5002)"
 msgstr ""
 
-#: plugin.py:213
+#: plugin.py:232
 msgid "yes"
 msgstr ""
 
-#: plugin.py:213
+#: plugin.py:232
 msgid "no"
 msgstr ""
 
-#: plugin.py:227
+#: plugin.py:246
 msgid "SETUP PLUGIN"
 msgstr ""
 
-#: plugin.py:235
+#: plugin.py:254
 msgid "Empty Cache"
 msgstr "Vuota Cache"
 
-#: plugin.py:269
+#: plugin.py:288
 msgid "All cache fold empty!"
 msgstr "Tutta la cache è vuota!"
 
-#: plugin.py:274 plugin.py:283
+#: plugin.py:293 plugin.py:302
 msgid "Services Player Reference type"
 msgstr ""
 
-#: plugin.py:274 plugin.py:284
+#: plugin.py:293 plugin.py:303
 msgid "Configure Service Player Reference, Enigma restart required"
 msgstr "Configura Service Player Reference, è richiesto il riavvio di Enigma"
 
-#: plugin.py:275 plugin.py:286
+#: plugin.py:294 plugin.py:305
 msgid "Cache folder"
 msgstr "Cartella cache"
 
-#: plugin.py:275 plugin.py:287
+#: plugin.py:294 plugin.py:306
 msgid "Configure Folder Cache Path (eg.: /media/hdd), Enigma restart required"
 msgstr ""
 "Configurare il percorso della cache della cartella (es .: /media/hdd), è "
 "necessario il riavvio di Enigma"
 
-#: plugin.py:276 plugin.py:292
+#: plugin.py:295 plugin.py:311
 msgid "Show thumbpic ?"
 msgstr "Mostra thumbpic?"
 
-#: plugin.py:276 plugin.py:293
+#: plugin.py:295 plugin.py:312
 msgid "Show Thumbpics ? Enigma restart required"
 msgstr "Mostra Thumbpics? È necessario riavviare Enigma"
 
-#: plugin.py:289
+#: plugin.py:308
 msgid "Skin resolution-(restart e2 after change)"
 msgstr "Risoluzione Skin (riavvia e2 dopo la modifica)"
 
-#: plugin.py:290
+#: plugin.py:309
 msgid "Configure Skin Resolution Screen, Enigma restart required"
-msgstr ""
+msgstr "Configura risoluzione Skin, � necessario riavviare Enigma"
 
-#: plugin.py:330
+#: plugin.py:349
 msgid "Choose Directory:"
 msgstr "Scegli cartella"
 
-#: plugin.py:331
+#: plugin.py:350
 msgid "Choose Directory"
 msgstr "Scegli percorso"
 
-#: plugin.py:351
+#: plugin.py:370
 msgid "Settings saved correctly!"
 msgstr "Settings salvati correttamente"
 
-#: plugin.py:358
+#: plugin.py:377
 msgid "Really close without saving the settings?"
 msgstr "Uscire senza salvare le impostazioni?"
 
-#: plugin.py:886 plugin.py:1279
+#: plugin.py:914 plugin.py:1307
 msgid "Filter this category..."
 msgstr ""
 
-#: plugin.py:1311 plugin.py:1372 plugin.py:1445 plugin.py:1516 plugin.py:1587
-#: plugin.py:1660 plugin.py:1738 plugin.py:1814 plugin.py:1893 plugin.py:1969
+#: plugin.py:1339 plugin.py:1399 plugin.py:1472 plugin.py:1543 plugin.py:1614
+#: plugin.py:1687 plugin.py:1764 plugin.py:1839 plugin.py:1918 plugin.py:1994
 msgid "Cancel"
 msgstr "Annulla"
 
-#: plugin.py:1312 plugin.py:1373 plugin.py:1446 plugin.py:1517 plugin.py:1588
-#: plugin.py:1661 plugin.py:1739 plugin.py:1815 plugin.py:1894 plugin.py:1970
-#: plugin.py:2038
+#: plugin.py:1340 plugin.py:1400 plugin.py:1473 plugin.py:1544 plugin.py:1615
+#: plugin.py:1688 plugin.py:1765 plugin.py:1840 plugin.py:1919 plugin.py:1995
+#: plugin.py:2063
 msgid "Select"
 msgstr "Seleziona"
 
-#: plugin.py:1985
+#: plugin.py:2010
 msgid ""
 "\n"
 "\n"
 "Error downloading Info!"
 msgstr ""
 
-#: plugin.py:1991
+#: plugin.py:2016
 msgid "==  WELCOME to WWW.TIVUSTREAM.COM ==\n"
 msgstr ""
 
-#: plugin.py:1992
+#: plugin.py:2017
 msgid "== SUPPORT ON: WWW.CORVOBOYS.COM http://t.me/tivustream ==\n"
 msgstr ""
 
-#: plugin.py:1993
+#: plugin.py:2018
 msgid "== thank's to @PCD and LINUXSAT-SUPPORT.COM\n"
 msgstr ""
 
-#: plugin.py:1994 plugin.py:2001 plugin.py:2008
+#: plugin.py:2019 plugin.py:2026 plugin.py:2033
 msgid "========================================\n"
 msgstr ""
 
-#: plugin.py:1995
+#: plugin.py:2020
 msgid "NOTA BENE:\n"
 msgstr ""
 
-#: plugin.py:1996
+#: plugin.py:2021
 msgid ""
 "Le liste create ad HOC contengono indirizzi liberamente e gratuitamente\n"
 msgstr ""
 
-#: plugin.py:1997
+#: plugin.py:2022
 msgid "trovati in rete e non protetti da sottoscrizione o abbonamento.\n"
 msgstr ""
 
-#: plugin.py:1998
+#: plugin.py:2023
 msgid "Il server di riferimento strutturale ai progetti rilasciati\n"
 msgstr ""
 
-#: plugin.py:1999
+#: plugin.py:2024
 msgid "non e' fonte di alcun stream/flusso.\n"
 msgstr ""
 
-#: plugin.py:2000
+#: plugin.py:2025
 msgid "Assolutamente VIETATO utilizzare queste liste senza autorizzazione.\n"
 msgstr ""
 
-#: plugin.py:2002
+#: plugin.py:2027
 msgid "DISCLAIMER:\n"
 msgstr ""
 
-#: plugin.py:2003
+#: plugin.py:2028
 msgid ""
 "The lists created at HOC contain addresses freely and freely found on\n"
 msgstr ""
 
-#: plugin.py:2004
+#: plugin.py:2029
 msgid "the net and not protected by subscription or subscription.\n"
 msgstr ""
 
-#: plugin.py:2005
+#: plugin.py:2030
 msgid "The structural reference server for projects released\n"
 msgstr ""
 
-#: plugin.py:2006
+#: plugin.py:2031
 msgid "is not a source of any stream/flow.\n"
 msgstr ""
 
-#: plugin.py:2007
+#: plugin.py:2032
 msgid "Absolutely PROHIBITED to use this lists without authorization\n"
 msgstr ""
 
-#: plugin.py:2037
+#: plugin.py:2062
 msgid "Exit"
 msgstr "Uscire"
 
-#: plugin.py:2167
+#: plugin.py:2192
 msgid "Install Streamlink first"
 msgstr ""
 
-#: plugin.py:2341
+#: plugin.py:2366
 msgid "4:3 Letterbox"
 msgstr ""
 
-#: plugin.py:2342
+#: plugin.py:2367
 msgid "4:3 PanScan"
 msgstr ""
 
-#: plugin.py:2343
+#: plugin.py:2368
 msgid "16:9"
 msgstr ""
 
-#: plugin.py:2344
+#: plugin.py:2369
 msgid "16:9 always"
 msgstr ""
 
-#: plugin.py:2345
+#: plugin.py:2370
 msgid "16:10 Letterbox"
 msgstr ""
 
-#: plugin.py:2346
+#: plugin.py:2371
 msgid "16:10 PanScan"
 msgstr ""
 
-#: plugin.py:2347
+#: plugin.py:2372
 msgid "16:9 Letterbox"
 msgstr ""
 
