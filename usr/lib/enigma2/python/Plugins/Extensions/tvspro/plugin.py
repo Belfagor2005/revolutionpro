@@ -25,6 +25,9 @@ from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 from Components.Sources.List import List
 from Components.Sources.Source import Source
 from Components.Sources.StaticText import StaticText
+from Components.ProgressBar import ProgressBar
+from Components.Sources.Progress import Progress
+from Tools.Downloader import downloadWithProgress
 from Components.config import ConfigSubsection, config, configfile, ConfigText, ConfigDirectory, ConfigSelection,ConfigYesNo,ConfigEnableDisable
 from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection, InfoBarNotifications, InfoBarMenu, InfoBarSubtitleSupport
 from Screens.LocationBox import LocationBox
@@ -78,7 +81,7 @@ except:
     streamlink = False
 
 def getversioninfo():
-    currversion = '1.2'
+    currversion = '1.3'
     version_file = THISPLUG + 'version'
     if os.path.exists(version_file):
         try:
@@ -91,7 +94,7 @@ def getversioninfo():
     return (currversion)
 global defpic, dblank
 currversion = getversioninfo()
-Version = currversion + ' - 12.09.2021'
+Version = currversion + ' - 15.09.2021'
 title_plug = '..:: TivuStream Pro Revolution V. %s ::..' % Version
 name_plug = 'TivuStream Pro Revolution'
 res_plugin_path = THISPLUG + 'res/'
@@ -191,7 +194,7 @@ def getUrl(url):
         return link
     except ImportError:
         print("Here in client2 getUrl url =", url)
-        print("Here in client2 getUrl url =", url)        
+        print("Here in client2 getUrl url =", url)
         req = Request(url)
         req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
         response = urlopen(req, None, 3)
@@ -228,13 +231,27 @@ if os.path.exists("/usr/bin/exteplayer3"):
     mdchoice.append(("5002", _("Exteplayer3(5002)")))
 config.plugins.tvspro = ConfigSubsection()
 config.plugins.tvspro.services = ConfigSelection(default='4097', choices=mdchoice)
-config.plugins.tvspro.cachefold = ConfigDirectory("/media/hdd", False)
 config.plugins.tvspro.thumb = ConfigSelection(default = "True", choices = [("True", _("yes")),("False", _("no"))])
+config.plugins.tvspro.cachefold = ConfigDirectory("/media/hdd", False)
+config.plugins.tvspro.movie = ConfigDirectory("/media/hdd/movie")
+try:
+    from Components.UsageConfig import defaultMoviePath
+    downloadpath = defaultMoviePath()
+    config.plugins.tvspro.movie = ConfigDirectory(default=downloadpath)
+except:
+    if os.path.exists("/usr/bin/apt-get"):
+        config.plugins.tvspro.movie   = ConfigDirectory(default='/media/hdd/movie')
 cfg = config.plugins.tvspro
+
+global Path_Movies
+Path_Movies             = str(config.plugins.tvspro.movie.value) + "/"
+if Path_Movies.endswith("\/\/") is True:
+    Path_Movies = Path_Movies[:-1]
+print('patch movies: ', Path_Movies)
 
 class ConfigEx(Screen, ConfigListScreen):
     def __init__(self, session):
-        skin = skin_path + 'Config.xml'    
+        skin = skin_path + 'Config.xml'
         if os.path.exists('/var/lib/dpkg/status'):
             skin = skin_path + 'ConfigOs.xml'
         # else:
@@ -291,7 +308,8 @@ class ConfigEx(Screen, ConfigListScreen):
         self.editListEntry = None
         self.list = []
         self.list.append(getConfigListEntry(_('Services Player Reference type'), cfg.services,_("Configure Service Player Reference, Enigma restart required")))
-        self.list.append(getConfigListEntry(_("Cache folder"), cfg.cachefold,_("Configure Folder Cache Path (eg.: /media/hdd), Enigma restart required")))
+        self.list.append(getConfigListEntry(_("Cache folder"), cfg.cachefold,_("Folder Cache Path (eg.: /media/hdd), Enigma restart required")))
+        self.list.append(getConfigListEntry(_("Movie folder"), cfg.movie,_("Folder Movie Path (eg.: /media/hdd/movie), Enigma restart required")))
         self.list.append(getConfigListEntry(_("Show thumbpic ?"), cfg.thumb,_("Show Thumbpics ? Enigma restart required")))
         self['config'].list = self.list
         self["config"].setList(self.list)
@@ -302,14 +320,23 @@ class ConfigEx(Screen, ConfigListScreen):
         if entry == _('Services Player Reference type'):
             self['description'].setText(_("Configure Service Player Reference, Enigma restart required"))
             return
-        if entry == _('Cache folder'):
-            self['description'].setText(_("Configure Folder Cache Path (eg.: /media/hdd), Enigma restart required"))
+
+        if entry == _('Movie folder ?'):
+            self['description'].setText(_("Folder Movie Path (eg.: /media/hdd/movie), Enigma restart required"))
             return
+
+        if entry == _('Cache folder'):
+            self['description'].setText(_("Folder Cache Path (eg.: /media/hdd), Enigma restart required"))
+            return
+
         if entry == _('Skin resolution-(restart e2 after change)'):
             self['description'].setText(_("Configure Skin Resolution Screen, Enigma restart required"))
             return
+
         if entry == _('Show thumbpic ?'):
             self['description'].setText(_("Show Thumbpics ? Enigma restart required"))
+            return
+
         return
 
     def changedEntry(self):
@@ -338,6 +365,10 @@ class ConfigEx(Screen, ConfigListScreen):
         if sel and sel == config.plugins.tvspro.cachefold:
             self.setting = 'cachefold'
             self.openDirectoryBrowser(config.plugins.tvspro.cachefold.value)
+        if sel and sel == config.plugins.tvspro.movie:
+            self.setting = 'moviefold'
+            self.openDirectoryBrowser(config.plugins.tvspro.movie.value)
+
         else:
             pass
 
@@ -361,6 +392,9 @@ class ConfigEx(Screen, ConfigListScreen):
         if path is not None:
             if self.setting == 'cachefold':
                 config.plugins.tvspro.cachefold.setValue(path)
+            if self.setting == 'moviefold':
+                config.plugins.tvspro.movie.setValue(path)
+
         return
 
     def save(self):
@@ -484,14 +518,14 @@ def getpics(names, pics, tmpfold, picfold):
             # now resise image
             # if os.path.exists('/var/lib/dpkg/status'):
                 try:
-                    from PIL import Image                
+                    from PIL import Image
 
                 except:
                     import Image
                 if HD.width() > 1280:
                     nw = 220
                 else:
-                    nw = 150        
+                    nw = 150
 
                 if os.path.exists(tpicf):
                     try:
@@ -520,7 +554,7 @@ def getpics(names, pics, tmpfold, picfold):
                         # # im.save(tpicf)
                     except Exception as e:
                            print("******* picon resize failed *******")
-                           print(e)                            
+                           print(e)
 ###
         except:
             tpicf = defpic
@@ -643,12 +677,12 @@ class AnimMain(Screen):
         else:
             idx = self.index - 1
         name = self.names[idx]
-        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
+        if os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD"):
             from Plugins.Extensions.TMBD.plugin import TMBD
             text_clear = name
             text = charRemove(text_clear)
             self.session.open(TMBD, text, False)
-        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb"):
             from Plugins.Extensions.IMDb.plugin import IMDB
             text_clear = name
             text = charRemove(text_clear)
@@ -946,10 +980,10 @@ class GridMain(Screen):
         print("In Gridmain nextmodule = ", nextmodule)
         title = menuTitle
         self["title"] = Button(title)
-        tmpfold = config.plugins.tvspro.cachefold.value + "/tvspro/tmp"
-        picfold = config.plugins.tvspro.cachefold.value + "/tvspro/pic"
-        pics = getpics(names, pics, tmpfold, picfold)
-        print("In Gridmain pics = ", pics)
+        # tmpfold = config.plugins.tvspro.cachefold.value + "/tvspro/tmp"
+        # picfold = config.plugins.tvspro.cachefold.value + "/tvspro/pic"
+        # pics = getpics(names, pics, tmpfold, picfold)
+        # print("In Gridmain pics = ", pics)
         self.pos = []
         if HD.width() > 1280:
             self.pos.append([30,24])
@@ -975,6 +1009,12 @@ class GridMain(Screen):
             self.pos.append([984,305])
 
         print("self.pos =", self.pos)
+        tmpfold = config.plugins.tvspro.cachefold.value + "/tvspro/tmp"
+        picfold = config.plugins.tvspro.cachefold.value + "/tvspro/pic"
+        pics = getpics(names, pics, tmpfold, picfold)
+        print("In Gridmain pics = ", pics)
+
+
 
         self.name = menuTitle
         self.nextmodule = nextmodule
@@ -1054,12 +1094,12 @@ class GridMain(Screen):
     def showIMDB(self):
         itype = self.index
         name = self.names[itype]
-        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.py"):
+        if os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD"):
             from Plugins.Extensions.TMBD.plugin import TMBD
             text_clear = name
             text = charRemove(text_clear)
             self.session.open(TMBD, text, False)
-        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.py"):
+        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb"):
             from Plugins.Extensions.IMDb.plugin import IMDB
             text_clear = name
             text = charRemove(text_clear)
@@ -1996,6 +2036,7 @@ class Abouttvr(Screen):
         self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
         {
             "ok": self.okClicked,
+
             "back": self.close,
             "cancel": self.cancel,
             "red": self.close,
@@ -2055,16 +2096,24 @@ class Playstream1(Screen):
         skin = skin_path + 'Playstream1.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
+        self.setup_title = ('Select Player Stream')
         self.list = []
         self['list'] = RSList([])
         self['info'] = Label()
-        self['info'].setText('Select Player')
+        self['info'].setText(name)
         self['key_red'] = Button(_('Exit'))
         self['key_green'] = Button(_('Select'))
-        self['setupActions'] = ActionMap(['SetupActions', 'ColorActions', 'TimerEditActions'], {'red': self.cancel,
+        self['progress'] = ProgressBar()
+        self['progresstext'] = StaticText()
+        self["progress"].hide()
+        self.downloading = False
+        self['setupActions'] = ActionMap(['SetupActions', 'ColorActions', 'TimerEditActions', 'InfobarInstantRecord'], {'red': self.cancel,
          'green': self.okClicked,
-         'back' : self.cancel,
+         'back': self.cancel,
          'cancel': self.cancel,
+         "rec": self.runRec,
+         "instantRecord": self.runRec,
+         "ShortRecord": self.runRec,
          'ok': self.okClicked}, -2)
         self.name1 = name
         self.url = url
@@ -2075,10 +2124,71 @@ class Playstream1(Screen):
         self.onLayoutFinish.append(self.openTest)
         return
 
+
+    def runRec(self):
+        self.namem3u = self.name1
+        self.urlm3u = self.url
+        if self.downloading == True:
+            self.session.open(MessageBox, _('You are already downloading!!!'), MessageBox.TYPE_INFO, timeout=5)
+            return
+        else:
+            if '.mp4' or '.mkv' or '.flv' or '.avi' in self.urlm3u: # or 'm3u8':
+                self.session.openWithCallback(self.download_m3u, MessageBox, _("DOWNLOAD VIDEO?\n%s" %self.namem3u ) , type=MessageBox.TYPE_YESNO, timeout = 10, default = False)
+            else:
+                self.downloading = False
+                self.session.open(MessageBox, _('Only VOD Movie allowed or not .ext Filtered!!!'), MessageBox.TYPE_INFO, timeout=5)
+
+    def download_m3u(self, result):
+        if result:
+            if not 'm3u8' in self.urlm3u:
+                path = urlparse(self.urlm3u).path
+                ext = '.mp4'
+                ext = splitext(path)[1]
+                if ext != '.mp4' or ext != '.mkv' or ext != '.avi' or ext != '.flv': # or ext != 'm3u8':
+                    ext = '.mp4'
+                fileTitle = re.sub(r'[\<\>\:\"\/\\\|\?\*\[\]]', '_', self.namem3u)
+                fileTitle = re.sub(r' ', '_', fileTitle)
+                fileTitle = re.sub(r'_+', '_', fileTitle)
+                fileTitle = fileTitle.replace("(", "_").replace(")", "_").replace("#", "").replace("+", "_").replace("\'", "_").replace("'", "_").replace("!", "_").replace("&", "_")
+                fileTitle = fileTitle.lower() + ext
+                self.in_tmp = Path_Movies + fileTitle
+                self.downloading = True
+                self.download = downloadWithProgress(self.urlm3u, self.in_tmp)
+                self.download.addProgress(self.downloadProgress)
+                self.download.start().addCallback(self.check).addErrback(self.showError)
+            else:
+                self.downloading = False
+                self.session.open(MessageBox, _('Download Failed!!!'), MessageBox.TYPE_INFO, timeout=5)
+        else:
+            self.downloading = False
+        # return
+
+    def downloadProgress(self, recvbytes, totalbytes):
+        self["progress"].show()
+        self['progress'].value = int(100 * recvbytes / float(totalbytes))
+        self['progresstext'].text = '%d of %d kBytes (%.2f%%)' % (recvbytes / 1024, totalbytes / 1024, 100 * recvbytes / float(totalbytes))
+
+    def check(self, fplug):
+        checkfile = self.in_tmp
+        if os.path.exists(checkfile):
+            self.downloading = False
+            self['progresstext'].text = ''
+            self.progclear = 0
+            self['progress'].setValue(self.progclear)
+            self["progress"].hide()
+
+    def showError(self, error):
+        self.downloading = False
+        self.session.open(MessageBox, _('Download Failed!!!'), MessageBox.TYPE_INFO, timeout=5)
+
+
     def openTest(self):
         url = self.url
         self.names = []
         self.urls = []
+
+        self.names.append('Download Now')
+        self.urls.append(checkStr(url))
         self.names.append('Play Now')
         self.urls.append(checkStr(url))
         self.names.append('Play HLS')
@@ -2116,12 +2226,20 @@ class Playstream1(Screen):
                     pass
                 self.session.open(Playstream2, self.name, self.url, desc)
 
+
             if idx == 0:
+                # self.name = self.names[idx]
+                self.url = self.urls[idx]
+                print('In playVideo url D=', self.url)
+                self.runRec()
+                # return
+
+            if idx == 1:
                 self.name = self.names[idx]
                 self.url = self.urls[idx]
                 print('In playVideo url D=', self.url)
                 self.play()
-            elif idx == 1:
+            elif idx == 2:
                 print('In playVideo url B=', self.url)
                 self.name = self.names[idx]
                 self.url = self.urls[idx]
@@ -2136,7 +2254,7 @@ class Playstream1(Screen):
                 os.system('sleep 3')
                 self.url = '/tmp/hls.avi'
                 self.play()
-            elif idx == 2:
+            elif idx == 3:
                 print('In playVideo url A=', self.url)
                 url = self.url
                 try:
@@ -2151,16 +2269,17 @@ class Playstream1(Screen):
                 self.name = self.names[idx]
                 self.play()
 
-            elif idx == 3:
-                self.name = self.names[idx]
-                self.url = self.urls[idx]
-                print('In playVideo url D=', self.url)
-                self.play2()
             else:
-                self.name = self.names[idx]
-                self.url = self.urls[idx]
-                print('In playVideo url D=', self.url)
-                self.play()
+                if idx == 4:
+                    self.name = self.names[idx]
+                    self.url = self.urls[idx]
+                    print('In playVideo url D=', self.url)
+                    self.play2()
+            # else:
+                # self.name = self.names[idx]
+                # self.url = self.urls[idx]
+                # print('In playVideo url D=', self.url)
+                # self.play()
             return
 
     def playfile(self, serverint):
@@ -2418,12 +2537,12 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         return
 
     def showIMDB(self):
-        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
+        if os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD"):
             from Plugins.Extensions.TMBD.plugin import TMBD
             text_clear = self.name
             text = charRemove(text_clear)
             self.session.open(TMBD, text, False)
-        elif fileExists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb"):
             from Plugins.Extensions.IMDb.plugin import IMDB
             text_clear = self.name
             text = charRemove(text_clear)
@@ -2436,8 +2555,8 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
                 text_clear = name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
 
-    def slinkPlay(self, url):
-        ref = str(url)
+    def slinkPlay(self):
+        ref = str(self.url)
         ref = ref.replace(':', '%3a')
         ref = ref.replace(' ','%20')
         print('final reference:   ', ref)
@@ -2462,7 +2581,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         global streml
         streaml = False
         from itertools import cycle, islice
-        self.servicetype = str(config.plugins.tvspro.services.value)# +':0:1:0:0:0:0:0:0:0:'#  '4097'
+        self.servicetype = int(config.plugins.tvspro.services.value)# +':0:1:0:0:0:0:0:0:0:'#  '4097'
         print('servicetype1: ', self.servicetype)
         url = str(self.url)
         currentindex = 0
