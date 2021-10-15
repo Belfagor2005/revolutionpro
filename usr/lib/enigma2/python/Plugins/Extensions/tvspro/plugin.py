@@ -289,7 +289,7 @@ class ConfigEx(Screen, ConfigListScreen):
         self.setTitle(self.setup_title)
 
     def VirtualKeyBoardCallback(self, callback = None):
-        if callback is not None and len(callback):
+        if callback != None and len(callback):
             self["config"].getCurrent()[1].setValue(callback)
             self["config"].invalidate(self["config"].getCurrent())
 
@@ -389,7 +389,7 @@ class ConfigEx(Screen, ConfigListScreen):
             print(ex)
 
     def openDirectoryBrowserCB(self, path):
-        if path is not None:
+        if path != None:
             if self.setting == 'cachefold':
                 config.plugins.tvspro.cachefold.setValue(path)
             if self.setting == 'moviefold':
@@ -1107,7 +1107,7 @@ class GridMain(Screen):
             self.session.open(IMDB, HHHHH)
         else:
             inf = self.index
-            if inf is not None or inf != -1:
+            if inf != None or inf != -1:
                 text_clear = self.infos[inf]
             else:
                 text_clear = name
@@ -1121,7 +1121,7 @@ class GridMain(Screen):
         ipos = self.pos[ifr]
         print("ipos =", ipos)
         inf = self.index
-        if inf is not None or inf != -1:
+        if inf != None or inf != -1:
             self["info"].setText(self.infos[inf])
             print('infos: ', inf)
         self["frame"].moveTo( ipos[0], ipos[1], 1)
@@ -2201,7 +2201,7 @@ class Playstream1(Screen):
 
     def okClicked(self):
         idx = self['list'].getSelectionIndex()
-        if idx is not None or idx != -1:
+        if idx != None or idx != -1:
             self.name = self.names[idx]
             self.url = self.urls[idx]
 
@@ -2469,13 +2469,16 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.url = url
         self.name = name
         self.state = self.STATE_PLAYING
-        self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
-        SREF = self.srefOld
+        SREF= self.session.nav.getCurrentlyPlayingServiceReference()
+        # self.onLayoutFinish.append(self.cicleStreamType)
+        # self.onClose.append(self.cancel)
+		# self.onClose.append(self.__onClose)
         if '8088' in str(self.url):
-            self.onLayoutFinish.append(self.slinkPlay)
+            # self.onLayoutFinish.append(self.slinkPlay)
+            self.onFirstExecBegin.append(self.slinkPlay)
         else:
-            self.onLayoutFinish.append(self.cicleStreamType)
-        self.onClose.append(self.cancel)
+            # self.onLayoutFinish.append(self.cicleStreamType)
+            self.onFirstExecBegin.append(self.cicleStreamType)
         return
 
     def getAspect(self):
@@ -2518,11 +2521,11 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         sServiceref = ''
         try:
             servicename, serviceurl = getserviceinfo(sref)
-            if servicename is not None:
+            if servicename != None:
                 sTitle = servicename
             else:
                 sTitle = ''
-            if serviceurl is not None:
+            if serviceurl != None:
                 sServiceref = serviceurl
             else:
                 sServiceref = ''
@@ -2557,8 +2560,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
 
     def slinkPlay(self):
         ref = str(self.url)
-        ref = ref.replace(':', '%3a')
-        ref = ref.replace(' ','%20')
+        ref = ref.replace(':', '%3a').replace(' ','%20')
         print('final reference:   ', ref)
         sref = eServiceReference(ref)
         sref.setName(self.name)
@@ -2566,8 +2568,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.session.nav.playService(sref)
 
     def openPlay(self, servicetype, url):
-        url = url.replace(':', '%3a')
-        url = url.replace(' ','%20')
+        url = url.replace(':', '%3a').replace(' ','%20')
         ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:' + str(url)
         if streaml == True:
             ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + str(url)
@@ -2581,7 +2582,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         global streml
         streaml = False
         from itertools import cycle, islice
-        self.servicetype = int(config.plugins.tvspro.services.value)# +':0:1:0:0:0:0:0:0:0:'#  '4097'
+        self.servicetype = str(config.plugins.tvspro.services.value)# +':0:1:0:0:0:0:0:0:0:'#  '4097'
         print('servicetype1: ', self.servicetype)
         url = str(self.url)
         currentindex = 0
@@ -2607,14 +2608,31 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         print('servicetype2: ', self.servicetype)
         self.openPlay(self.servicetype, url)
 
+    def keyNumberGlobal(self, number):
+        self['text'].number(number)
+
+    def keyLeft(self):
+        self['text'].left()
+
+    def keyRight(self):
+        self['text'].right()
+
+    def showVideoInfo(self):
+        if self.shown:
+            self.hideInfobar()
+        if self.infoCallback != None:
+            self.infoCallback()
+        return
+
+    def showAfterSeek(self):
+        if isinstance(self, TvInfoBarShowHide):
+            self.doShow()
+            
     def cancel(self):
-        if os.path.exists('/tmp/hls.avi'):
+        if os.path.isfile('/tmp/hls.avi'):
             os.remove('/tmp/hls.avi')
         self.session.nav.stopService()
         self.session.nav.playService(SREF)
-        if self.pcip != 'None':
-            url2 = 'http://' + self.pcip + ':8080/requests/status.xml?command=pl_stop'
-            resp = urlopen(url2)
         if not self.new_aspect == self.init_aspect:
             try:
                 self.setAspect(self.init_aspect)
@@ -2627,66 +2645,100 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.close()
 
 def charRemove(text):
-    char = ["1080p",
-     "2018",
-     "2019",
-     "2020",
-     "2021",
-     "480p",
-     "4K",
-     "720p",
-     "ANIMAZIONE",
-     "APR",
-     "AVVENTURA",
-     "BIOGRAFICO",
-     "BDRip",
-     "BluRay",
-     "CINEMA",
-     "COMMEDIA",
-     "DOCUMENTARIO",
-     "DRAMMATICO",
-     "FANTASCIENZA",
-     "FANTASY",
-     "FEB",
-     "GEN",
-     "GIU",
-     "HDCAM",
-     "HDTC",
-     "HDTS",
-     "LD",
-     "MAFIA",
-     "MAG",
-     "MARVEL",
-     "MD",
-     "ORROR",
-     "NEW_AUDIO",
-     "POLIZ",
-     "R3",
-     "R6",
-     "SD",
-     "SENTIMENTALE",
-     "TC",
-     "TEEN",
-     "TELECINE",
-     "TELESYNC",
-     "THRILLER",
-     "Uncensored",
-     "V2",
-     "WEBDL",
-     "WEBRip",
-     "WEB",
-     "WESTERN",
-     "-",
-     "_",
-     ".",
-     "+",
-     "[",
-     "]"]
+        char = ["1080p",
+                 "2018",
+                 "2019",
+                 "2020",
+                 "2021",
+                 "2022"
+                 "PF1",
+                 "PF2",
+                 "PF3",
+                 "PF4",
+                 "PF5",
+                 "PF6",
+                 "PF7",
+                 "PF8",
+                 "PF9",
+                 "PF10",
+                 "PF11",
+                 "PF12",
+                 "PF13",
+                 "PF14",
+                 "PF15",
+                 "PF16",
+                 "PF17",
+                 "PF18",
+                 "PF19",
+                 "PF20",
+                 "PF21",
+                 "PF22",
+                 "PF23",
+                 "PF24",
+                 "PF25",
+                 "PF26",
+                 "PF27",
+                 "PF28",
+                 "PF29",
+                 "PF30"
+                 "480p",
+                 "4K",
+                 "720p",
+                 "ANIMAZIONE",
+                 # "APR",
+                 # "AVVENTURA",
+                 "BIOGRAFICO",
+                 "BDRip",
+                 "BluRay",
+                 "CINEMA",
+                 # "COMMEDIA",
+                 "DOCUMENTARIO",
+                 "DRAMMATICO",
+                 "FANTASCIENZA",
+                 "FANTASY",
+                 # "FEB",
+                 # "GEN",
+                 # "GIU",
+                 "HDCAM",
+                 "HDTC",
+                 "HDTS",
+                 "LD",
+                 "MAFIA",
+                 # "MAG",
+                 "MARVEL",
+                 "MD",
+                 # "ORROR",
+                 "NEW_AUDIO",
+                 "POLIZ",
+                 "R3",
+                 "R6",
+                 "SD",
+                 "SENTIMENTALE",
+                 "TC",
+                 "TEEN",
+                 "TELECINE",
+                 "TELESYNC",
+                 "THRILLER",
+                 "Uncensored",
+                 "V2",
+                 "WEBDL",
+                 "WEBRip",
+                 "WEB",
+                 "WESTERN",
+                 "-",
+                 "_",
+                 ".",
+                 "+",
+                 "[",
+                 "]"
+                 ]
 
-    myreplace = text
-    for ch in char:
-            myreplace = myreplace.replace(ch, "").replace("  ", " ").replace("       ", " ").strip()
-    return myreplace
+        myreplace = text.lower()
+        for ch in char:
+            ch= ch.lower()
+            # if myreplace == ch:
+            myreplace = myreplace.replace(ch, "").replace("  ", " ").replace("   ", " ").strip()
+        return myreplace
 
 def main(session, **kwargs):
     _session = session
