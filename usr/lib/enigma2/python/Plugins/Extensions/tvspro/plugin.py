@@ -32,6 +32,7 @@ from Components.config import ConfigSubsection, config, configfile, ConfigText, 
 from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection, InfoBarNotifications, InfoBarMenu, InfoBarSubtitleSupport
 from Screens.LocationBox import LocationBox
 from Screens.Screen import Screen
+from Screens.MessageBox import MessageBox
 from Screens.Standby import TryQuitMainloop
 from Screens.VirtualKeyBoard import VirtualKeyBoard
 from Tools.Directories import SCOPE_PLUGINS
