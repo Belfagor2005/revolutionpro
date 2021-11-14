@@ -5,7 +5,7 @@ Info http://t.me/tivustream
 ****************************************
 *        coded by Lululla              *
 *           thank's Pcd                *
-*             07/08/2021               *
+*             28/10/2021               *
 ****************************************
 '''
 from __future__ import print_function
@@ -55,18 +55,53 @@ import sys
 # from six.moves.urllib.parse import urlparse
 # from six.moves.urllib.parse import quote
 # from six.moves.urllib.parse import urlencode
-# # import six.moves.urllib.request
-PY3 = False
-try:
-    from urllib.request import urlopen, Request
-    from urllib.error import URLError, HTTPError
-    from urllib.parse import urlparse, urlencode, quote
-    PY3 = True; unicode = str; unichr = chr; long = int
-except:
-    from urllib2 import urlopen, Request, URLError, HTTPError
-    from urlparse import urlparse
-    from urllib import urlencode, quote
 
+# pythonFull = float(str(sys.version_info.major) + "." + str(sys.version_info.minor))
+# pythonVer = sys.version_info.major
+# PY3 = False
+# if pythonFull < 3.9:
+    # PY3 = True
+_session = None
+dreamos = False
+if os.path.exists('/var/lib/dpkg/status'):
+	dreamos = True
+
+if os.path.exists('/usr/lib/python2.7'):
+	from urllib2 import urlopen, Request, URLError, HTTPError
+	from urlparse import urlparse, parse_qs
+	from urllib import quote_plus, urlencode, quote
+	import httplib
+	import six
+	from htmlentitydefs import name2codepoint as n2cp
+	from urllib import unquote_plus
+
+PY3 = False
+if os.path.exists('/usr/lib/python3.9'):
+	import http.client
+	from urllib.error import URLError, HTTPError
+	from urllib.request import urlopen, Request
+	from urllib.parse import urlparse
+	from urllib.parse import quote_plus, unquote_plus
+	from urllib.parse import parse_qs, urlencode, quote
+	unicode = str; unichr = chr; long = int
+	PY3 = True
+
+# try:
+    # from urllib.request import urlopen, Request
+    # from urllib.error import URLError, HTTPError
+    # from urllib.parse import urlparse, urlencode, quote
+    # PY3 = True and not dreamos; 
+    # unicode = str; unichr = chr; long = int
+# except:
+    # from urllib2 import urlopen, Request, URLError, HTTPError
+    # from urlparse import urlparse
+    # from urllib import urlencode, quote
+
+try:
+    from PIL import Image
+
+except:
+    import Image
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36',
        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', 'Accept-Encoding': 'deflate'}
 THISPLUG = '/usr/lib/enigma2/python/Plugins/Extensions/tvspro/'
@@ -81,6 +116,18 @@ try:
 except:
     streamlink = False
 
+try:
+	from Plugins.Extensions.tmdb import tmdb
+	is_tmdb = True
+except Exception:
+	is_tmdb = False
+
+try:
+	from Plugins.Extensions.IMDb.plugin import main as imdb
+	is_imdb = True
+except Exception:
+	is_imdb = False
+    
 def getversioninfo():
     currversion = '1.3'
     version_file = THISPLUG + 'version'
@@ -107,7 +154,7 @@ if not os.path.exists(folder_path):
 SREF = ""
 
 def checkStr(txt):
-    if PY3:
+    if PY3 and not dreamos:
         if isinstance(txt, type(bytes())):
             txt = txt.decode('utf-8')
     else:
@@ -144,46 +191,9 @@ if sslverify:
                 ClientTLSOptions(self.hostname, ctx)
             return ctx
 
-# def getUrl(url):
-    # link = []
-    # print("Here in client2 getUrl url =", url)
-    # req = Request(url)
-    # req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-    # response = urlopen(req)
-    # link=response.read()
-    # response.close()
-    # print("Here in client2 link =", link)
-    # return link
-
-# def getUrl2(url, referer):
-        # try:
-            # req =Request(url)
-        # except:
-            # req = Request(url)
-        # req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-        # req.add_header('Referer', referer)
-        # try:
-            # try:
-                # response = urlopen(req)
-            # except:
-                # response = urlopen(req)
-            # link=response.read()
-            # response.close()
-            # return link
-        # except:
-            # import ssl
-            # gcontext = ssl._create_unverified_context()
-            # try:
-                # response = urlopen(req)
-            # except:
-                # response = urlopen(req)
-            # link=response.read()
-            # response.close()
-            # return link
-
 def getUrl(url):
     link = []
-    url= checkStr(url)
+    # url= checkStr(url)
     try:
         print("Here in client1 getUrl url =", url)
         req = Request(url)
@@ -208,7 +218,7 @@ def getUrl(url):
     return
 
 def getUrl2(url, referer):
-    url= checkStr(url)
+    # url= checkStr(url)
     link = []
     print("Here in client2 getUrl2 url =", url)
     req = Request(url)
@@ -255,8 +265,6 @@ class ConfigEx(Screen, ConfigListScreen):
         skin = skin_path + 'Config.xml'
         if os.path.exists('/var/lib/dpkg/status'):
             skin = skin_path + 'ConfigOs.xml'
-        # else:
-            # skin = skin_path + 'Config.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
             f.close()
@@ -264,7 +272,6 @@ class ConfigEx(Screen, ConfigListScreen):
         self.setup_title = _("SETUP PLUGIN")
         self.onChangedEntry = [ ]
         self.session = session
-        # self['title'] = Label(_('Setup Plugin'))
         self["status"] = Label()
         self["statusbar"] = Label()
         self['key_red'] = Label('Exit')
@@ -447,13 +454,10 @@ def getpics(names, pics, tmpfold, picfold):
         if name is None:
             name = "Video"
         try:
-            name = name.replace("&", "")
-            name = name.replace(":", "")
-            name = name.replace("(", "-")
-            name = name.replace(")", "")
-            name = name.replace(" ", "")
-            name = name.replace("'", "")
+            name = name.replace("&", "").replace(":", "").replace("(", "-")
+            name = name.replace(")", "").replace(" ", "").replace("'", "")
             name = name.replace("/", "-")
+
         except:
             pass
         url = pics[j]
@@ -461,6 +465,7 @@ def getpics(names, pics, tmpfold, picfold):
             url = ""
         url = url.replace(" ", "%20")
         url = url.replace("ExQ", "=")
+        url = url.replace("AxNxD", "&")
         # print("In getpics url =", url)
 #------- check image
         ext = str(os.path.splitext(url)[-1])
@@ -515,55 +520,80 @@ def getpics(names, pics, tmpfold, picfold):
             cmd = "cp " + defpic + " " + tpicf
             # print("In getpics not fileExists(tpicf) cmd=", cmd)
             os.system(cmd)
-        try:
-            # now resise image
-            # if os.path.exists('/var/lib/dpkg/status'):
-                try:
-                    from PIL import Image
+        # try:
 
-                except:
-                    import Image
-                if HD.width() > 1280:
-                    nw = 220
-                else:
-                    nw = 150
+            # #start kiddac code
+            # size = [200, 200]
+            # if screenwidth.width() > 1280:
+                # size = [300, 300]
+            # if os.path.exists(tpicf):
+                    # try:
+                        # im = Image.open(tpicf).convert('RGBA')
+                        # im.thumbnail(size, Image.ANTIALIAS)
+                        # # crop and center image
+                        # bg = Image.new('RGBA', size, (255, 255, 255, 0))
+                        # imagew, imageh = im.size
+                        # im_alpha = im.convert('RGBA').split()[-1]
+                        # bgwidth, bgheight = bg.size
+                        # bg_alpha = bg.convert('RGBA').split()[-1]
+                        # temp = Image.new('L', (bgwidth, bgheight), 0)
+                        # temp.paste(im_alpha, (int((bgwidth - imagew) / 2), int((bgheight - imageh) / 2)), im_alpha)
+                        # bg_alpha = ImageChops.screen(bg_alpha, temp)
+                        # bg.paste(im, (int((bgwidth - imagew) / 2), int((bgheight - imageh) / 2)))
+                        # im = bg
+                        # im.save(tpicf, 'PNG')
+                    # except Exception as e:
+                        # print("******* picon resize failed *******")
+                        # print(e)
+            # else:
+                # tpicf = defpic     
+            # #end kiddac code
 
-                if os.path.exists(tpicf):
-                    try:
-                        im = Image.open(tpicf)#.convert('RGBA')
-                        # imode = im.mode
-                        # if im.mode == "JPEG":
-                            # im.save(tpicf)
-                            # # in most case, resulting jpg file is resized small one
-                        # if imode.mode in ["RGBA", "P"]:
-                            # imode = imode.convert("RGB")
-                            # rgb_im.save(tpicf)
-                        # if imode != "P":
-                            # im = im.convert("P")
-                        # if im.mode != "P":
-                            # im = im.convert("P")
-                        w = im.size[0]
-                        d = im.size[1]
-                        r = float(d)/float(w)
-                        d1 = r*nw
-                        if w != nw:
-                            x = int(nw)
-                            y = int(d1)
-                            im = im.resize((x,y), Image.ANTIALIAS)
-                        im.save(tpicf, quality=100, optimize=True)
-                        # im.save(tpicf, 'JPG')
-                        # # im.save(tpicf)
-                    except Exception as e:
-                           print("******* picon resize failed *******")
-                           print(e)
-###
-        except:
+
+        if HD.width() > 1280:
+            nw = 220
+        else:
+            nw = 150
+        if os.path.exists(tpicf):
+            try:
+                im = Image.open(tpicf)#.convert('RGBA')
+                # imode = im.mode
+                # if im.mode == "JPEG":
+                    # im.save(tpicf)
+                    # # in most case, resulting jpg file is resized small one
+                # if imode.mode in ["RGBA", "P"]:
+                    # imode = imode.convert("RGB")
+                    # rgb_im.save(tpicf)
+                # if imode != "P":
+                    # im = im.convert("P")
+                # if im.mode != "P":
+                    # im = im.convert("P")
+                w = im.size[0]
+                d = im.size[1]
+                r = float(d)/float(w)
+                d1 = r*nw
+                if w != nw:
+                    x = int(nw)
+                    y = int(d1)
+                    im = im.resize((x,y), Image.ANTIALIAS)
+                im.save(tpicf, quality=100, optimize=True)
+                # im.save(tpicf, 'PNG')
+                # im.save(tpicf, 'JPG')
+                # # im.save(tpicf)
+            except Exception as e:
+                   print("******* picon resize failed *******")
+                   print(e)
+        else:
+            print("******* make picon failed *******")
             tpicf = defpic
+        # except:
+            # print("******* make picon failed *******")
+            # tpicf = defpic
         pix.append(j)
         pix[j] = picf
         j = j+1
     cmd1 = "cp " + tmpfold + "/* " + picfold + " && rm " + tmpfold + "/* &"
-    print("In getpics final cmd1=", cmd1)
+    # print("In getpics final cmd1=", cmd1)
     os.system(cmd1)
     return pix
 
@@ -573,6 +603,8 @@ class AnimMain(Screen):
     def __init__(self, session, menuTitle, nextmodule, names, urls, infos, pics = []):
         Screen.__init__(self, session)
         self.session = session
+        global _session
+        _session = session        
         skin = skin_path + 'AnimMain.xml'
         with open(skin, 'r') as f:
           self.skin = f.read()
@@ -678,17 +710,31 @@ class AnimMain(Screen):
         else:
             idx = self.index - 1
         name = self.names[idx]
-        if os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD"):
-            from Plugins.Extensions.TMBD.plugin import TMBD
-            text_clear = name
-            text = charRemove(text_clear)
-            self.session.open(TMBD, text, False)
-        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb"):
-            from Plugins.Extensions.IMDb.plugin import IMDB
-            text_clear = name
-            text = charRemove(text_clear)
-            HHHHH = text
-            self.session.open(IMDB, HHHHH)
+        text_clear = name
+        if is_tmdb:
+            try:
+                text = charRemove(text_clear)
+                _session.open(tmdb.tmdbScreen, text, 0)
+            except Exception as e:
+                print("[XCF] Tmdb: ", e)
+        elif is_imdb:
+            try:
+                text = charRemove(text_clear)
+                imdb(_session, text)
+            except Exception as e:
+                print("[XCF] imdb: ", e)  
+                
+        # if os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD"):
+            # from Plugins.Extensions.TMBD.plugin import TMBD
+            # text_clear = name
+            # text = charRemove(text_clear)
+            # self.session.open(TMBD, text, False)
+        # elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb"):
+            # from Plugins.Extensions.IMDb.plugin import IMDB
+            # text_clear = name
+            # text = charRemove(text_clear)
+            # HHHHH = text
+            # self.session.open(IMDB, HHHHH)
         else:
             inf = idx
             if inf and inf != '':
@@ -972,6 +1018,8 @@ class GridMain(Screen):
     def __init__(self, session, menuTitle, nextmodule, names, urls, infos, pics = []):
         Screen.__init__(self, session)
         self.session = session
+        global _session
+        _session = session        
         skin = skin_path + 'GridMain.xml'
         with open(skin, 'r') as f:
           self.skin = f.read()
@@ -986,7 +1034,7 @@ class GridMain(Screen):
         # pics = getpics(names, pics, tmpfold, picfold)
         # print("In Gridmain pics = ", pics)
         self.pos = []
-        if HD.width() > 1280:
+        if HD.width() >= 1280:
             self.pos.append([30,24])
             self.pos.append([396,24])
             self.pos.append([764,24])
@@ -1015,8 +1063,6 @@ class GridMain(Screen):
         pics = getpics(names, pics, tmpfold, picfold)
         print("In Gridmain pics = ", pics)
 
-
-
         self.name = menuTitle
         self.nextmodule = nextmodule
 
@@ -1032,38 +1078,51 @@ class GridMain(Screen):
         for x in list:
            print("x in list =", x)
         self["frame"] = MovingPixmap()
-        self["label1"] = StaticText()
-        self["label2"] = StaticText()
-        self["label3"] = StaticText()
-        self["label4"] = StaticText()
-        self["label5"] = StaticText()
-        self["label6"] = StaticText()
-        self["label7"] = StaticText()
-        self["label8"] = StaticText()
-        self["label9"] = StaticText()
-        self["label10"] = StaticText()
-        self["label11"] = StaticText()
-        self["label12"] = StaticText()
-        self["label13"] = StaticText()
-        self["label14"] = StaticText()
-        self["label15"] = StaticText()
-        self["label16"] = StaticText()
-        self["pixmap1"] = Pixmap()
-        self["pixmap2"] = Pixmap()
-        self["pixmap3"] = Pixmap()
-        self["pixmap4"] = Pixmap()
-        self["pixmap5"] = Pixmap()
-        self["pixmap6"] = Pixmap()
-        self["pixmap7"] = Pixmap()
-        self["pixmap8"] = Pixmap()
-        self["pixmap9"] = Pixmap()
-        self["pixmap10"] = Pixmap()
-        self["pixmap11"] = Pixmap()
-        self["pixmap12"] = Pixmap()
-        self["pixmap13"] = Pixmap()
-        self["pixmap14"] = Pixmap()
-        self["pixmap15"] = Pixmap()
-        self["pixmap16"] = Pixmap()
+        # self["label1"] = StaticText()
+        # self["label2"] = StaticText()
+        # self["label3"] = StaticText()
+        # self["label4"] = StaticText()
+        # self["label5"] = StaticText()
+        # self["label6"] = StaticText()
+        # self["label7"] = StaticText()
+        # self["label8"] = StaticText()
+        # self["label9"] = StaticText()
+        # self["label10"] = StaticText()
+        # self["label11"] = StaticText()
+        # self["label12"] = StaticText()
+        # self["label13"] = StaticText()
+        # self["label14"] = StaticText()
+        # self["label15"] = StaticText()
+        # self["label16"] = StaticText()
+        # self["pixmap1"] = Pixmap()
+        # self["pixmap2"] = Pixmap()
+        # self["pixmap3"] = Pixmap()
+        # self["pixmap4"] = Pixmap()
+        # self["pixmap5"] = Pixmap()
+        # self["pixmap6"] = Pixmap()
+        # self["pixmap7"] = Pixmap()
+        # self["pixmap8"] = Pixmap()
+        # self["pixmap9"] = Pixmap()
+        # self["pixmap10"] = Pixmap()
+        # self["pixmap11"] = Pixmap()
+        # self["pixmap12"] = Pixmap()
+        # self["pixmap13"] = Pixmap()
+        # self["pixmap14"] = Pixmap()
+        # self["pixmap15"] = Pixmap()
+        # self["pixmap16"] = Pixmap()
+        i = 0
+        while i<16:
+              self["label" + str(i+1)] = StaticText()
+              self["pixmap" + str(i+1)] = Pixmap()
+              i = i+1
+        i = 0
+        ip = 0
+        self.index = 0
+        self.ipage = 1
+        self.icount = 0
+        ln = len(self.names)
+        self.npage = int(float(ln/10)) + 1
+        print("self.npage =", self.npage)        
         self["actions"] = NumberActionMap(["OkCancelActions", "EPGSelectActions", "MenuActions", "DirectionActions", "NumberActions"],
             {
                 "ok": self.okClicked,
@@ -1075,14 +1134,7 @@ class GridMain(Screen):
                 "up": self.key_up,
                 "down": self.key_down,
             })
-        i = 0
-        ip = 0
-        self.index = 0
-        self.ipage = 1
-        self.icount = 0
-        ln = len(self.names)
-        self.npage = int(float(ln/10)) + 1
-        print("self.npage =", self.npage)
+
         print("Going in openTest")
         self.onLayoutFinish.append(self.openTest)
 
@@ -1095,17 +1147,31 @@ class GridMain(Screen):
     def showIMDB(self):
         itype = self.index
         name = self.names[itype]
-        if os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD"):
-            from Plugins.Extensions.TMBD.plugin import TMBD
-            text_clear = name
-            text = charRemove(text_clear)
-            self.session.open(TMBD, text, False)
-        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb"):
-            from Plugins.Extensions.IMDb.plugin import IMDB
-            text_clear = name
-            text = charRemove(text_clear)
-            HHHHH = text
-            self.session.open(IMDB, HHHHH)
+        text_clear = name
+        if is_tmdb:
+            try:
+                text = charRemove(text_clear)
+                _session.open(tmdb.tmdbScreen, text, 0)
+            except Exception as e:
+                print("[XCF] Tmdb: ", e)
+        elif is_imdb:
+            try:
+                text = charRemove(text_clear)
+                imdb(_session, text)
+            except Exception as e:
+                print("[XCF] imdb: ", e)  
+                
+        # if os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD"):
+            # from Plugins.Extensions.TMBD.plugin import TMBD
+            # text_clear = name
+            # text = charRemove(text_clear)
+            # self.session.open(TMBD, text, False)
+        # elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb"):
+            # from Plugins.Extensions.IMDb.plugin import IMDB
+            # text_clear = name
+            # text = charRemove(text_clear)
+            # HHHHH = text
+            # self.session.open(IMDB, HHHHH)
         else:
             inf = self.index
             if inf != None or inf != -1:
@@ -1458,7 +1524,7 @@ class Videos2(Screen):
         url = self.url
         print("Videos2 url =", url)
         content = getUrl(url)
-        if PY3:
+        if PY3 and not dreamos:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -1532,7 +1598,7 @@ class Videos6(Screen):
         url = self.url
         print("Videos1 url =", url)
         content = getUrl(url)
-        if PY3:
+        if PY3 and not dreamos:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -1602,7 +1668,7 @@ class Videos1(Screen):
         url = self.url
         print("Videos1 url =", url)
         content = getUrl(url)
-        if PY3:
+        if PY3 and not dreamos:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -1673,7 +1739,7 @@ class nextVideos1(Screen):
         url = self.url
         print("nextVideos1 url =", url)
         content = getUrl(url)
-        if PY3:
+        if PY3 and not dreamos:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -1750,7 +1816,7 @@ class Videos3(Screen):
         url = self.url
         print("Videos3 url =", url)
         content = getUrl(url)
-        if PY3:
+        if PY3 and not dreamos:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -1827,7 +1893,7 @@ class Videos4(Screen):
         url = self.url
         print("Videos4 url =", url)
         content = getUrl(url)
-        if PY3:
+        if PY3 and not dreamos:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -1902,7 +1968,7 @@ class nextVideos4(Screen):
         url = self.url
         print("nextVideos4 url =", url)
         content = getUrl(url)
-        if PY3:
+        if PY3 and not dreamos:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -1980,7 +2046,7 @@ class Videos5(Screen):
         url = self.url
         print("Videos5 url =", url)
         content = getUrl(url)
-        if PY3:
+        if PY3 and not dreamos:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -2428,6 +2494,8 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         global SREF, streaml
         Screen.__init__(self, session)
         self.session = session
+        global _session
+        _session = session        
         self.skinName = 'MoviePlayer'
         title = name
         streaml = False
@@ -2541,16 +2609,30 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         return
 
     def showIMDB(self):
-        if os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD"):
-            from Plugins.Extensions.TMBD.plugin import TMBD
-            text_clear = self.name
-            text = charRemove(text_clear)
-            self.session.open(TMBD, text, False)
-        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb"):
-            from Plugins.Extensions.IMDb.plugin import IMDB
-            text_clear = self.name
-            text = charRemove(text_clear)
-            self.session.open(IMDB, text)
+        text_clear = self.name
+        if is_tmdb:
+            try:
+                text = charRemove(text_clear)
+                _session.open(tmdb.tmdbScreen, text, 0)
+            except Exception as e:
+                print("[XCF] Tmdb: ", e)
+        elif is_imdb:
+            try:
+                text = charRemove(text_clear)
+                imdb(_session, text)
+            except Exception as e:
+                print("[XCF] imdb: ", e)  
+                
+        # if os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD"):
+            # from Plugins.Extensions.TMBD.plugin import TMBD
+            # text_clear = self.name
+            # text = charRemove(text_clear)
+            # self.session.open(TMBD, text, False)
+        # elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb"):
+            # from Plugins.Extensions.IMDb.plugin import IMDB
+            # text_clear = self.name
+            # text = charRemove(text_clear)
+            # self.session.open(IMDB, text)
         else:
             inf = self.desc
             if inf and inf != '':
