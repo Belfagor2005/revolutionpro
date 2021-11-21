@@ -5,50 +5,69 @@ Info http://t.me/tivustream
 ****************************************
 *        coded by Lululla              *
 *           thank's Pcd                *
-*             28/10/2021               *
+*             19/11/2021               *
 ****************************************
 '''
 from __future__ import print_function
 from . import _
-try:
-       from Plugins.Extensions.SubsSupport import SubsSupport, initSubsSettings
-       from Plugins.Extensions.tvspro.lib.Utils2 import *
-except:
-       from Plugins.Extensions.tvspro.lib.Utils import *
 from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap, NumberActionMap
 from Components.Button import Button
-from Components.ConfigList import ConfigListScreen
+from Components.ConfigList import ConfigList, ConfigListScreen
+from Components.FileList import FileList
+from Components.Input import Input
 from Components.Label import Label
+from Components.MenuList import MenuList
+from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaTest
+from Components.Pixmap import MovingPixmap
 from Components.Pixmap import Pixmap, MultiPixmap
+from Components.ProgressBar import ProgressBar
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 from Components.Sources.List import List
+from Components.Sources.Progress import Progress
 from Components.Sources.Source import Source
 from Components.Sources.StaticText import StaticText
-from Components.ProgressBar import ProgressBar
-from Components.Sources.Progress import Progress
-from Tools.Downloader import downloadWithProgress
+from Components.Task import Task, Job, job_manager as JobManager, Condition
+from Components.config import ConfigInteger, ConfigSelection, KEY_LEFT, KEY_RIGHT, KEY_0, getConfigListEntry
 from Components.config import ConfigSubsection, config, configfile, ConfigText, ConfigDirectory, ConfigSelection,ConfigYesNo,ConfigEnableDisable
+from Plugins.Plugin import PluginDescriptor
+from Screens.ChoiceBox import ChoiceBox
+from Screens.InfoBar import InfoBar
+from Screens.InfoBar import MoviePlayer
+from Screens.InfoBarGenerics import *
+from Screens.InfoBarGenerics import *
 from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection, InfoBarNotifications, InfoBarMenu, InfoBarSubtitleSupport
+from Screens.InputBox import InputBox
 from Screens.LocationBox import LocationBox
-from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
+from Screens.Screen import Screen
 from Screens.Standby import TryQuitMainloop
+from Screens.TaskView import JobView
 from Screens.VirtualKeyBoard import VirtualKeyBoard
-from Tools.Directories import SCOPE_PLUGINS
-from Tools.Directories import resolveFilename, fileExists, copyfile, pathExists
+from ServiceReference import ServiceReference
+from Tools.Directories import SCOPE_PLUGINS, resolveFilename, pathExists, fileExists, copyfile, SCOPE_SKIN_IMAGE, SCOPE_MEDIA
+from Tools.Downloader import downloadWithProgress
+from Tools.LoadPixmap import LoadPixmap
+from enigma import eEnv, iPlayableService
 from enigma import RT_HALIGN_LEFT, RT_HALIGN_RIGHT, RT_HALIGN_CENTER, RT_VALIGN_CENTER
-from enigma import ePixmap
-from enigma import eSize, eListbox, eListboxPythonMultiContent, iServiceInformation, eServiceReference
-from enigma import getDesktop, gFont
-from enigma import loadPNG, loadJPG
+from enigma import eServiceCenter
+from enigma import eServiceReference
+from enigma import eSize, eListbox, eListboxPythonMultiContent, iServiceInformation
+from enigma import eTimer, quitMainloop
+from enigma import gFont
+from enigma import loadPNG, loadJPG, ePicLoad, gPixmapPtr, ePixmap
 from os.path import splitext
-from twisted.web.client import downloadPage
+from twisted.web.client import downloadPage, getPage
+import os
+import re
 import glob
 import json
 import six
 import sys
-# PY3 = sys.version_info.major >= 3
+from Plugins.Extensions.revolution.Utils import *
+_session = None
+THISPLUG = '/usr/lib/enigma2/python/Plugins/Extensions/tvspro/'
+PY3 = sys.version_info.major >= 3
 # from six.moves.urllib.request import urlopen
 # from six.moves.urllib.request import Request
 # from six.moves.urllib.error import HTTPError, URLError
@@ -61,75 +80,59 @@ import sys
 # PY3 = False
 # if pythonFull < 3.9:
     # PY3 = True
-_session = None
-dreamos = False
-if os.path.exists('/var/lib/dpkg/status'):
-	dreamos = True
+# dreamos = False
+# if os.path.exists('/var/lib/dpkg/status'):
+	# dreamos = True
+# if os.path.exists('/usr/lib/python2.7'):
+	# from urllib2 import urlopen, Request, URLError, HTTPError
+	# from urlparse import urlparse, parse_qs
+	# from urllib import quote_plus, urlencode, quote
+	# import httplib
+	# import six
+	# from htmlentitydefs import name2codepoint as n2cp
+	# from urllib import unquote_plus
 
-if os.path.exists('/usr/lib/python2.7'):
-	from urllib2 import urlopen, Request, URLError, HTTPError
-	from urlparse import urlparse, parse_qs
-	from urllib import quote_plus, urlencode, quote
-	import httplib
-	import six
-	from htmlentitydefs import name2codepoint as n2cp
-	from urllib import unquote_plus
+# PY3 = False
+# if os.path.exists('/usr/lib/python3.9'):
+	# import http.client
+	# from urllib.error import URLError, HTTPError
+	# from urllib.request import urlopen, Request
+	# from urllib.parse import urlparse
+	# from urllib.parse import quote_plus, unquote_plus
+	# from urllib.parse import parse_qs, urlencode, quote
+	# unicode = str; unichr = chr; long = int
+	# PY3 = True
 
-PY3 = False
-if os.path.exists('/usr/lib/python3.9'):
-	import http.client
-	from urllib.error import URLError, HTTPError
-	from urllib.request import urlopen, Request
-	from urllib.parse import urlparse
-	from urllib.parse import quote_plus, unquote_plus
-	from urllib.parse import parse_qs, urlencode, quote
-	unicode = str; unichr = chr; long = int
-	PY3 = True
-
-# try:
-    # from urllib.request import urlopen, Request
-    # from urllib.error import URLError, HTTPError
-    # from urllib.parse import urlparse, urlencode, quote
-    # PY3 = True and not dreamos; 
-    # unicode = str; unichr = chr; long = int
-# except:
-    # from urllib2 import urlopen, Request, URLError, HTTPError
-    # from urlparse import urlparse
-    # from urllib import urlencode, quote
+if PY3:
+        import http.client
+        from http.client import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
+        from urllib.error import URLError, HTTPError
+        from urllib.request import urlopen, Request
+        from urllib.parse import urlparse
+        from urllib.parse import quote_plus, unquote_plus
+        from urllib.parse import parse_qs, urlencode, quote
+        unicode = str; unichr = chr; long = int
+        PY3 = True
+else:
+# if os.path.exists('/usr/lib/python2.7'):
+        from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
+        from urllib2 import urlopen, Request, URLError, HTTPError
+        from urlparse import urlparse, parse_qs
+        from urllib import quote_plus, urlencode, quote
+        import httplib
+        import six
+        from htmlentitydefs import name2codepoint as n2cp
+        from urllib import unquote_plus
 
 try:
     from PIL import Image
-
 except:
     import Image
-headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36',
-       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', 'Accept-Encoding': 'deflate'}
-THISPLUG = '/usr/lib/enigma2/python/Plugins/Extensions/tvspro/'
-DESKHEIGHT = getDesktop(0).size().height()
-HD = getDesktop(0).size()
 
-streamlink = False
-try:
-    if os.path.exists('/usr/lib/python2.7/site-packages/streamlink'):
-        if fileExists('/usr/lib/python2.7/site-packages/streamlink/plugin/plugin.pyo'):
-            streamlink = True
-except:
-    streamlink = False
+HTTPConnection.debuglevel = 1
 
-try:
-	from Plugins.Extensions.tmdb import tmdb
-	is_tmdb = True
-except Exception:
-	is_tmdb = False
-
-try:
-	from Plugins.Extensions.IMDb.plugin import main as imdb
-	is_imdb = True
-except Exception:
-	is_imdb = False
-    
 def getversioninfo():
-    currversion = '1.3'
+    currversion = '1.5'
     version_file = THISPLUG + 'version'
     if os.path.exists(version_file):
         try:
@@ -140,28 +143,21 @@ def getversioninfo():
         except:
             pass
     return (currversion)
+
 global defpic, dblank
 currversion = getversioninfo()
-Version = currversion + ' - 15.09.2021'
+Version = currversion + ' - 15.11.2021'
 title_plug = '..:: TivuStream Pro Revolution V. %s ::..' % Version
 name_plug = 'TivuStream Pro Revolution'
 res_plugin_path = THISPLUG + 'res/'
+pngx = res_plugin_path + 'pics/setting2.png'
 skin_path = THISPLUG
+SREF = ""
 folder_path = "/tmp/tvspro/"
 if not os.path.exists(folder_path):
     os.makedirs(folder_path)
 
-SREF = ""
-
-def checkStr(txt):
-    if PY3 and not dreamos:
-        if isinstance(txt, type(bytes())):
-            txt = txt.decode('utf-8')
-    else:
-        if isinstance(txt, type(six.text_type())):
-            txt = txt.encode('utf-8')
-    return txt
-if HD.width() > 1280:
+if isFHD():
     skin_path = res_plugin_path + 'skins/fhd/'
     defpic = res_plugin_path + "pics/defaultL.png"
     dblank = res_plugin_path + "pics/blankL.png"
@@ -191,21 +187,87 @@ if sslverify:
                 ClientTLSOptions(self.hostname, ctx)
             return ctx
 
-def getUrl(url):
+# if PY3:
+	# def gettUrl(url):
+		# req = Request(url)
+		# req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+		# try:
+			   # response = urlopen(req)
+			   # link=response.read().decode(errors='ignore')
+			   # response.close()
+			   # return link
+		# except:
+			   # import ssl
+			   # gcontext = ssl._create_unverified_context()
+			   # response = urlopen(req, context=gcontext)
+			   # link=response.read().decode(errors='ignore')
+			   # response.close()
+			   # return link
+
+	# def gettUrl2(url, referer):
+		# req = Request(url)
+		# req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+		# req.add_header('Referer', referer)
+		# try:
+			   # response = urlopen(req)
+			   # link=response.read().decode()
+			   # response.close()
+			   # return link
+		# except:
+			   # import ssl
+			   # gcontext = ssl._create_unverified_context()
+			   # response = urlopen(req, context=gcontext)
+			   # link=response.read().decode()
+			   # response.close()
+			   # return link
+
+# else:
+	# def gettUrl(url):
+		# req = Request(url)
+		# req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+		# try:
+			   # response = urlopen(req)
+			   # pass#print "Here in gettUrl response =", response
+			   # link=response.read()
+			   # response.close()
+			   # return link
+		# except:
+			   # import ssl
+			   # gcontext = ssl._create_unverified_context()
+			   # response = urlopen(req, context=gcontext)
+			   # link=response.read()
+			   # response.close()
+			   # return link
+
+	# def gettUrl2(url, referer):
+		# req = Request(url)
+		# req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+		# req.add_header('Referer', referer)
+		# try:
+			   # response = urlopen(req)
+			   # link=response.read()
+			   # response.close()
+			   # return link
+		# except:
+			   # import ssl
+			   # gcontext = ssl._create_unverified_context()
+			   # response = urlopen(req, context=gcontext)
+			   # link=response.read()
+			   # response.close()
+			   # return link
+def gettUrl(url):
     link = []
-    # url= checkStr(url)
     try:
-        print("Here in client1 getUrl url =", url)
+        print("Here in client1 gettUrl url =", url)
         req = Request(url)
         req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-        response = urlopen(req)#.decode('utf-8')
+        response = urlopen(req)
         link=response.read()#.decode('utf-8')
         response.close()
         print("Here in client1 link =", link)
         return link
     except ImportError:
-        print("Here in client2 getUrl url =", url)
-        print("Here in client2 getUrl url =", url)
+        print("Here in client2 gettUrl url =", url)
         req = Request(url)
         req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
         response = urlopen(req, None, 3)
@@ -217,10 +279,9 @@ def getUrl(url):
         return ''
     return
 
-def getUrl2(url, referer):
-    # url= checkStr(url)
+def gettUrl2(url, referer):
     link = []
-    print("Here in client2 getUrl2 url =", url)
+    print("Here in client2 gettUrl2 url =", url)
     req = Request(url)
     req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
     req.add_header('Referer', referer)
@@ -228,6 +289,44 @@ def getUrl2(url, referer):
     link=response.read()
     response.close()
     return link
+
+
+class rvList(MenuList):
+    def __init__(self, list):
+        MenuList.__init__(self, list, False, eListboxPythonMultiContent)
+        self.l.setFont(0, gFont('Regular', 20))
+        self.l.setFont(1, gFont('Regular', 22))
+        self.l.setFont(2, gFont('Regular', 24))
+        self.l.setFont(3, gFont('Regular', 26))
+        self.l.setFont(4, gFont('Regular', 28))
+        self.l.setFont(5, gFont('Regular', 30))
+        self.l.setFont(6, gFont('Regular', 32))
+        self.l.setFont(7, gFont('Regular', 34))
+        self.l.setFont(8, gFont('Regular', 36))
+        self.l.setFont(9, gFont('Regular', 40))
+        if isFHD():
+            self.l.setItemHeight(50)
+        else:
+            self.l.setItemHeight(40)
+
+def rvoneListEntry(name):
+    res = [name]
+    if isFHD():
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(pngx)))
+        res.append(MultiContentEntryText(pos=(60, 0), size=(1900, 50), font=7, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+    else:
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 6), size=(34, 25), png=loadPNG(pngx)))
+        res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=2, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT))
+    return res
+
+def showlist(data, list):
+    icount = 0
+    plist = []
+    for line in data:
+        name = data[icount]
+        plist.append(rvoneListEntry(name))
+        icount = icount+1
+        list.setList(plist)
 
 #config
 mdchoice = [
@@ -344,7 +443,6 @@ class ConfigEx(Screen, ConfigListScreen):
         if entry == _('Show thumbpic ?'):
             self['description'].setText(_("Show Thumbpics ? Enigma restart required"))
             return
-
         return
 
     def changedEntry(self):
@@ -376,7 +474,6 @@ class ConfigEx(Screen, ConfigListScreen):
         if sel and sel == config.plugins.tvspro.movie:
             self.setting = 'moviefold'
             self.openDirectoryBrowser(config.plugins.tvspro.movie.value)
-
         else:
             pass
 
@@ -402,7 +499,6 @@ class ConfigEx(Screen, ConfigListScreen):
                 config.plugins.tvspro.cachefold.setValue(path)
             if self.setting == 'moviefold':
                 config.plugins.tvspro.movie.setValue(path)
-
         return
 
     def save(self):
@@ -501,14 +597,14 @@ def getpics(names, pics, tmpfold, picfold):
                         n2 = url.find("=", n1)
                         url = url[:n3]
                         referer = url[n2:]
-                        p = getUrl2(url, referer)
+                        p = gettUrl2(url, referer)
                         #-----------------
                         f1=open(tpicf,"wb")
                         f1.write(p)
                         f1.close()
                     else:
                         print("Going in urlopen url =", url)
-                        p = getUrl(url)
+                        p = gettUrl(url)
                         f1=open(tpicf,"wb")
                         f1.write(p)
                         f1.close()
@@ -521,7 +617,6 @@ def getpics(names, pics, tmpfold, picfold):
             # print("In getpics not fileExists(tpicf) cmd=", cmd)
             os.system(cmd)
         # try:
-
             # #start kiddac code
             # size = [200, 200]
             # if screenwidth.width() > 1280:
@@ -546,11 +641,9 @@ def getpics(names, pics, tmpfold, picfold):
                         # print("******* picon resize failed *******")
                         # print(e)
             # else:
-                # tpicf = defpic     
+                # tpicf = defpic
             # #end kiddac code
-
-
-        if HD.width() > 1280:
+        if isFHD():
             nw = 220
         else:
             nw = 150
@@ -599,15 +692,15 @@ def getpics(names, pics, tmpfold, picfold):
 
 #menulist
 class AnimMain(Screen):
-
     def __init__(self, session, menuTitle, nextmodule, names, urls, infos, pics = []):
         Screen.__init__(self, session)
         self.session = session
         global _session
-        _session = session        
+        _session = session
         skin = skin_path + 'AnimMain.xml'
         with open(skin, 'r') as f:
           self.skin = f.read()
+        f.close()
         self.names = names
         self.urls = urls
         self.pics = pics
@@ -630,7 +723,8 @@ class AnimMain(Screen):
         self["label3"] = StaticText()
         self["label4"] = StaticText()
         self["label5"] = StaticText()
-        self["actions"] = NumberActionMap(["OkCancelActions", "EPGSelectActions", "MenuActions", "DirectionActions", "NumberActions", "ColorActions"],
+        self["actions"] = ActionMap(["OkCancelActions", "EPGSelectActions", "MenuActions", "DirectionActions", "NumberActions", "ColorActions"],
+        # self["actions"] = NumberActionMap(["OkCancelActions", "EPGSelectActions", "MenuActions", "DirectionActions", "NumberActions", "ColorActions"],        
         {
          "ok": self.okbuttonClick,
          "epg": self.showIMDB,
@@ -713,28 +807,19 @@ class AnimMain(Screen):
         text_clear = name
         if is_tmdb:
             try:
+                from Plugins.Extensions.tmdb import tmdb
                 text = charRemove(text_clear)
                 _session.open(tmdb.tmdbScreen, text, 0)
             except Exception as e:
                 print("[XCF] Tmdb: ", e)
         elif is_imdb:
             try:
+                from Plugins.Extensions.IMDb.plugin import main as imdb
                 text = charRemove(text_clear)
                 imdb(_session, text)
             except Exception as e:
-                print("[XCF] imdb: ", e)  
-                
-        # if os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD"):
-            # from Plugins.Extensions.TMBD.plugin import TMBD
-            # text_clear = name
-            # text = charRemove(text_clear)
-            # self.session.open(TMBD, text, False)
-        # elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb"):
-            # from Plugins.Extensions.IMDb.plugin import IMDB
-            # text_clear = name
-            # text = charRemove(text_clear)
-            # HHHHH = text
-            # self.session.open(IMDB, HHHHH)
+                print("[XCF] imdb: ", e)
+
         else:
             inf = idx
             if inf and inf != '':
@@ -806,7 +891,7 @@ class AnimMain(Screen):
         self["label3"].setText(name3)
         self["label4"].setText(name4)
         self["label5"].setText(name5)
-        if HD.width() > 1280:
+        if isFHD():
             if self.nop > 5:
                 dpointer = res_plugin_path + "pics/pointerL.png"
                 self["pointer"].instance.setPixmapFromFile(dpointer)
@@ -817,7 +902,6 @@ class AnimMain(Screen):
             if self.nop > 5:
                 dpointer = res_plugin_path + "pics/pointer.png"
                 self["pointer"].instance.setPixmapFromFile(dpointer)
-
             else:
                 dpointer = dblank
                 self["pointer"].instance.setPixmapFromFile(dpointer)
@@ -1014,15 +1098,15 @@ class AnimMain(Screen):
 #-----------------
 #menupic
 class GridMain(Screen):
-
     def __init__(self, session, menuTitle, nextmodule, names, urls, infos, pics = []):
         Screen.__init__(self, session)
         self.session = session
         global _session
-        _session = session        
+        _session = session
         skin = skin_path + 'GridMain.xml'
         with open(skin, 'r') as f:
           self.skin = f.read()
+        f.close()
         print("In Gridmain names 1= ", names)
         print("In Gridmain urls 1 = ", urls)
         print("In Gridmain pics 1= ", pics)
@@ -1034,7 +1118,7 @@ class GridMain(Screen):
         # pics = getpics(names, pics, tmpfold, picfold)
         # print("In Gridmain pics = ", pics)
         self.pos = []
-        if HD.width() >= 1280:
+        if isFHD():
             self.pos.append([30,24])
             self.pos.append([396,24])
             self.pos.append([764,24])
@@ -1078,38 +1162,6 @@ class GridMain(Screen):
         for x in list:
            print("x in list =", x)
         self["frame"] = MovingPixmap()
-        # self["label1"] = StaticText()
-        # self["label2"] = StaticText()
-        # self["label3"] = StaticText()
-        # self["label4"] = StaticText()
-        # self["label5"] = StaticText()
-        # self["label6"] = StaticText()
-        # self["label7"] = StaticText()
-        # self["label8"] = StaticText()
-        # self["label9"] = StaticText()
-        # self["label10"] = StaticText()
-        # self["label11"] = StaticText()
-        # self["label12"] = StaticText()
-        # self["label13"] = StaticText()
-        # self["label14"] = StaticText()
-        # self["label15"] = StaticText()
-        # self["label16"] = StaticText()
-        # self["pixmap1"] = Pixmap()
-        # self["pixmap2"] = Pixmap()
-        # self["pixmap3"] = Pixmap()
-        # self["pixmap4"] = Pixmap()
-        # self["pixmap5"] = Pixmap()
-        # self["pixmap6"] = Pixmap()
-        # self["pixmap7"] = Pixmap()
-        # self["pixmap8"] = Pixmap()
-        # self["pixmap9"] = Pixmap()
-        # self["pixmap10"] = Pixmap()
-        # self["pixmap11"] = Pixmap()
-        # self["pixmap12"] = Pixmap()
-        # self["pixmap13"] = Pixmap()
-        # self["pixmap14"] = Pixmap()
-        # self["pixmap15"] = Pixmap()
-        # self["pixmap16"] = Pixmap()
         i = 0
         while i<16:
               self["label" + str(i+1)] = StaticText()
@@ -1122,8 +1174,9 @@ class GridMain(Screen):
         self.icount = 0
         ln = len(self.names)
         self.npage = int(float(ln/10)) + 1
-        print("self.npage =", self.npage)        
-        self["actions"] = NumberActionMap(["OkCancelActions", "EPGSelectActions", "MenuActions", "DirectionActions", "NumberActions"],
+        print("self.npage =", self.npage)
+        # self["actions"] = NumberActionMap(["OkCancelActions", "EPGSelectActions", "MenuActions", "DirectionActions", "NumberActions"],
+        self["actions"] = ActionMap(["OkCancelActions", "EPGSelectActions", "MenuActions", "DirectionActions", "NumberActions"],        
             {
                 "ok": self.okClicked,
                 "epg": self.showIMDB,
@@ -1150,28 +1203,18 @@ class GridMain(Screen):
         text_clear = name
         if is_tmdb:
             try:
+                from Plugins.Extensions.tmdb import tmdb
                 text = charRemove(text_clear)
                 _session.open(tmdb.tmdbScreen, text, 0)
             except Exception as e:
                 print("[XCF] Tmdb: ", e)
         elif is_imdb:
             try:
+                from Plugins.Extensions.IMDb.plugin import main as imdb
                 text = charRemove(text_clear)
                 imdb(_session, text)
             except Exception as e:
-                print("[XCF] imdb: ", e)  
-                
-        # if os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD"):
-            # from Plugins.Extensions.TMBD.plugin import TMBD
-            # text_clear = name
-            # text = charRemove(text_clear)
-            # self.session.open(TMBD, text, False)
-        # elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb"):
-            # from Plugins.Extensions.IMDb.plugin import IMDB
-            # text_clear = name
-            # text = charRemove(text_clear)
-            # HHHHH = text
-            # self.session.open(IMDB, HHHHH)
+                print("[XCF] imdb: ", e)
         else:
             inf = self.index
             if inf != None or inf != -1:
@@ -1214,7 +1257,6 @@ class GridMain(Screen):
                 i1 = i1+1
         print("len(self.pics) , self.minentry, self.maxentry =", len(self.pics) , self.minentry, self.maxentry)
         self.npics = len(self.pics)
-
         i = 0
         i1 = 0
         self.picnum = 0
@@ -1429,15 +1471,15 @@ class GridMain(Screen):
         global search
         search = False
         return
+
 #-----------------
 #main exe
 class tvspromain(Screen):
-
     def __init__(self, session):
         Screen.__init__(self, session)
         self.list = []
         self["menu"] = List(self.list)
-        self["menu"] = RSList([])
+        self["menu"] = rvList([])
         title = _(name_plug)
         self["title"] = Button(title)
         self["info"] = Label()
@@ -1445,7 +1487,8 @@ class tvspromain(Screen):
         self["pixmap"] = Pixmap()
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
-        self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
+        # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
+        self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
         {
             "ok": self.okClicked,
             "back": self.close,
@@ -1498,14 +1541,15 @@ class Videos2(Screen):
         Screen.__init__(self, session)
         self.list = []
         self["menu"] = List(self.list)
-        self["menu"] = RSList([])
+        self["menu"] = rvList([])
         self["title"] = Button(name)
         self["info"] = Label()
         self["info"].setText(title_plug)
         self["pixmap"] = Pixmap()
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
-        self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
+        # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
+        self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
         {
             "ok": self.okClicked,
             "back": self.close,
@@ -1523,8 +1567,8 @@ class Videos2(Screen):
         self.infos = []
         url = self.url
         print("Videos2 url =", url)
-        content = getUrl(url)
-        if PY3 and not dreamos:
+        content = gettUrl(url)
+        if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -1571,14 +1615,15 @@ class Videos6(Screen):
         Screen.__init__(self, session)
         self.list = []
         self["menu"] = List(self.list)
-        self["menu"] = RSList([])
+        self["menu"] = rvList([])
         self["title"] = Button(name)
         self["info"] = Label()
         self["info"].setText(title_plug)
         self["pixmap"] = Pixmap()
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
-        self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
+        self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
+        # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
         {
             "ok": self.okClicked,
             "back": self.close,
@@ -1597,8 +1642,8 @@ class Videos6(Screen):
         self.infos = []
         url = self.url
         print("Videos1 url =", url)
-        content = getUrl(url)
-        if PY3 and not dreamos:
+        content = gettUrl(url)
+        if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -1642,14 +1687,15 @@ class Videos1(Screen):
         Screen.__init__(self, session)
         self.list = []
         self["menu"] = List(self.list)
-        self["menu"] = RSList([])
+        self["menu"] = rvList([])
         self["title"] = Button(name)
         self["info"] = Label()
         self["info"].setText(title_plug)
         self["pixmap"] = Pixmap()
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
-        self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
+        self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
+        # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
         {
             "ok": self.okClicked,
             "back": self.close,
@@ -1667,8 +1713,8 @@ class Videos1(Screen):
         self.infos = []
         url = self.url
         print("Videos1 url =", url)
-        content = getUrl(url)
-        if PY3 and not dreamos:
+        content = gettUrl(url)
+        if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -1713,14 +1759,15 @@ class nextVideos1(Screen):
         Screen.__init__(self, session)
         self.list = []
         self["menu"] = List(self.list)
-        self["menu"] = RSList([])
+        self["menu"] = rvList([])
         self["title"] = Button(name)
         self["info"] = Label()
         self["info"].setText(title_plug)
         self["pixmap"] = Pixmap()
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
-        self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
+        self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
+        # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
         {
             "ok": self.okClicked,
             "back": self.close,
@@ -1738,8 +1785,8 @@ class nextVideos1(Screen):
         self.infos = []
         url = self.url
         print("nextVideos1 url =", url)
-        content = getUrl(url)
-        if PY3 and not dreamos:
+        content = gettUrl(url)
+        if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -1780,27 +1827,25 @@ class nextVideos1(Screen):
         pass
 
 class Videos3(Screen):
-
     def __init__(self, session, name, url):
-
         Screen.__init__(self, session)
         self.list = []
         self["menu"] = List(self.list)
-        self["menu"] = RSList([])
+        self["menu"] = rvList([])
         self["title"] = Button(name)
         self["info"] = Label()
         self["info"].setText(title_plug)
         self["pixmap"] = Pixmap()
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
-        self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
+        self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
+        # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
         {
             "ok": self.okClicked,
             "back": self.close,
             "red": self.close,
             "green": self.okClicked,
         }, -1)
-
         self.name = name
         self.url = url
         self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
@@ -1815,8 +1860,8 @@ class Videos3(Screen):
         self.infos = []
         url = self.url
         print("Videos3 url =", url)
-        content = getUrl(url)
-        if PY3 and not dreamos:
+        content = gettUrl(url)
+        if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -1858,19 +1903,19 @@ class Videos3(Screen):
         pass
 
 class Videos4(Screen):
-
     def __init__(self, session, name, url):
         Screen.__init__(self, session)
         self.list = []
         self["menu"] = List(self.list)
-        self["menu"] = RSList([])
+        self["menu"] = rvList([])
         self["title"] = Button(name)
         self["info"] = Label()
         self["info"].setText(title_plug)
         self["pixmap"] = Pixmap()
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
-        self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
+        self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
+        # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
         {
             "ok": self.okClicked,
             "back": self.close,
@@ -1892,8 +1937,8 @@ class Videos4(Screen):
         self.infos = []
         url = self.url
         print("Videos4 url =", url)
-        content = getUrl(url)
-        if PY3 and not dreamos:
+        content = gettUrl(url)
+        if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -1938,14 +1983,15 @@ class nextVideos4(Screen):
         Screen.__init__(self, session)
         self.list = []
         self["menu"] = List(self.list)
-        self["menu"] = RSList([])
+        self["menu"] = rvList([])
         self["title"] = Button(name)
         self["info"] = Label()
         self["info"].setText(title_plug)
         self["pixmap"] = Pixmap()
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
-        self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
+        self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
+        # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
         {
             "ok": self.okClicked,
             "back": self.close,
@@ -1967,8 +2013,8 @@ class nextVideos4(Screen):
         self.infos = []
         url = self.url
         print("nextVideos4 url =", url)
-        content = getUrl(url)
-        if PY3 and not dreamos:
+        content = gettUrl(url)
+        if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -2012,19 +2058,19 @@ class nextVideos4(Screen):
            pass
 
 class Videos5(Screen):
-
     def __init__(self, session, name, url):
         Screen.__init__(self, session)
         self.list = []
         self["menu"] = List(self.list)
-        self["menu"] = RSList([])
+        self["menu"] = rvList([])
         self["title"] = Button(name)
         self["info"] = Label()
         self["info"].setText(title_plug)
         self["pixmap"] = Pixmap()
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
-        self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
+        self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
+        # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
         {
             "ok": self.okClicked,
             "back": self.close,
@@ -2045,8 +2091,8 @@ class Videos5(Screen):
         self.infos = []
         url = self.url
         print("Videos5 url =", url)
-        content = getUrl(url)
-        if PY3 and not dreamos:
+        content = gettUrl(url)
+        if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
         i = 0
@@ -2093,6 +2139,7 @@ class Abouttvr(Screen):
         skin = skin_path + 'Abouttvr.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
+        f.close()
         title = _(name_plug)
         self["title"] = Button(title)
         self["info"] = Label()
@@ -2100,7 +2147,8 @@ class Abouttvr(Screen):
         self["pixmap"] = Pixmap()
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
-        self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
+        self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
+        # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
         {
             "ok": self.okClicked,
 
@@ -2156,16 +2204,17 @@ class Abouttvr(Screen):
         Screen.close(self, False)
 
 class Playstream1(Screen):
-
     def __init__(self, session, name, url):
         Screen.__init__(self, session)
         self.session = session
         skin = skin_path + 'Playstream1.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
+        print('self.skin: ', skin)
+        f.close()
         self.setup_title = ('Select Player Stream')
         self.list = []
-        self['list'] = RSList([])
+        self['list'] = rvList([])
         self['info'] = Label()
         self['info'].setText(name)
         self['key_red'] = Button(_('Exit'))
@@ -2190,7 +2239,6 @@ class Playstream1(Screen):
         srefInit = self.initialservice
         self.onLayoutFinish.append(self.openTest)
         return
-
 
     def runRec(self):
         self.namem3u = self.name1
@@ -2228,7 +2276,6 @@ class Playstream1(Screen):
                 self.session.open(MessageBox, _('Download Failed!!!'), MessageBox.TYPE_INFO, timeout=5)
         else:
             self.downloading = False
-        # return
 
     def downloadProgress(self, recvbytes, totalbytes):
         self["progress"].show()
@@ -2248,12 +2295,10 @@ class Playstream1(Screen):
         self.downloading = False
         self.session.open(MessageBox, _('Download Failed!!!'), MessageBox.TYPE_INFO, timeout=5)
 
-
     def openTest(self):
         url = self.url
         self.names = []
         self.urls = []
-
         self.names.append('Download Now')
         self.urls.append(checkStr(url))
         self.names.append('Play Now')
@@ -2271,7 +2316,6 @@ class Playstream1(Screen):
         if idx != None or idx != -1:
             self.name = self.names[idx]
             self.url = self.urls[idx]
-
             # if "youtube" in str(self.url):
                 # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
                 # return
@@ -2292,7 +2336,6 @@ class Playstream1(Screen):
                 except:
                     pass
                 self.session.open(Playstream2, self.name, self.url, desc)
-
 
             if idx == 0:
                 # self.name = self.names[idx]
@@ -2335,7 +2378,6 @@ class Playstream1(Screen):
                 self.url = '/tmp/hls.avi'
                 self.name = self.names[idx]
                 self.play()
-
             else:
                 if idx == 4:
                     self.name = self.names[idx]
@@ -2360,7 +2402,7 @@ class Playstream1(Screen):
         self.close()
 
     def play2(self):
-        if os.path.exists("/usr/sbin/streamlinksrv"):
+        if isStreamlinkAvailable():
             desc = self.name
             name = self.name1
             # if os.path.exists("/usr/sbin/streamlinksrv"):
@@ -2390,7 +2432,6 @@ class Playstream1(Screen):
         self.session.nav.stopService()
         self.session.nav.playService(srefInit)
         self.close()
-
 
 class TvInfoBarShowHide():
     """ InfoBar show/hide control, accepts toggleShow and hide actions, might start
@@ -2423,7 +2464,6 @@ class TvInfoBarShowHide():
         if self.skipToggleShow:
             self.skipToggleShow = False
             return
-
         if self.__state == self.STATE_HIDDEN:
             self.show()
             self.hideTimer.stop()
@@ -2482,20 +2522,19 @@ class TvInfoBarShowHide():
     def debug(obj, text = ""):
         print(text + " %s\n" % obj)
 
-class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarAudioSelection, TvInfoBarShowHide):#,InfoBarSubtitleSupport
+class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarAudioSelection, TvInfoBarShowHide,InfoBarSubtitleSupport):
     STATE_IDLE = 0
     STATE_PLAYING = 1
     STATE_PAUSED = 2
     ENABLE_RESUME_SUPPORT = True
     ALLOW_SUSPEND = True
     screen_timeout = 4000
-
     def __init__(self, session, name, url, desc):
         global SREF, streaml
         Screen.__init__(self, session)
         self.session = session
         global _session
-        _session = session        
+        _session = session
         self.skinName = 'MoviePlayer'
         title = name
         streaml = False
@@ -2504,7 +2543,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         InfoBarBase.__init__(self, steal_current_service=True)
         TvInfoBarShowHide.__init__(self)
         InfoBarAudioSelection.__init__(self)
-        # InfoBarSubtitleSupport.__init__(self)
+        InfoBarSubtitleSupport.__init__(self)
         try:
             self.init_aspect = int(self.getAspect())
         except:
@@ -2612,27 +2651,18 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         text_clear = self.name
         if is_tmdb:
             try:
+                from Plugins.Extensions.tmdb import tmdb
                 text = charRemove(text_clear)
                 _session.open(tmdb.tmdbScreen, text, 0)
             except Exception as e:
                 print("[XCF] Tmdb: ", e)
         elif is_imdb:
             try:
+                from Plugins.Extensions.IMDb.plugin import main as imdb
                 text = charRemove(text_clear)
                 imdb(_session, text)
             except Exception as e:
-                print("[XCF] imdb: ", e)  
-                
-        # if os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD"):
-            # from Plugins.Extensions.TMBD.plugin import TMBD
-            # text_clear = self.name
-            # text = charRemove(text_clear)
-            # self.session.open(TMBD, text, False)
-        # elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb"):
-            # from Plugins.Extensions.IMDb.plugin import IMDB
-            # text_clear = self.name
-            # text = charRemove(text_clear)
-            # self.session.open(IMDB, text)
+                print("[XCF] imdb: ", e)
         else:
             inf = self.desc
             if inf and inf != '':
@@ -2673,7 +2703,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         # if "youtube" in str(self.url):
             # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
             # return
-        if os.path.exists("/usr/sbin/streamlinksrv"):
+        if isStreamlinkAvailable():
             streamtypelist.append("5002") #ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
             streaml = True
         if os.path.exists("/usr/bin/gstplayer"):
@@ -2710,7 +2740,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
     def showAfterSeek(self):
         if isinstance(self, TvInfoBarShowHide):
             self.doShow()
-            
+
     def cancel(self):
         if os.path.isfile('/tmp/hls.avi'):
             os.remove('/tmp/hls.avi')
@@ -2727,103 +2757,12 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
     def leavePlayer(self):
         self.close()
 
-def charRemove(text):
-        char = ["1080p",
-                 "2018",
-                 "2019",
-                 "2020",
-                 "2021",
-                 "2022"
-                 "PF1",
-                 "PF2",
-                 "PF3",
-                 "PF4",
-                 "PF5",
-                 "PF6",
-                 "PF7",
-                 "PF8",
-                 "PF9",
-                 "PF10",
-                 "PF11",
-                 "PF12",
-                 "PF13",
-                 "PF14",
-                 "PF15",
-                 "PF16",
-                 "PF17",
-                 "PF18",
-                 "PF19",
-                 "PF20",
-                 "PF21",
-                 "PF22",
-                 "PF23",
-                 "PF24",
-                 "PF25",
-                 "PF26",
-                 "PF27",
-                 "PF28",
-                 "PF29",
-                 "PF30"
-                 "480p",
-                 "4K",
-                 "720p",
-                 "ANIMAZIONE",
-                 # "APR",
-                 # "AVVENTURA",
-                 "BIOGRAFICO",
-                 "BDRip",
-                 "BluRay",
-                 "CINEMA",
-                 # "COMMEDIA",
-                 "DOCUMENTARIO",
-                 "DRAMMATICO",
-                 "FANTASCIENZA",
-                 "FANTASY",
-                 # "FEB",
-                 # "GEN",
-                 # "GIU",
-                 "HDCAM",
-                 "HDTC",
-                 "HDTS",
-                 "LD",
-                 "MAFIA",
-                 # "MAG",
-                 "MARVEL",
-                 "MD",
-                 # "ORROR",
-                 "NEW_AUDIO",
-                 "POLIZ",
-                 "R3",
-                 "R6",
-                 "SD",
-                 "SENTIMENTALE",
-                 "TC",
-                 "TEEN",
-                 "TELECINE",
-                 "TELESYNC",
-                 "THRILLER",
-                 "Uncensored",
-                 "V2",
-                 "WEBDL",
-                 "WEBRip",
-                 "WEB",
-                 "WESTERN",
-                 "-",
-                 "_",
-                 ".",
-                 "+",
-                 "[",
-                 "]"
-                 ]
-
-        myreplace = text.lower()
-        for ch in char:
-            ch= ch.lower()
-            # if myreplace == ch:
-            myreplace = myreplace.replace(ch, "").replace("  ", " ").replace("   ", " ").strip()
-        return myreplace
-
 def main(session, **kwargs):
+    try:
+        from Plugins.Extensions.tvspro.Update import upd_done
+        upd_done()
+    except:
+        pass
     _session = session
     os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro")
     os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro/vid")
