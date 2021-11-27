@@ -64,7 +64,7 @@ import glob
 import json
 import six
 import sys
-from Plugins.Extensions.revolution.Utils import *
+from Plugins.Extensions.tvspro.lib.Utils import *
 _session = None
 THISPLUG = '/usr/lib/enigma2/python/Plugins/Extensions/tvspro/'
 PY3 = sys.version_info.major >= 3
@@ -255,40 +255,40 @@ if sslverify:
 			   # link=response.read()
 			   # response.close()
 			   # return link
-def gettUrl(url):
-    link = []
-    try:
-        print("Here in client1 gettUrl url =", url)
-        req = Request(url)
-        req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-        response = urlopen(req)
-        link=response.read()#.decode('utf-8')
-        response.close()
-        print("Here in client1 link =", link)
-        return link
-    except ImportError:
-        print("Here in client2 gettUrl url =", url)
-        req = Request(url)
-        req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-        response = urlopen(req, None, 3)
-        link=response.read()#.decode('utf-8')
-        response.close()
-        print("Here in client2 link =", link)
-        return link
-    except:
-        return ''
-    return
+# def gettUrl(url):
+    # link = []
+    # try:
+        # print("Here in client1 gettUrl url =", url)
+        # req = Request(url)
+        # req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+        # response = urlopen(req)
+        # link=response.read()#.decode('utf-8')
+        # response.close()
+        # print("Here in client1 link =", link)
+        # return link
+    # except ImportError:
+        # print("Here in client2 gettUrl url =", url)
+        # req = Request(url)
+        # req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+        # response = urlopen(req, None, 3)
+        # link=response.read()#.decode('utf-8')
+        # response.close()
+        # print("Here in client2 link =", link)
+        # return link
+    # except:
+        # return ''
+    # return
 
-def gettUrl2(url, referer):
-    link = []
-    print("Here in client2 gettUrl2 url =", url)
-    req = Request(url)
-    req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-    req.add_header('Referer', referer)
-    response = urlopen(req)
-    link=response.read()
-    response.close()
-    return link
+# def gettUrl2(url, referer):
+    # link = []
+    # print("Here in client2 gettUrl2 url =", url)
+    # req = Request(url)
+    # req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+    # req.add_header('Referer', referer)
+    # response = urlopen(req)
+    # link=response.read()
+    # response.close()
+    # return link
 
 
 class rvList(MenuList):
@@ -335,7 +335,7 @@ mdchoice = [
             ("8193", _("eServiceUri(8193)")),
             ]
 
-if os.path.exists("/usr/bin/gstplayer"):
+if DreamOS():
     mdchoice.append(("5001", _("Gstreamer(5001)")))
 if os.path.exists("/usr/bin/exteplayer3"):
     mdchoice.append(("5002", _("Exteplayer3(5002)")))
@@ -2706,7 +2706,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         if isStreamlinkAvailable():
             streamtypelist.append("5002") #ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
             streaml = True
-        if os.path.exists("/usr/bin/gstplayer"):
+        if DreamOS():
             streamtypelist.append("5001")
         if os.path.exists("/usr/bin/exteplayer3"):
             streamtypelist.append("5002")
@@ -2759,7 +2759,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
 
 def main(session, **kwargs):
     try:
-        from Plugins.Extensions.tvspro.Update import upd_done
+        from Plugins.Extensions.tvspro.lib.Update import upd_done
         upd_done()
     except:
         pass
