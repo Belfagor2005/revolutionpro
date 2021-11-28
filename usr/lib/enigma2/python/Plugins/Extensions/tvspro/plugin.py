@@ -64,7 +64,10 @@ import glob
 import json
 import six
 import sys
-from Plugins.Extensions.tvspro.lib.Utils import *
+try:
+    from Plugins.Extensions.tvspro.Utils import *
+except:
+    from . import Utils
 _session = None
 THISPLUG = '/usr/lib/enigma2/python/Plugins/Extensions/tvspro/'
 PY3 = sys.version_info.major >= 3
@@ -81,7 +84,7 @@ PY3 = sys.version_info.major >= 3
 # if pythonFull < 3.9:
     # PY3 = True
 # dreamos = False
-# if os.path.exists('/var/lib/dpkg/status'):
+# if DreamOS():
 	# dreamos = True
 # if os.path.exists('/usr/lib/python2.7'):
 	# from urllib2 import urlopen, Request, URLError, HTTPError
@@ -187,110 +190,6 @@ if sslverify:
                 ClientTLSOptions(self.hostname, ctx)
             return ctx
 
-# if PY3:
-	# def gettUrl(url):
-		# req = Request(url)
-		# req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-		# try:
-			   # response = urlopen(req)
-			   # link=response.read().decode(errors='ignore')
-			   # response.close()
-			   # return link
-		# except:
-			   # import ssl
-			   # gcontext = ssl._create_unverified_context()
-			   # response = urlopen(req, context=gcontext)
-			   # link=response.read().decode(errors='ignore')
-			   # response.close()
-			   # return link
-
-	# def gettUrl2(url, referer):
-		# req = Request(url)
-		# req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-		# req.add_header('Referer', referer)
-		# try:
-			   # response = urlopen(req)
-			   # link=response.read().decode()
-			   # response.close()
-			   # return link
-		# except:
-			   # import ssl
-			   # gcontext = ssl._create_unverified_context()
-			   # response = urlopen(req, context=gcontext)
-			   # link=response.read().decode()
-			   # response.close()
-			   # return link
-
-# else:
-	# def gettUrl(url):
-		# req = Request(url)
-		# req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-		# try:
-			   # response = urlopen(req)
-			   # pass#print "Here in gettUrl response =", response
-			   # link=response.read()
-			   # response.close()
-			   # return link
-		# except:
-			   # import ssl
-			   # gcontext = ssl._create_unverified_context()
-			   # response = urlopen(req, context=gcontext)
-			   # link=response.read()
-			   # response.close()
-			   # return link
-
-	# def gettUrl2(url, referer):
-		# req = Request(url)
-		# req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-		# req.add_header('Referer', referer)
-		# try:
-			   # response = urlopen(req)
-			   # link=response.read()
-			   # response.close()
-			   # return link
-		# except:
-			   # import ssl
-			   # gcontext = ssl._create_unverified_context()
-			   # response = urlopen(req, context=gcontext)
-			   # link=response.read()
-			   # response.close()
-			   # return link
-# def gettUrl(url):
-    # link = []
-    # try:
-        # print("Here in client1 gettUrl url =", url)
-        # req = Request(url)
-        # req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-        # response = urlopen(req)
-        # link=response.read()#.decode('utf-8')
-        # response.close()
-        # print("Here in client1 link =", link)
-        # return link
-    # except ImportError:
-        # print("Here in client2 gettUrl url =", url)
-        # req = Request(url)
-        # req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-        # response = urlopen(req, None, 3)
-        # link=response.read()#.decode('utf-8')
-        # response.close()
-        # print("Here in client2 link =", link)
-        # return link
-    # except:
-        # return ''
-    # return
-
-# def gettUrl2(url, referer):
-    # link = []
-    # print("Here in client2 gettUrl2 url =", url)
-    # req = Request(url)
-    # req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-    # req.add_header('Referer', referer)
-    # response = urlopen(req)
-    # link=response.read()
-    # response.close()
-    # return link
-
-
 class rvList(MenuList):
     def __init__(self, list):
         MenuList.__init__(self, list, False, eListboxPythonMultiContent)
@@ -362,7 +261,7 @@ print('patch movies: ', Path_Movies)
 class ConfigEx(Screen, ConfigListScreen):
     def __init__(self, session):
         skin = skin_path + 'Config.xml'
-        if os.path.exists('/var/lib/dpkg/status'):
+        if DreamOS():
             skin = skin_path + 'ConfigOs.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
@@ -597,14 +496,14 @@ def getpics(names, pics, tmpfold, picfold):
                         n2 = url.find("=", n1)
                         url = url[:n3]
                         referer = url[n2:]
-                        p = gettUrl2(url, referer)
+                        p = getUrl2(url, referer)
                         #-----------------
                         f1=open(tpicf,"wb")
                         f1.write(p)
                         f1.close()
                     else:
                         print("Going in urlopen url =", url)
-                        p = gettUrl(url)
+                        p = ReadUrl(url)
                         f1=open(tpicf,"wb")
                         f1.write(p)
                         f1.close()
@@ -646,7 +545,7 @@ def getpics(names, pics, tmpfold, picfold):
         if isFHD():
             nw = 220
         else:
-            nw = 150
+            nw = 180
         if os.path.exists(tpicf):
             try:
                 im = Image.open(tpicf)#.convert('RGBA')
@@ -980,16 +879,16 @@ class AnimMain(Screen):
         elif '&page' in str(url) and self.nextmodule == 'Videos1':
             print("In AnimMain Going in Videos1")
             try:
-                vid2 = nextVideos1(self.session, name, url)
-                vid2.startSession()
+                vid1 = nextVideos1(self.session, name, url)
+                vid1.startSession()
             except:
                 pass
         elif '&page' not in str(url) and self.nextmodule == 'Videos1':
             print('video1 and play next sss  ', self.nextmodule)
             if 'tvseriesId' in str(url):
                 try:
-                    vid2 = Videos6(self.session, name, url) #atv 6.5
-                    vid2.startSession()
+                    vid1 = Videos6(self.session, name, url) #atv 6.5
+                    vid1.startSession()
                 except:
                     pass
             else:
@@ -999,24 +898,25 @@ class AnimMain(Screen):
         elif '&page' in str(url) and self.nextmodule == 'Videos4' :
                 print("AnimMain Going in nextVideos4")
                 try:
-                    vid2 = nextVideos4(self.session, name, url)
-                    vid2.startSession()
+                    vid4 = nextVideos4(self.session, name, url)
+                    vid4.startSession()
                 except:
                     pass
 
-        elif 'listMovie' in str(url) and self.nextmodule == 'Videos4':
+        # elif 'Film' in str(name) and self.nextmodule == 'Videos4':
+        elif 'listMovie' in str(url) and self.nextmodule == 'Videos4':        
             print("AnimMain Going listmovie in Videos4")
             try:
-                vid2 = Videos4(self.session, name, url)
-                vid2.startSession()
+                vid4 = Videos4(self.session, name, url)
+                vid4.startSession()
             except:
                 pass
 
         elif 'movieId' in str(url) : # and self.nextmodule == 'Videos4':
             print('AnimMain videos5 moveid')
             try:
-                vid2 = Videos5(self.session, name, url)
-                vid2.startSession()
+                vid5 = Videos5(self.session, name, url)
+                vid5.startSession()
             except:
                 pass
 
@@ -1032,42 +932,72 @@ class AnimMain(Screen):
             print("In AnimMain Going in PlaySeries")
             try:
                 desc = " "
-                vid2 = Videos4(self.session, name, url)
-                vid2.startSession()
+                vid4 = Videos4(self.session, name, url)
+                vid4.startSession()
             except:
                 pass
-
+                
         elif self.nextmodule == "Videos2":
             print("In animeMain Going in Videos2 name =", name)
             print("In animeMain Going in Videos2 url =", url)
-            print("In AnimMain Going in Nextmodule")
+            print("In AnimMain Going in Nextmodule = ", self.nextmodule)
             try:
                 vid2 = Videos2(self.session, name, url)
                 vid2.startSession()
             except:
                 pass
+                
+        # elif 'Film' in str(name) and self.nextmodule == "Videos2":
+            # print("In animeMain Going in Videos2 name =", name)
+            # print("In animeMain Going in Videos2 url =", url)
+            # print("In AnimMain Going in Nextmodule = ", self.nextmodule)
+            # try:
+                # vid2 = Videos2(self.session, name, url)
+                # vid2.startSession()
+            # except:
+                # pass
 
+        # elif 'Live' in str(name) and self.nextmodule == "Videos2":
+            # print("In GridMain Going in Videos2 name =", name)
+            # print("In GridMain Going in Videos2 url =", url)
+            # print("In GridMain Going in Nextmodule =", self.nextmodule)
+            # try:
+                # vid2 = Videos2(self.session, name, url)
+                # vid2.startSession()
+            # except:
+                # pass 
+                
+        # elif 'Serie' in str(name) and self.nextmodule == "Videos2":
+            # print("In GridMain Going in Videos2 name =", name)
+            # print("In GridMain Going in Videos2 url =", url)
+            # print("In GridMain Going in Nextmodule =", self.nextmodule)
+            # try:
+                # vid2 = Videos2(self.session, name, url)
+                # vid2.startSession()
+            # except:
+                # pass      
+                
         elif self.nextmodule == "Videos3":
             print("In AnimMain Going in Videos3")
             try:
-                vid2 = Videos3(self.session, name, url)
-                vid2.startSession()
+                vid3 = Videos3(self.session, name, url)
+                vid3.startSession()
             except:
                 pass
 
         elif self.nextmodule == "Videos4":
             print("in AnimMain Going in Videos4")
             try:
-                vid2 = Videos4(self.session, name, url)
-                vid2.startSession()
+                vid4 = Videos4(self.session, name, url)
+                vid4.startSession()
             except:
                 pass
 
         elif self.nextmodule == "Videos5":
             print("In AnimMain Going in Videos5")
             try:
-                vid2 = Videos5(self.session, name, url)
-                vid2.startSession()
+                vid5 = Videos5(self.session, name, url)
+                vid5.startSession()
             except:
                 pass
         else:
@@ -1083,8 +1013,8 @@ class AnimMain(Screen):
             name = str(result)
             url = self.urlx + str(result)
             try:
-                vid2 = nextVideos4(self.session, name, url)
-                vid2.startSession()
+                vid4 = nextVideos4(self.session, name, url)
+                vid4.startSession()
             except:
                 return
         else:
@@ -1357,16 +1287,16 @@ class GridMain(Screen):
         elif '&page' in str(url) and self.nextmodule == 'Videos1':
             print("In GridMain Going in Videos1")
             try:
-                vid2 = nextVideos1(self.session, name, url)
-                vid2.startSession()
+                vid1 = nextVideos1(self.session, name, url)
+                vid1.startSession()
             except:
                 pass
         elif '&page' not in str(url) and self.nextmodule == 'Videos1':
             print('In GridMain video1 and play next sss  ', self.nextmodule)
             if 'tvseriesId' in str(url):
                 try:
-                    vid2 = Videos6(self.session, name, url) #atv 6.5
-                    vid2.startSession()
+                    vid1 = Videos6(self.session, name, url) #atv 6.5
+                    vid1.startSession()
                 except:
                     pass
             else:
@@ -1376,24 +1306,25 @@ class GridMain(Screen):
         elif '&page' in str(url) and self.nextmodule == 'Videos4' :
                 print("In GridMain Going in nextVideos4")
                 try:
-                    vid2 = nextVideos4(self.session, name, url)
-                    vid2.startSession()
+                    vid4 = nextVideos4(self.session, name, url)
+                    vid4.startSession()
                 except:
                     pass
 
-        elif 'listMovie' in str(url) and self.nextmodule == 'Videos4':
+        # elif 'Film' in str(name) and self.nextmodule == 'Videos4':
+        elif 'listMovie' in str(url) and self.nextmodule == 'Videos4':        
             print("In GridMain Going listmovie in Videos4")
             try:
-                vid2 = Videos4(self.session, name, url)
-                vid2.startSession()
+                vid4 = Videos4(self.session, name, url)
+                vid4.startSession()
             except:
                 pass
 
         elif 'movieId' in str(url) : # and self.nextmodule == 'Videos4':
             print('In GridMain videos5 moveid')
             try:
-                vid2 = Videos5(self.session, name, url)
-                vid2.startSession()
+                vid5 = Videos5(self.session, name, url)
+                vid5.startSession()
             except:
                 pass
 
@@ -1409,42 +1340,72 @@ class GridMain(Screen):
             print("In GridMain Going in PlaySeries")
             try:
                 desc = " "
-                vid2 = Videos4(self.session, name, url)
-                vid2.startSession()
+                vid4 = Videos4(self.session, name, url)
+                vid4.startSession()
             except:
                 pass
 
         elif self.nextmodule == "Videos2":
-            print("In GridMain Going in Videos2 name =", name)
-            print("In GridMain Going in Videos2 url =", url)
-            print("In GridMain Going in Nextmodule")
+            print("In animeMain Going in Videos2 name =", name)
+            print("In animeMain Going in Videos2 url =", url)
+            print("In AnimMain Going in Nextmodule = ", self.nextmodule)
             try:
                 vid2 = Videos2(self.session, name, url)
                 vid2.startSession()
             except:
                 pass
 
+        # elif 'Film' in str(name) and self.nextmodule == "Videos2":
+            # print("In GridMain Going in Videos2 name =", name)
+            # print("In GridMain Going in Videos2 url =", url)
+            # print("In GridMain Going in Nextmodule =", self.nextmodule)
+            # try:
+                # vid2 = Videos2(self.session, name, url)
+                # vid2.startSession()
+            # except:
+                # pass
+                
+        # elif 'Live' in str(name) and self.nextmodule == "Videos2":
+            # print("In GridMain Going in Videos2 name =", name)
+            # print("In GridMain Going in Videos2 url =", url)
+            # print("In GridMain Going in Nextmodule =", self.nextmodule)
+            # try:
+                # vid2 = Videos2(self.session, name, url)
+                # vid2.startSession()
+            # except:
+                # pass          
+                
+        # elif 'Serie' in str(name) and self.nextmodule == "Videos2":
+            # print("In GridMain Going in Videos2 name =", name)
+            # print("In GridMain Going in Videos2 url =", url)
+            # print("In GridMain Going in Nextmodule =", self.nextmodule)
+            # try:
+                # vid2 = Videos2(self.session, name, url)
+                # vid2.startSession()
+            # except:
+                # pass                
+
         elif self.nextmodule == "Videos3":
             print("In GridMain Going in Videos3")
             try:
-                vid2 = Videos3(self.session, name, url)
-                vid2.startSession()
+                vid3 = Videos3(self.session, name, url)
+                vid3.startSession()
             except:
                 pass
 
         elif self.nextmodule == "Videos4":
             print("In GridMain Going in Videos4")
             try:
-                vid2 = Videos4(self.session, name, url)
-                vid2.startSession()
+                vid4 = Videos4(self.session, name, url)
+                vid4.startSession()
             except:
                 pass
 
         elif self.nextmodule == "Videos5":
             print("In GridMain Going in Videos5")
             try:
-                vid2 = Videos5(self.session, name, url)
-                vid2.startSession()
+                vid5 = Videos5(self.session, name, url)
+                vid5.startSession()
             except:
                 pass
         else:
@@ -1460,8 +1421,8 @@ class GridMain(Screen):
             name = str(result)
             url = self.urlx + str(result)
             try:
-                vid2 = nextVideos4(self.session, name, url)
-                vid2.startSession()
+                vid4 = nextVideos4(self.session, name, url)
+                vid4.startSession()
             except:
                 return
         else:
@@ -1561,13 +1522,14 @@ class Videos2(Screen):
         self.onLayoutFinish.append(self.startSession)
 
     def startSession(self):
+        global nextmodule
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
         url = self.url
         print("Videos2 url =", url)
-        content = gettUrl(url)
+        content = ReadUrl(url)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -1593,13 +1555,19 @@ class Videos2(Screen):
             except:
                 break
         title = name_plug
+        print('self.name is : ', self.name)
+        # if str(self.name) == "Live":
+            # nextmodule = "Videos3"
+        # if str(self.name) == "Film":
+            # nextmodule = "Videos4"
+        # if str(self.name) == "Serie":
+            # nextmodule = "Videos1"
         if "Live" in self.name:
             nextmodule = "Videos3"
-        elif "Film" in self.name:
+        if "Film" in self.name:
             nextmodule = "Videos4"
-        elif "Serie" in self.name:
+        if "Serie" in self.name:
             nextmodule = "Videos1"
-
         print("In Videos2 config.plugins.tvspro.thumb.value =", config.plugins.tvspro.thumb.value)
         if config.plugins.tvspro.thumb.value == "True":
             print("In Videos2 Going in GridMain")
@@ -1642,7 +1610,7 @@ class Videos6(Screen):
         self.infos = []
         url = self.url
         print("Videos1 url =", url)
-        content = gettUrl(url)
+        content = ReadUrl(url)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -1713,7 +1681,7 @@ class Videos1(Screen):
         self.infos = []
         url = self.url
         print("Videos1 url =", url)
-        content = gettUrl(url)
+        content = ReadUrl(url)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -1785,7 +1753,7 @@ class nextVideos1(Screen):
         self.infos = []
         url = self.url
         print("nextVideos1 url =", url)
-        content = gettUrl(url)
+        content = ReadUrl(url)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -1860,7 +1828,7 @@ class Videos3(Screen):
         self.infos = []
         url = self.url
         print("Videos3 url =", url)
-        content = gettUrl(url)
+        content = ReadUrl(url)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -1937,7 +1905,7 @@ class Videos4(Screen):
         self.infos = []
         url = self.url
         print("Videos4 url =", url)
-        content = gettUrl(url)
+        content = ReadUrl(url)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -2013,7 +1981,7 @@ class nextVideos4(Screen):
         self.infos = []
         url = self.url
         print("nextVideos4 url =", url)
-        content = gettUrl(url)
+        content = ReadUrl(url)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -2091,7 +2059,7 @@ class Videos5(Screen):
         self.infos = []
         url = self.url
         print("Videos5 url =", url)
-        content = gettUrl(url)
+        content = ReadUrl(url)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -2573,7 +2541,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         InfoBarSeek.__init__(self, actionmap='InfobarSeekActions')
         self.icount = 0
         self.desc = desc
-        self.pcip = 'None'
+        # self.pcip = 'None'
         self.url = url
         self.name = name
         self.state = self.STATE_PLAYING

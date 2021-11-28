@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-#19.11.2021
+#25.11.2021
 #a common tips used from Lululla
 #
 import sys
 import datetime
 import os
+import re
 import base64
 # from sys import version_info
 # pythonFull = float(str(sys.version_info.major) + "." + str(sys.version_info.minor))
@@ -13,13 +14,18 @@ import base64
 PY3 = sys.version_info.major >= 3
 if PY3:
     # Python 3
-    _str = str
+    str = unicode = basestring = str
+    unichr = chr; long = int
     from urllib.parse import quote
     from urllib.request import urlopen
     from urllib.request import Request
 else:
     # Python 2
-    _str = unicode
+    _str = str
+    str = unicode
+    range = xrange
+    unicode = unicode
+    basestring = basestring
     from urllib import quote
     from urllib2 import urlopen
     from urllib2 import Request
@@ -41,9 +47,10 @@ def isHD():
     desktopSize = getDesktopSize()
     return desktopSize[0] >= 1280 and desktopSize[0] < 1920
 
-        
 def DreamOS():
+    DreamOS = False
     if os.path.exists('/var/lib/dpkg/status'):
+        DreamOS = True
         return DreamOS
 
 def mySkin():
@@ -108,6 +115,18 @@ def checkInternet():
     except:
         return False
 
+def check(url):
+    try:
+        response = checkStr(urlopen(url, None, 5))
+        response.close()
+        return True
+    except HTTPError:
+        return False
+    except URLError:
+        return False
+    except socket.timeout:
+        return False
+
 def checkStr(txt):
     # convert variable to type str both in Python 2 and 3
     if PY3:
@@ -119,6 +138,16 @@ def checkStr(txt):
         if type(txt) == type(unicode()):
             txt = txt.encode('utf-8')
     return txt
+
+# def checkStr(txt):
+    #import six
+    # if six.PY3:
+        # if isinstance(txt, type(bytes())):
+            # txt = txt.decode('utf-8')
+    # else:
+        # if isinstance(txt, type(six.text_type())):
+            # txt = txt.encode('utf-8')
+    # return txt
 
 def freespace():
     try:
@@ -141,6 +170,7 @@ def b64encoder(source):
 def b64decoder(source):
     if PY3:
         # source = source.decode('utf-8')
+        import base64
         source = base64.b64decode(source).decode('utf-8')
     content = source
     return content
@@ -166,7 +196,7 @@ try:
 	is_imdb = True
 except Exception:
 	is_imdb = False
-    
+
 
 def substr(data,start,end):
     i1 = data.find(start)
@@ -317,8 +347,23 @@ def isStreamlinkAvailable():
 # WHERE_CHANNEL_CONTEXT_MENU = 15
 
 #========================getUrl
+
+# if sys.version_info >= (2, 7, 9):
+    # try:
+        # import ssl
+        # sslContext = ssl._create_unverified_context()
+    # except:
+        # sslContext = None
+# def ssl_urlopen(url):
+    # if sslContext:
+        # return urlopen(url, context=sslContext)
+    # else:
+        # return urlopen(url)
+
 from random import choice
 ListAgent = [
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36',
+          'Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2919.83 Safari/537.36',
 		  'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.15 (KHTML, like Gecko) Chrome/24.0.1295.0 Safari/537.15',
 		  'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.14 (KHTML, like Gecko) Chrome/24.0.1292.0 Safari/537.14',
 		  'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
@@ -360,7 +405,8 @@ ListAgent = [
 		  'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)',
 		  'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; it-IT)',
 		  'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; en-US)',
-		  'Opera/12.80 (Windows NT 5.1; U; en) Presto/2.10.289 Version/12.02',
+		  'Opera/9.80 (X11; Linux i686; Ubuntu/14.10) Presto/2.12.388 Version/12.16.2',
+          'Opera/12.80 (Windows NT 5.1; U; en) Presto/2.10.289 Version/12.02',
 		  'Opera/9.80 (Windows NT 6.1; U; es-ES) Presto/2.9.181 Version/12.00',
 		  'Opera/9.80 (Windows NT 5.1; U; zh-sg) Presto/2.9.181 Version/12.00',
 		  'Opera/12.0(Windows NT 5.2;U;en)Presto/22.9.168 Version/12.00',
@@ -375,6 +421,70 @@ ListAgent = [
 def RequestAgent():
 	RandomAgent = choice(ListAgent)
 	return RandomAgent
+
+def ReadUrl(url):
+    if sys.version_info.major == 3:
+        import urllib.request as urllib2
+    elif sys.version_info.major == 2:
+        import urllib2
+
+    try:
+        import ssl
+        CONTEXT = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+    except:
+        CONTEXT = None
+
+    TIMEOUT_URL = 15
+    print(_("ReadUrl1:\n  url = %s") % url)
+    try:
+        req = urllib2.Request(url)
+        req.add_header('User-Agent', RequestAgent())
+        try:
+          r = urllib2.urlopen(req,None,TIMEOUT_URL,context=CONTEXT)
+        except Exception as e:
+          r = urllib2.urlopen(req,None,TIMEOUT_URL)
+          # CreateLog(_("ReadUrl1 - Errore: %s") % e)
+        link = r.read()
+        r.close()
+
+        dec = "Null"
+        dcod = 0
+        tlink = link
+        if str(type(link)).find('bytes') != -1:
+            try:
+                tlink = link.decode("utf-8")
+                dec = "utf-8"
+            except Exception as e:
+                dcod = 1
+                print("ReadUrl2 - Errore: %s." % e)
+            if dcod == 1:
+                dcod = 0
+                try:
+                    tlink = link.decode("cp437")
+                    dec = "cp437"
+                except Exception as e:
+                    dcod = 1
+                    print("ReadUrl3 - Errore: %s." % e)
+            if dcod == 1:
+                dcod = 0
+                try:
+                    tlink = link.decode("iso-8859-1")
+                    dec = "iso-8859-1"
+                except Exception as e:
+                    dcod = 1
+                    CreateLog("ReadUrl4 - Errore: %s." % e)
+            link = tlink
+
+        elif str(type(link)).find('str') != -1:
+            dec = "str"
+
+        print("CreateLog Codifica ReadUrl: %s." % dec)
+    except Exception as e:
+        print("ReadUrl5 - Errore: %s." % e)
+        link = None
+    return link
+
+
 
 if PY3:
 	def getUrl(url):
@@ -663,7 +773,27 @@ def charRemove(text):
         myreplace = myreplace.replace(ch, "").replace("  ", " ").replace("   ", " ").strip()
     return myreplace
 
-#######################################    
+def clean_html(html):
+    """Clean an HTML snippet into a readable string"""
+    import xml.sax.saxutils as saxutils
+    # saxutils.unescape("Suzy &amp; John")
+    if type(html) == type(u''):
+        strType = 'unicode'
+    elif type(html) == type(''):
+        strType = 'utf-8'
+        html = html.decode("utf-8", 'ignore')
+    # Newline vs <br />
+    html = html.replace('\n', ' ')
+    html = re.sub(r'\s*<\s*br\s*/?\s*>\s*', '\n', html)
+    html = re.sub(r'<\s*/\s*p\s*>\s*<\s*p[^>]*>', '\n', html)
+    # Strip html tags
+    html = re.sub('<.*?>', '', html)
+    # Replace html entities
+    html = saxutils.unescape(html)  #and for py3 ?
+    if strType == 'utf-8':
+        html = html.encode("utf-8")
+    return html.strip()
+#######################################
 
 def addstreamboq(bouquetname=None):
            boqfile="/etc/enigma2/bouquets.tv"
@@ -678,15 +808,15 @@ def addstreamboq(bouquetname=None):
                  if "userbouquet."+bouquetname+".tv" in line :
                     add=False
                     break
-           if add==True:   
-              fp=open(boqfile,"a")                               
-              fp.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "userbouquet.%s.tv" ORDER BY bouquet\n'% bouquetname) 
+           if add==True:
+              fp=open(boqfile,"a")
+              fp.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "userbouquet.%s.tv" ORDER BY bouquet\n'% bouquetname)
               fp.close()
               add=True
 
 def stream2bouquet(url=None,name=None,bouquetname=None):
-          error='none' 
-          bouquetname='XBMCAddons'                              
+          error='none'
+          bouquetname='XBMCAddons'
           fileName ="/etc/enigma2/userbouquet.%s.tv" % bouquetname
           out = '#SERVICE 4097:0:0:0:0:0:0:0:0:0:%s:%s\r\n' % (quote(url), quote(name))
           #py3
@@ -695,10 +825,10 @@ def stream2bouquet(url=None,name=None,bouquetname=None):
               addstreamboq(bouquetname)
               if not os.path.exists(fileName):
                  fp = open(fileName, 'w')
-                 fp.write("#NAME %s\n"%bouquetname) 
+                 fp.write("#NAME %s\n"%bouquetname)
                  fp.close()
-                 fp = open(fileName, 'a')                          
-                 fp.write(out)                 
+                 fp = open(fileName, 'a')
+                 fp.write(out)
               else:
                  fp=open(fileName,'r')
                  lines=fp.readlines()
@@ -707,10 +837,10 @@ def stream2bouquet(url=None,name=None,bouquetname=None):
                      if out in line:
                         error=(_('Stream already added to bouquet'))
                         return error
-                 fp = open(fileName, 'a')                          
-                 fp.write(out)                 
+                 fp = open(fileName, 'a')
+                 fp.write(out)
               fp.write("")
-              fp.close()              
+              fp.close()
           except:
              error=(_('Adding to bouquet failed'))
           return error
