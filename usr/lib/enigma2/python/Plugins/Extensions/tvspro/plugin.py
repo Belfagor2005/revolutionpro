@@ -5,7 +5,7 @@ Info http://t.me/tivustream
 ****************************************
 *        coded by Lululla              *
 *           thank's Pcd                *
-*             19/11/2021               *
+*             01/12/2021               *
 ****************************************
 '''
 from __future__ import print_function
@@ -23,6 +23,7 @@ from Components.Pixmap import MovingPixmap
 from Components.Pixmap import Pixmap, MultiPixmap
 from Components.ProgressBar import ProgressBar
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
+from Components.ServiceList import ServiceList
 from Components.Sources.List import List
 from Components.Sources.Progress import Progress
 from Components.Sources.Source import Source
@@ -35,21 +36,21 @@ from Screens.ChoiceBox import ChoiceBox
 from Screens.InfoBar import InfoBar
 from Screens.InfoBar import MoviePlayer
 from Screens.InfoBarGenerics import *
-from Screens.InfoBarGenerics import *
 from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection, InfoBarNotifications, InfoBarMenu, InfoBarSubtitleSupport
 from Screens.InputBox import InputBox
 from Screens.LocationBox import LocationBox
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
-from Screens.Standby import TryQuitMainloop
+from Screens.Standby import TryQuitMainloop, Standby
 from Screens.TaskView import JobView
 from Screens.VirtualKeyBoard import VirtualKeyBoard
 from ServiceReference import ServiceReference
 from Tools.Directories import SCOPE_PLUGINS, resolveFilename, pathExists, fileExists, copyfile, SCOPE_SKIN_IMAGE, SCOPE_MEDIA
 from Tools.Downloader import downloadWithProgress
 from Tools.LoadPixmap import LoadPixmap
+from enigma import RT_HALIGN_CENTER, RT_VALIGN_CENTER
+from enigma import RT_HALIGN_LEFT, RT_HALIGN_RIGHT
 from enigma import eEnv, iPlayableService
-from enigma import RT_HALIGN_LEFT, RT_HALIGN_RIGHT, RT_HALIGN_CENTER, RT_VALIGN_CENTER
 from enigma import eServiceCenter
 from enigma import eServiceReference
 from enigma import eSize, eListbox, eListboxPythonMultiContent, iServiceInformation
@@ -229,12 +230,11 @@ def showlist(data, list):
 
 #config
 mdchoice = [
-            ("4097", _("IPTV(4097)")),
-            ("1", _("Dvb(1)")),
-            ("8193", _("eServiceUri(8193)")),
+            ("4097", _("ServiceMp3(4097)")),
+            ("1", _("Hardware(1)")),
             ]
 
-if DreamOS():
+if os.path.exists("/usr/bin/gstplayer"):
     mdchoice.append(("5001", _("Gstreamer(5001)")))
 if os.path.exists("/usr/bin/exteplayer3"):
     mdchoice.append(("5002", _("Exteplayer3(5002)")))
@@ -249,12 +249,12 @@ try:
     config.plugins.tvspro.movie = ConfigDirectory(default=downloadpath)
 except:
     if os.path.exists("/usr/bin/apt-get"):
-        config.plugins.tvspro.movie   = ConfigDirectory(default='/media/hdd/movie')
+        config.plugins.tvspro.movie   = ConfigDirectory(default='/media/hdd/movie/')
 cfg = config.plugins.tvspro
 
 global Path_Movies
-Path_Movies             = str(config.plugins.tvspro.movie.value) + "/"
-if Path_Movies.endswith("\/\/") is True:
+Path_Movies             = str(config.plugins.tvspro.movie.value)
+if Path_Movies.endswith("\/\/"):
     Path_Movies = Path_Movies[:-1]
 print('patch movies: ', Path_Movies)
 
@@ -623,7 +623,6 @@ class AnimMain(Screen):
         self["label4"] = StaticText()
         self["label5"] = StaticText()
         self["actions"] = ActionMap(["OkCancelActions", "EPGSelectActions", "MenuActions", "DirectionActions", "NumberActions", "ColorActions"],
-        # self["actions"] = NumberActionMap(["OkCancelActions", "EPGSelectActions", "MenuActions", "DirectionActions", "NumberActions", "ColorActions"],        
         {
          "ok": self.okbuttonClick,
          "epg": self.showIMDB,
@@ -647,7 +646,6 @@ class AnimMain(Screen):
          "8": self.keyNumberGlobal,
          "9": self.keyNumberGlobal
          })
-
         nop = len(self.names)
         self.nop = nop
         nh = 1
@@ -2517,8 +2515,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         except:
             self.init_aspect = 0
         self.new_aspect = self.init_aspect
-        self['actions'] = ActionMap(['WizardActions',
-         'MoviePlayerActions',
+        self['actions'] = ActionMap(['MoviePlayerActions',
          'MovieSelectionActions',
          'MediaPlayerActions',
          'EPGSelectActions',
@@ -2543,7 +2540,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.desc = desc
         # self.pcip = 'None'
         self.url = url
-        self.name = name
+        self.name = decodeHtml(name)
         self.state = self.STATE_PLAYING
         SREF= self.session.nav.getCurrentlyPlayingServiceReference()
         # self.onLayoutFinish.append(self.cicleStreamType)
@@ -2555,7 +2552,8 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         else:
             # self.onLayoutFinish.append(self.cicleStreamType)
             self.onFirstExecBegin.append(self.cicleStreamType)
-        return
+        self.onClose.append(self.cancel)
+        # return
 
     def getAspect(self):
         return AVSwitch().getAspectRatioSetting()
@@ -2616,46 +2614,43 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         return
 
     def showIMDB(self):
-        text_clear = self.name
-        if is_tmdb:
-            try:
-                from Plugins.Extensions.tmdb import tmdb
-                text = charRemove(text_clear)
-                _session.open(tmdb.tmdbScreen, text, 0)
-            except Exception as e:
-                print("[XCF] Tmdb: ", e)
-        elif is_imdb:
-            try:
-                from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = charRemove(text_clear)
-                imdb(_session, text)
-            except Exception as e:
-                print("[XCF] imdb: ", e)
+        TMDB = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('TMDB'))
+        IMDb = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('IMDb'))
+        if os.path.exists(TMDB):
+            from Plugins.Extensions.TMBD.plugin import TMBD
+            text_clear = self.name
+            text = charRemove(text_clear)
+            self.session.open(TMBD, text, False)
+        elif os.path.exists(IMDb):
+            from Plugins.Extensions.IMDb.plugin import IMDB
+            text_clear = self.name
+            text = charRemove(text_clear)
+            HHHHH = text
+            self.session.open(IMDB, HHHHH)
         else:
-            inf = self.desc
-            if inf and inf != '':
-                text_clear = self.infos[inf]
-            else:
-                text_clear = name
+            text_clear = self.name
             self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
 
-    def slinkPlay(self):
-        ref = str(self.url)
-        ref = ref.replace(':', '%3a').replace(' ','%20')
+    def slinkPlay(self, url):
+        name = self.name
+        ref = "{0}:{1}".format(url.replace(":", "%3A"), name.replace(":", "%3A"))
         print('final reference:   ', ref)
         sref = eServiceReference(ref)
-        sref.setName(self.name)
+        sref.setName(name)
         self.session.nav.stopService()
         self.session.nav.playService(sref)
 
     def openPlay(self, servicetype, url):
-        url = url.replace(':', '%3a').replace(' ','%20')
-        ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:' + str(url)
+        name = self.name
+        ref = "{0}:0:0:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3A"), name.replace(":", "%3A"))
+        print('reference:   ', ref)
         if streaml == True:
-            ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + str(url)
+            url = 'http://127.0.0.1:8088/' + str(url)
+            ref = "{0}:0:1:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3A"), name.replace(":", "%3A"))
+            print('streaml reference:   ', ref)
         print('final reference:   ', ref)
         sref = eServiceReference(ref)
-        sref.setName(self.name)
+        sref.setName(name)
         self.session.nav.stopService()
         self.session.nav.playService(sref)
 
@@ -2666,6 +2661,9 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.servicetype = str(config.plugins.tvspro.services.value)# +':0:1:0:0:0:0:0:0:0:'#  '4097'
         print('servicetype1: ', self.servicetype)
         url = str(self.url)
+        if str(os.path.splitext(self.url)[-1]) == ".m3u8":
+            if self.servicetype == "1":
+                self.servicetype = "4097"
         currentindex = 0
         streamtypelist = ["4097"]
         # if "youtube" in str(self.url):
@@ -2674,7 +2672,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         if isStreamlinkAvailable():
             streamtypelist.append("5002") #ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
             streaml = True
-        if DreamOS():
+        if os.path.exists("/usr/bin/gstplayer"):
             streamtypelist.append("5001")
         if os.path.exists("/usr/bin/exteplayer3"):
             streamtypelist.append("5002")
@@ -2689,14 +2687,18 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         print('servicetype2: ', self.servicetype)
         self.openPlay(self.servicetype, url)
 
-    def keyNumberGlobal(self, number):
-        self['text'].number(number)
+    def up(self):
+        pass
 
-    def keyLeft(self):
-        self['text'].left()
+    def down(self):
+        # pass
+        self.up()
 
-    def keyRight(self):
-        self['text'].right()
+    def doEofInternal(self, playing):
+        self.close()
+
+    def __evEOF(self):
+        self.end = True
 
     def showVideoInfo(self):
         if self.shown:
