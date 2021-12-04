@@ -2265,9 +2265,9 @@ class Playstream1(Screen):
         url = self.url
         self.names = []
         self.urls = []
-        self.names.append('Download Now')
-        self.urls.append(checkStr(url))
         self.names.append('Play Now')
+        self.urls.append(checkStr(url))        
+        self.names.append('Download Now')
         self.urls.append(checkStr(url))
         self.names.append('Play HLS')
         self.urls.append(checkStr(url))
@@ -2303,14 +2303,14 @@ class Playstream1(Screen):
                     pass
                 self.session.open(Playstream2, self.name, self.url, desc)
 
-            if idx == 0:
+            if idx == 1:
                 # self.name = self.names[idx]
                 self.url = self.urls[idx]
                 print('In playVideo url D=', self.url)
                 self.runRec()
                 # return
 
-            if idx == 1:
+            if idx == 0:
                 self.name = self.names[idx]
                 self.url = self.urls[idx]
                 print('In playVideo url D=', self.url)
