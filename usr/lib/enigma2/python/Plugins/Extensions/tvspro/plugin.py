@@ -272,7 +272,7 @@ class ConfigEx(Screen, ConfigListScreen):
         self.session = session
         self["status"] = Label()
         self["statusbar"] = Label()
-        self['key_red'] = Label('Exit')
+        self['key_red'] = Label('Back')
         self['key_green'] = Label('Save')
         self['key_yellow'] = Button(_('Empty Cache'))
         # self["key_blue"] = Button(_(''))
@@ -503,7 +503,7 @@ def getpics(names, pics, tmpfold, picfold):
                         f1.close()
                     else:
                         print("Going in urlopen url =", url)
-                        p = ReadUrl(url)
+                        p = ReadUrl2(url)
                         f1=open(tpicf,"wb")
                         f1.write(p)
                         f1.close()
@@ -1444,7 +1444,7 @@ class tvspromain(Screen):
         self["info"] = Label()
         self["info"].setText(title_plug)
         self["pixmap"] = Pixmap()
-        self["key_red"] = Button(_("Cancel"))
+        self["key_red"] = Button(_("Exit"))
         self["key_green"] = Button(_("Select"))
         # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
@@ -1505,7 +1505,7 @@ class Videos2(Screen):
         self["info"] = Label()
         self["info"].setText(title_plug)
         self["pixmap"] = Pixmap()
-        self["key_red"] = Button(_("Cancel"))
+        self["key_red"] = Button(_("Back"))
         self["key_green"] = Button(_("Select"))
         # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
@@ -1527,7 +1527,7 @@ class Videos2(Screen):
         self.infos = []
         url = self.url
         print("Videos2 url =", url)
-        content = ReadUrl(url)
+        content = ReadUrl2(url)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -1586,7 +1586,7 @@ class Videos6(Screen):
         self["info"] = Label()
         self["info"].setText(title_plug)
         self["pixmap"] = Pixmap()
-        self["key_red"] = Button(_("Cancel"))
+        self["key_red"] = Button(_("Back"))
         self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
         # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
@@ -1608,7 +1608,7 @@ class Videos6(Screen):
         self.infos = []
         url = self.url
         print("Videos1 url =", url)
-        content = ReadUrl(url)
+        content = ReadUrl2(url)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -1658,7 +1658,7 @@ class Videos1(Screen):
         self["info"] = Label()
         self["info"].setText(title_plug)
         self["pixmap"] = Pixmap()
-        self["key_red"] = Button(_("Cancel"))
+        self["key_red"] = Button(_("Back"))
         self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
         # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
@@ -1679,7 +1679,7 @@ class Videos1(Screen):
         self.infos = []
         url = self.url
         print("Videos1 url =", url)
-        content = ReadUrl(url)
+        content = ReadUrl2(url)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -1730,7 +1730,7 @@ class nextVideos1(Screen):
         self["info"] = Label()
         self["info"].setText(title_plug)
         self["pixmap"] = Pixmap()
-        self["key_red"] = Button(_("Cancel"))
+        self["key_red"] = Button(_("Back"))
         self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
         # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
@@ -1751,7 +1751,7 @@ class nextVideos1(Screen):
         self.infos = []
         url = self.url
         print("nextVideos1 url =", url)
-        content = ReadUrl(url)
+        content = ReadUrl2(url)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -1802,7 +1802,7 @@ class Videos3(Screen):
         self["info"] = Label()
         self["info"].setText(title_plug)
         self["pixmap"] = Pixmap()
-        self["key_red"] = Button(_("Cancel"))
+        self["key_red"] = Button(_("Back"))
         self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
         # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
@@ -1826,7 +1826,7 @@ class Videos3(Screen):
         self.infos = []
         url = self.url
         print("Videos3 url =", url)
-        content = ReadUrl(url)
+        content = ReadUrl2(url)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -1878,7 +1878,7 @@ class Videos4(Screen):
         self["info"] = Label()
         self["info"].setText(title_plug)
         self["pixmap"] = Pixmap()
-        self["key_red"] = Button(_("Cancel"))
+        self["key_red"] = Button(_("Back"))
         self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
         # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
@@ -1903,7 +1903,7 @@ class Videos4(Screen):
         self.infos = []
         url = self.url
         print("Videos4 url =", url)
-        content = ReadUrl(url)
+        content = ReadUrl2(url)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -1954,7 +1954,7 @@ class nextVideos4(Screen):
         self["info"] = Label()
         self["info"].setText(title_plug)
         self["pixmap"] = Pixmap()
-        self["key_red"] = Button(_("Cancel"))
+        self["key_red"] = Button(_("Back"))
         self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
         # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
@@ -1979,7 +1979,7 @@ class nextVideos4(Screen):
         self.infos = []
         url = self.url
         print("nextVideos4 url =", url)
-        content = ReadUrl(url)
+        content = ReadUrl2(url)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -2033,7 +2033,7 @@ class Videos5(Screen):
         self["info"] = Label()
         self["info"].setText(title_plug)
         self["pixmap"] = Pixmap()
-        self["key_red"] = Button(_("Cancel"))
+        self["key_red"] = Button(_("Back"))
         self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
         # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
@@ -2057,7 +2057,7 @@ class Videos5(Screen):
         self.infos = []
         url = self.url
         print("Videos5 url =", url)
-        content = ReadUrl(url)
+        content = ReadUrl2(url)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -2111,7 +2111,7 @@ class Abouttvr(Screen):
         self["info"] = Label()
         self["info"].setText(title_plug)
         self["pixmap"] = Pixmap()
-        self["key_red"] = Button(_("Cancel"))
+        self["key_red"] = Button(_("Back"))
         self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
         # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
@@ -2183,7 +2183,7 @@ class Playstream1(Screen):
         self['list'] = rvList([])
         self['info'] = Label()
         self['info'].setText(name)
-        self['key_red'] = Button(_('Exit'))
+        self['key_red'] = Button(_('Back'))
         self['key_green'] = Button(_('Select'))
         self['progress'] = ProgressBar()
         self['progresstext'] = StaticText()
