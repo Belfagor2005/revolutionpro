@@ -11,7 +11,7 @@ Info http://t.me/tivustream
 from __future__ import print_function
 from . import _
 from Components.AVSwitch import AVSwitch
-from Components.ActionMap import ActionMap, NumberActionMap
+from Components.ActionMap import ActionMap
 from Components.Button import Button
 from Components.ConfigList import ConfigList, ConfigListScreen
 from Components.FileList import FileList
@@ -33,10 +33,12 @@ from Components.config import ConfigInteger, ConfigSelection, KEY_LEFT, KEY_RIGH
 from Components.config import ConfigSubsection, config, configfile, ConfigText, ConfigDirectory, ConfigSelection,ConfigYesNo,ConfigEnableDisable
 from Plugins.Plugin import PluginDescriptor
 from Screens.ChoiceBox import ChoiceBox
+from Screens.Console import Console                                   
 from Screens.InfoBar import InfoBar
 from Screens.InfoBar import MoviePlayer
-from Screens.InfoBarGenerics import *
-from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection, InfoBarNotifications, InfoBarMenu, InfoBarSubtitleSupport
+# from Screens.InfoBarGenerics import *
+from Screens.InfoBarGenerics import InfoBarMenu, InfoBarSeek, InfoBarAudioSelection, InfoBarMoviePlayerSummarySupport, \
+    InfoBarSubtitleSupport, InfoBarSummarySupport, InfoBarServiceErrorPopupSupport, InfoBarNotifications
 from Screens.InputBox import InputBox
 from Screens.LocationBox import LocationBox
 from Screens.MessageBox import MessageBox
@@ -45,7 +47,8 @@ from Screens.Standby import TryQuitMainloop, Standby
 from Screens.TaskView import JobView
 from Screens.VirtualKeyBoard import VirtualKeyBoard
 from ServiceReference import ServiceReference
-from Tools.Directories import SCOPE_PLUGINS, resolveFilename, pathExists, fileExists, copyfile, SCOPE_SKIN_IMAGE, SCOPE_MEDIA
+from Tools.Directories import SCOPE_SKIN_IMAGE, SCOPE_PLUGINS, SCOPE_LANGUAGE
+from Tools.Directories import pathExists, resolveFilename, fileExists, copyfile
 from Tools.Downloader import downloadWithProgress
 from Tools.LoadPixmap import LoadPixmap
 from enigma import RT_HALIGN_CENTER, RT_VALIGN_CENTER
@@ -1103,7 +1106,6 @@ class GridMain(Screen):
         ln = len(self.names)
         self.npage = int(float(ln/10)) + 1
         print("self.npage =", self.npage)
-        # self["actions"] = NumberActionMap(["OkCancelActions", "EPGSelectActions", "MenuActions", "DirectionActions", "NumberActions"],
         self["actions"] = ActionMap(["OkCancelActions", "EPGSelectActions", "MenuActions", "DirectionActions", "NumberActions"],        
             {
                 "ok": self.okClicked,
@@ -1446,7 +1448,6 @@ class tvspromain(Screen):
         self["pixmap"] = Pixmap()
         self["key_red"] = Button(_("Exit"))
         self["key_green"] = Button(_("Select"))
-        # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
         {
             "ok": self.okClicked,
@@ -1507,7 +1508,6 @@ class Videos2(Screen):
         self["pixmap"] = Pixmap()
         self["key_red"] = Button(_("Back"))
         self["key_green"] = Button(_("Select"))
-        # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
         {
             "ok": self.okClicked,
@@ -1589,7 +1589,6 @@ class Videos6(Screen):
         self["key_red"] = Button(_("Back"))
         self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
-        # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
         {
             "ok": self.okClicked,
             "back": self.close,
@@ -1661,7 +1660,6 @@ class Videos1(Screen):
         self["key_red"] = Button(_("Back"))
         self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
-        # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
         {
             "ok": self.okClicked,
             "back": self.close,
@@ -1733,7 +1731,6 @@ class nextVideos1(Screen):
         self["key_red"] = Button(_("Back"))
         self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
-        # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
         {
             "ok": self.okClicked,
             "back": self.close,
@@ -1805,7 +1802,6 @@ class Videos3(Screen):
         self["key_red"] = Button(_("Back"))
         self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
-        # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
         {
             "ok": self.okClicked,
             "back": self.close,
@@ -1881,7 +1877,6 @@ class Videos4(Screen):
         self["key_red"] = Button(_("Back"))
         self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
-        # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
         {
             "ok": self.okClicked,
             "back": self.close,
@@ -1957,7 +1952,6 @@ class nextVideos4(Screen):
         self["key_red"] = Button(_("Back"))
         self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
-        # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
         {
             "ok": self.okClicked,
             "back": self.close,
@@ -2036,7 +2030,6 @@ class Videos5(Screen):
         self["key_red"] = Button(_("Back"))
         self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
-        # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
         {
             "ok": self.okClicked,
             "back": self.close,
@@ -2114,7 +2107,6 @@ class Abouttvr(Screen):
         self["key_red"] = Button(_("Back"))
         self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
-        # self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
         {
             "ok": self.okClicked,
 
@@ -2448,6 +2440,7 @@ class TvInfoBarShowHide():
 
     def startHideTimer(self):
         if self.__state == self.STATE_SHOWN and not self.__locked:
+            self.hideTimer.stop()                     
             idx = config.usage.infobar_timeout.index
             if idx:
                 self.hideTimer.start(idx * 1500, True)
@@ -2488,7 +2481,17 @@ class TvInfoBarShowHide():
     def debug(obj, text = ""):
         print(text + " %s\n" % obj)
 
-class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarAudioSelection, TvInfoBarShowHide,InfoBarSubtitleSupport):
+class Playstream2(
+    InfoBarBase,
+    InfoBarMenu,
+    InfoBarSeek,
+    InfoBarAudioSelection,
+    InfoBarSubtitleSupport,
+    InfoBarMoviePlayerSummarySupport,                                     
+    InfoBarNotifications,
+    TvInfoBarShowHide,
+    Screen
+):
     STATE_IDLE = 0
     STATE_PLAYING = 1
     STATE_PAUSED = 2
@@ -2504,12 +2507,15 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.skinName = 'MoviePlayer'
         title = name
         streaml = False
-        InfoBarMenu.__init__(self)
-        InfoBarNotifications.__init__(self)
-        InfoBarBase.__init__(self, steal_current_service=True)
-        TvInfoBarShowHide.__init__(self)
-        InfoBarAudioSelection.__init__(self)
-        InfoBarSubtitleSupport.__init__(self)
+        for x in InfoBarBase, \
+                InfoBarMenu, \
+                InfoBarSeek, \
+                InfoBarAudioSelection, \
+                InfoBarMoviePlayerSummarySupport, \
+                InfoBarSubtitleSupport, \
+                InfoBarNotifications, \
+                TvInfoBarShowHide:
+            x.__init__(self)                            
         try:
             self.init_aspect = int(self.getAspect())
         except:
@@ -2535,14 +2541,14 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.allowPiP = False
         self.service = None
         service = None
+        self.pcip = 'None'
         InfoBarSeek.__init__(self, actionmap='InfobarSeekActions')
         self.icount = 0
         self.desc = desc
-        # self.pcip = 'None'
         self.url = url
         self.name = decodeHtml(name)
         self.state = self.STATE_PLAYING
-        SREF= self.session.nav.getCurrentlyPlayingServiceReference()
+        SREF = self.session.nav.getCurrentlyPlayingServiceReference()
         # self.onLayoutFinish.append(self.cicleStreamType)
         # self.onClose.append(self.cancel)
 		# self.onClose.append(self.__onClose)
@@ -2607,7 +2613,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
             sTagCodec = currPlay.info().getInfoString(iServiceInformation.sTagCodec)
             sTagVideoCodec = currPlay.info().getInfoString(iServiceInformation.sTagVideoCodec)
             sTagAudioCodec = currPlay.info().getInfoString(iServiceInformation.sTagAudioCodec)
-            message = 'stitle:' + str(sTitle) + '\n' + 'sServiceref:' + str(sServiceref) + '\n' + 'sTagCodec:' + str(sTagCodec) + '\n' + 'sTagVideoCodec:' + str(sTagVideoCodec) + '\n' + 'sTagAudioCodec :' + str(sTagAudioCodec)
+            message = 'stitle:' + str(sTitle) + '\n' + 'sServiceref:' + str(sServiceref) + '\n' + 'sTagCodec:' + str(sTagCodec) + '\n' + 'sTagVideoCodec:' + str(sTagVideoCodec) + '\n' + 'sTagAudioCodec : ' + str(sTagAudioCodec)
             self.mbox = self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
         except:
             pass
