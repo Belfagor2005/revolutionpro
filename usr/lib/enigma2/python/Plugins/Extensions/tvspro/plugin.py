@@ -5,7 +5,7 @@ Info http://t.me/tivustream
 ****************************************
 *        coded by Lululla              *
 *           thank's Pcd                *
-*             01/12/2021               *
+*             11/12/2021               *
 ****************************************
 '''
 from __future__ import print_function
@@ -33,12 +33,13 @@ from Components.config import ConfigInteger, ConfigSelection, KEY_LEFT, KEY_RIGH
 from Components.config import ConfigSubsection, config, configfile, ConfigText, ConfigDirectory, ConfigSelection,ConfigYesNo,ConfigEnableDisable
 from Plugins.Plugin import PluginDescriptor
 from Screens.ChoiceBox import ChoiceBox
-from Screens.Console import Console                                   
+from Screens.Console import Console
 from Screens.InfoBar import InfoBar
 from Screens.InfoBar import MoviePlayer
 # from Screens.InfoBarGenerics import *
-from Screens.InfoBarGenerics import InfoBarMenu, InfoBarSeek, InfoBarAudioSelection, InfoBarMoviePlayerSummarySupport, \
-    InfoBarSubtitleSupport, InfoBarSummarySupport, InfoBarServiceErrorPopupSupport, InfoBarNotifications
+from Screens.InfoBarGenerics import InfoBarShowHide, InfoBarSubtitleSupport, InfoBarSummarySupport, \
+	InfoBarNumberZap, InfoBarMenu, InfoBarEPG, InfoBarSeek, InfoBarMoviePlayerSummarySupport, \
+	InfoBarAudioSelection, InfoBarNotifications, InfoBarServiceNotifications
 from Screens.InputBox import InputBox
 from Screens.LocationBox import LocationBox
 from Screens.MessageBox import MessageBox
@@ -75,12 +76,6 @@ except:
 _session = None
 THISPLUG = '/usr/lib/enigma2/python/Plugins/Extensions/tvspro/'
 PY3 = sys.version_info.major >= 3
-# from six.moves.urllib.request import urlopen
-# from six.moves.urllib.request import Request
-# from six.moves.urllib.error import HTTPError, URLError
-# from six.moves.urllib.parse import urlparse
-# from six.moves.urllib.parse import quote
-# from six.moves.urllib.parse import urlencode
 
 # pythonFull = float(str(sys.version_info.major) + "." + str(sys.version_info.minor))
 # pythonVer = sys.version_info.major
@@ -157,7 +152,6 @@ Version = currversion + ' - 15.11.2021'
 title_plug = '..:: TivuStream Pro Revolution V. %s ::..' % Version
 name_plug = 'TivuStream Pro Revolution'
 res_plugin_path = THISPLUG + 'res/'
-pngx = res_plugin_path + 'pics/setting2.png'
 skin_path = THISPLUG
 SREF = ""
 folder_path = "/tmp/tvspro/"
@@ -165,13 +159,16 @@ if not os.path.exists(folder_path):
     os.makedirs(folder_path)
 
 if isFHD():
-    skin_path = res_plugin_path + 'skins/fhd/'
+    skin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/fhd/".format('tvspro'))
     defpic = res_plugin_path + "pics/defaultL.png"
     dblank = res_plugin_path + "pics/blankL.png"
 else:
-    skin_path = res_plugin_path + 'skins/hd/'
+    skin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/skins/hd/".format('tvspro'))
     defpic = res_plugin_path + "pics/default.png"
     dblank = res_plugin_path + "pics/blank.png"
+# if DreamOS():
+    # skin_path = skin_path + 'dreamOs/'
+
 try:
     from OpenSSL import SSL
     from twisted.internet import ssl
@@ -214,6 +211,7 @@ class rvList(MenuList):
 
 def rvoneListEntry(name):
     res = [name]
+    pngx = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/setting2.png".format('tvspro'))
     if isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(pngx)))
         res.append(MultiContentEntryText(pos=(60, 0), size=(1900, 50), font=7, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
@@ -719,7 +717,6 @@ class AnimMain(Screen):
                 imdb(_session, text)
             except Exception as e:
                 print("[XCF] imdb: ", e)
-
         else:
             inf = idx
             if inf and inf != '':
@@ -905,7 +902,7 @@ class AnimMain(Screen):
                     pass
 
         # elif 'Film' in str(name) and self.nextmodule == 'Videos4':
-        elif 'listMovie' in str(url) and self.nextmodule == 'Videos4':        
+        elif 'listMovie' in str(url) and self.nextmodule == 'Videos4':
             print("AnimMain Going listmovie in Videos4")
             try:
                 vid4 = Videos4(self.session, name, url)
@@ -937,7 +934,7 @@ class AnimMain(Screen):
                 vid4.startSession()
             except:
                 pass
-                
+
         elif self.nextmodule == "Videos2":
             print("In animeMain Going in Videos2 name =", name)
             print("In animeMain Going in Videos2 url =", url)
@@ -947,7 +944,7 @@ class AnimMain(Screen):
                 vid2.startSession()
             except:
                 pass
-                
+
         # elif 'Film' in str(name) and self.nextmodule == "Videos2":
             # print("In animeMain Going in Videos2 name =", name)
             # print("In animeMain Going in Videos2 url =", url)
@@ -966,8 +963,8 @@ class AnimMain(Screen):
                 # vid2 = Videos2(self.session, name, url)
                 # vid2.startSession()
             # except:
-                # pass 
-                
+                # pass
+
         # elif 'Serie' in str(name) and self.nextmodule == "Videos2":
             # print("In GridMain Going in Videos2 name =", name)
             # print("In GridMain Going in Videos2 url =", url)
@@ -976,8 +973,8 @@ class AnimMain(Screen):
                 # vid2 = Videos2(self.session, name, url)
                 # vid2.startSession()
             # except:
-                # pass      
-                
+                # pass
+
         elif self.nextmodule == "Videos3":
             print("In AnimMain Going in Videos3")
             try:
@@ -1106,7 +1103,7 @@ class GridMain(Screen):
         ln = len(self.names)
         self.npage = int(float(ln/10)) + 1
         print("self.npage =", self.npage)
-        self["actions"] = ActionMap(["OkCancelActions", "EPGSelectActions", "MenuActions", "DirectionActions", "NumberActions"],        
+        self["actions"] = ActionMap(["OkCancelActions", "EPGSelectActions", "MenuActions", "DirectionActions", "NumberActions"],
             {
                 "ok": self.okClicked,
                 "epg": self.showIMDB,
@@ -1312,7 +1309,7 @@ class GridMain(Screen):
                     pass
 
         # elif 'Film' in str(name) and self.nextmodule == 'Videos4':
-        elif 'listMovie' in str(url) and self.nextmodule == 'Videos4':        
+        elif 'listMovie' in str(url) and self.nextmodule == 'Videos4':
             print("In GridMain Going listmovie in Videos4")
             try:
                 vid4 = Videos4(self.session, name, url)
@@ -1364,7 +1361,7 @@ class GridMain(Screen):
                 # vid2.startSession()
             # except:
                 # pass
-                
+
         # elif 'Live' in str(name) and self.nextmodule == "Videos2":
             # print("In GridMain Going in Videos2 name =", name)
             # print("In GridMain Going in Videos2 url =", url)
@@ -1373,8 +1370,8 @@ class GridMain(Screen):
                 # vid2 = Videos2(self.session, name, url)
                 # vid2.startSession()
             # except:
-                # pass          
-                
+                # pass
+
         # elif 'Serie' in str(name) and self.nextmodule == "Videos2":
             # print("In GridMain Going in Videos2 name =", name)
             # print("In GridMain Going in Videos2 url =", url)
@@ -1383,7 +1380,7 @@ class GridMain(Screen):
                 # vid2 = Videos2(self.session, name, url)
                 # vid2.startSession()
             # except:
-                # pass                
+                # pass
 
         elif self.nextmodule == "Videos3":
             print("In GridMain Going in Videos3")
@@ -1448,7 +1445,7 @@ class tvspromain(Screen):
         self["pixmap"] = Pixmap()
         self["key_red"] = Button(_("Exit"))
         self["key_green"] = Button(_("Select"))
-        self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
+        self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
         {
             "ok": self.okClicked,
             "back": self.close,
@@ -1508,7 +1505,7 @@ class Videos2(Screen):
         self["pixmap"] = Pixmap()
         self["key_red"] = Button(_("Back"))
         self["key_green"] = Button(_("Select"))
-        self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],        
+        self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"],
         {
             "ok": self.okClicked,
             "back": self.close,
@@ -2258,7 +2255,7 @@ class Playstream1(Screen):
         self.names = []
         self.urls = []
         self.names.append('Play Now')
-        self.urls.append(checkStr(url))        
+        self.urls.append(checkStr(url))
         self.names.append('Download Now')
         self.urls.append(checkStr(url))
         self.names.append('Play HLS')
@@ -2295,6 +2292,11 @@ class Playstream1(Screen):
                     pass
                 self.session.open(Playstream2, self.name, self.url, desc)
 
+            if idx == 0:
+                self.name = self.names[idx]
+                self.url = self.urls[idx]
+                print('In playVideo url D=', self.url)
+                self.play()
             if idx == 1:
                 # self.name = self.names[idx]
                 self.url = self.urls[idx]
@@ -2302,11 +2304,7 @@ class Playstream1(Screen):
                 self.runRec()
                 # return
 
-            if idx == 0:
-                self.name = self.names[idx]
-                self.url = self.urls[idx]
-                print('In playVideo url D=', self.url)
-                self.play()
+
             elif idx == 2:
                 print('In playVideo url B=', self.url)
                 self.name = self.names[idx]
@@ -2371,7 +2369,7 @@ class Playstream1(Screen):
             # ref = '4097:0:1:0:0:0:0:0:0:0:' + url
             sref = eServiceReference(ref)
             print('SREF: ', sref)
-            sref.setName(self.name1)
+            sref.setName(name)
             self.session.open(Playstream2, name, sref, desc)
             self.close()
         else:
@@ -2440,7 +2438,7 @@ class TvInfoBarShowHide():
 
     def startHideTimer(self):
         if self.__state == self.STATE_SHOWN and not self.__locked:
-            self.hideTimer.stop()                     
+            self.hideTimer.stop()
             idx = config.usage.infobar_timeout.index
             if idx:
                 self.hideTimer.start(idx * 1500, True)
@@ -2487,7 +2485,6 @@ class Playstream2(
     InfoBarSeek,
     InfoBarAudioSelection,
     InfoBarSubtitleSupport,
-    InfoBarMoviePlayerSummarySupport,                                     
     InfoBarNotifications,
     TvInfoBarShowHide,
     Screen
@@ -2511,11 +2508,10 @@ class Playstream2(
                 InfoBarMenu, \
                 InfoBarSeek, \
                 InfoBarAudioSelection, \
-                InfoBarMoviePlayerSummarySupport, \
                 InfoBarSubtitleSupport, \
                 InfoBarNotifications, \
                 TvInfoBarShowHide:
-            x.__init__(self)                            
+            x.__init__(self)
         try:
             self.init_aspect = int(self.getAspect())
         except:
@@ -2559,7 +2555,7 @@ class Playstream2(
             # self.onLayoutFinish.append(self.cicleStreamType)
             self.onFirstExecBegin.append(self.cicleStreamType)
         self.onClose.append(self.cancel)
-        # return
+
 
     def getAspect(self):
         return AVSwitch().getAspectRatioSetting()
@@ -2664,7 +2660,7 @@ class Playstream2(
         global streml
         streaml = False
         from itertools import cycle, islice
-        self.servicetype = str(config.plugins.tvspro.services.value)# +':0:1:0:0:0:0:0:0:0:'#  '4097'
+        self.servicetype = str(config.plugins.tvspro.services.value)
         print('servicetype1: ', self.servicetype)
         url = str(self.url)
         if str(os.path.splitext(self.url)[-1]) == ".m3u8":
