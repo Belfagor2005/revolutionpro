@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/python
 '''
-Info http://t.me/tivustream
 ****************************************
 *        coded by Lululla              *
 *           thank's Pcd                *
 *             11/12/2021               *
 ****************************************
+Info http://t.me/tivustream                           
 '''
 from __future__ import print_function
 from . import _
@@ -76,34 +76,6 @@ except:
 _session = None
 THISPLUG = '/usr/lib/enigma2/python/Plugins/Extensions/tvspro/'
 PY3 = sys.version_info.major >= 3
-
-# pythonFull = float(str(sys.version_info.major) + "." + str(sys.version_info.minor))
-# pythonVer = sys.version_info.major
-# PY3 = False
-# if pythonFull < 3.9:
-    # PY3 = True
-# dreamos = False
-# if DreamOS():
-	# dreamos = True
-# if os.path.exists('/usr/lib/python2.7'):
-	# from urllib2 import urlopen, Request, URLError, HTTPError
-	# from urlparse import urlparse, parse_qs
-	# from urllib import quote_plus, urlencode, quote
-	# import httplib
-	# import six
-	# from htmlentitydefs import name2codepoint as n2cp
-	# from urllib import unquote_plus
-
-# PY3 = False
-# if os.path.exists('/usr/lib/python3.9'):
-	# import http.client
-	# from urllib.error import URLError, HTTPError
-	# from urllib.request import urlopen, Request
-	# from urllib.parse import urlparse
-	# from urllib.parse import quote_plus, unquote_plus
-	# from urllib.parse import parse_qs, urlencode, quote
-	# unicode = str; unichr = chr; long = int
-	# PY3 = True
 
 if PY3:
         import http.client
@@ -191,33 +163,44 @@ if sslverify:
                 ClientTLSOptions(self.hostname, ctx)
             return ctx
 
+# class rvList(MenuList):
+    # def __init__(self, list):
+        # MenuList.__init__(self, list, False, eListboxPythonMultiContent)
+        # self.l.setFont(0, gFont('Regular', 20))
+        # self.l.setFont(1, gFont('Regular', 22))
+        # self.l.setFont(2, gFont('Regular', 24))
+        # self.l.setFont(3, gFont('Regular', 26))
+        # self.l.setFont(4, gFont('Regular', 28))
+        # self.l.setFont(5, gFont('Regular', 30))
+        # self.l.setFont(6, gFont('Regular', 32))
+        # self.l.setFont(7, gFont('Regular', 34))
+        # self.l.setFont(8, gFont('Regular', 36))
+        # self.l.setFont(9, gFont('Regular', 40))
+        # if isFHD():
+            # self.l.setItemHeight(50)
+        # else:
+            # self.l.setItemHeight(40)
 class rvList(MenuList):
     def __init__(self, list):
-        MenuList.__init__(self, list, False, eListboxPythonMultiContent)
-        self.l.setFont(0, gFont('Regular', 20))
-        self.l.setFont(1, gFont('Regular', 22))
-        self.l.setFont(2, gFont('Regular', 24))
-        self.l.setFont(3, gFont('Regular', 26))
-        self.l.setFont(4, gFont('Regular', 28))
-        self.l.setFont(5, gFont('Regular', 30))
-        self.l.setFont(6, gFont('Regular', 32))
-        self.l.setFont(7, gFont('Regular', 34))
-        self.l.setFont(8, gFont('Regular', 36))
-        self.l.setFont(9, gFont('Regular', 40))
+        MenuList.__init__(self, list, True, eListboxPythonMultiContent)
         if isFHD():
             self.l.setItemHeight(50)
+            textfont = int(34)
+            self.l.setFont(0, gFont('Regular', textfont))
         else:
-            self.l.setItemHeight(40)
-
+            self.l.setItemHeight(50)
+            textfont = int(24)
+            self.l.setFont(0, gFont('Regular', textfont))
+            
 def rvoneListEntry(name):
     res = [name]
     pngx = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/pics/setting2.png".format('tvspro'))
     if isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(pngx)))
-        res.append(MultiContentEntryText(pos=(60, 0), size=(1900, 50), font=7, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryText(pos=(60, 0), size=(1900, 50), font=0, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 6), size=(34, 25), png=loadPNG(pngx)))
-        res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=2, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT))
+        res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=0, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 def showlist(data, list):
@@ -2327,7 +2310,7 @@ class Playstream1(Screen):
                     os.remove('/tmp/hls.avi')
                 except:
                     pass
-                cmd = 'python "/usr/lib/enigma2/python/Plugins/Extensions/tvspro/l/tsclient.py" "' + url + '" "1" + &'
+                cmd = 'python "/usr/lib/enigma2/python/Plugins/Extensions/tvspro/lib/tsclient.py" "' + url + '" "1" + &'
                 print('hls cmd = ', cmd)
                 os.system(cmd)
                 os.system('sleep 3')
@@ -2366,7 +2349,6 @@ class Playstream1(Screen):
             url = url.replace(':', '%3a')
             print('In revolution url =', url)
             ref = '5002:0:1:0:0:0:0:0:0:0:' + 'http%3a//127.0.0.1%3a8088/' + str(url)
-            # ref = '4097:0:1:0:0:0:0:0:0:0:' + url
             sref = eServiceReference(ref)
             print('SREF: ', sref)
             sref.setName(name)
@@ -2538,7 +2520,6 @@ class Playstream2(
         self.service = None
         service = None
         self.pcip = 'None'
-        InfoBarSeek.__init__(self, actionmap='InfobarSeekActions')
         self.icount = 0
         self.desc = desc
         self.url = url
