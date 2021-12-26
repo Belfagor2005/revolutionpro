@@ -1,10 +1,10 @@
 <screen name="AnimMain" position="0,56" size="1280,628" title="AnimMain" flags="wfNoBorder" backgroundColor="#ff000000">
 	<widget name="title" position="194,431" size="857,32" zPosition="3" halign="left" valign="center" foregroundColor="#389416" backgroundColor="#389416" font="Regular; 20" transparent="1" />
 	<ePixmap position="-4,427" zPosition="-2" size="1280,201" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/infobar2.png" />
-	<widget name="pointer" position="606,457" size="50,150" zPosition="2" alphatest="on" />
+	<widget name="pointer" position="586,457" size="84,150" zPosition="2" alphatest="on" />
 	<widget source="label1" render="Label" position="197,495" size="166,70" font="Regular; 20" halign="center" valign="center" zPosition="2" noWrap="1" foregroundColor="#b3b3b9" backgroundColor="#b3b3b9" transparent="1" />
 	<widget source="label2" render="Label" position="371,495" size="166,70" font="Regular; 20" halign="center" valign="center" zPosition="2" noWrap="1" foregroundColor="#b3b3b9" backgroundColor="#b3b3b9" transparent="1" />
-	<widget source="label3" render="Label" position="546,495" size="166,70" font="Regular; 26" halign="center" valign="center" zPosition="3" noWrap="1" foregroundColor="#ffffff" backgroundColor="#ffffff" transparent="1" />
+	<widget source="label3" render="Label" position="546,495" size="166,70" font="Regular; 26" halign="center" valign="center" zPosition="3" noWrap="1" foregroundColor="yellow" backgroundColor="#ffffff" transparent="1" />
 	<widget source="label4" render="Label" position="721,495" size="166,70" font="Regular; 20" halign="center" valign="center" zPosition="2" noWrap="1" foregroundColor="#b3b3b9" backgroundColor="#b3b3b9" transparent="1" />
 	<widget source="label5" render="Label" position="895,495" size="166,70" font="Regular; 20" halign="center" valign="center" zPosition="2" noWrap="1" foregroundColor="#b3b3b9" backgroundColor="#b3b3b9" transparent="1" />
 	<widget name="info" position="81,11" zPosition="8" size="1027,168" font="Regular; 18" foregroundColor="#ffff00" backgroundColor="#40000000" transparent="1" halign="left" valign="top" />
