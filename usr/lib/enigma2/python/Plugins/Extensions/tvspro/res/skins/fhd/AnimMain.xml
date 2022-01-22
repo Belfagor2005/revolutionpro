@@ -1,13 +1,12 @@
 <screen name="AnimMain" position="center,center" size="1920,1080" title="AnimMain" flags="wfNoBorder" backgroundColor="#ff000000">
 	<widget name="title" position="103,786" size="1724,60" zPosition="3" halign="left" valign="center" foregroundColor="#389416" backgroundColor="#389416" font="Regular;38" transparent="1" />
 	<ePixmap position="0,775" zPosition="-2" size="1920,306" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/infobar2L.png" />
-	<widget name="pointer" position="870,806" size="150,225" zPosition="2" alphatest="on" />
+	<ePixmap position="1794,858" zPosition="4" size="40,40" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/info_on.png" />	
+	<widget name="pointer" position="870,806" size="150,225" zPosition="2" alphatest="on" halign="center" valign="center" />
 	<widget source="label1" render="Label" position="105,855" size="330,150" font="Regular;26" halign="center" valign="center" zPosition="2" noWrap="1" foregroundColor="#b3b3b9" backgroundColor="#b3b3b9" transparent="1" />
 	<widget source="label2" render="Label" position="435,855" size="330,150" font="Regular;26" halign="center" valign="center" zPosition="2" noWrap="1" foregroundColor="#b3b3b9" backgroundColor="#b3b3b9" transparent="1" />
 	<widget source="label3" render="Label" position="710,853" size="480,150" font="Regular; 38" halign="center" valign="center" zPosition="3" noWrap="1" foregroundColor="yellow" backgroundColor="#b3b3b9" transparent="1" />
 	<widget source="label4" render="Label" position="1125,855" size="330,150" font="Regular;26" halign="center" valign="center" zPosition="2" noWrap="1" foregroundColor="#b3b3b9" backgroundColor="#b3b3b9" transparent="1" />
 	<widget source="label5" render="Label" position="1455,855" size="330,150" font="Regular;26" halign="center" valign="center" zPosition="2" noWrap="1" foregroundColor="#b3b3b9" backgroundColor="#b3b3b9" transparent="1" />
-
 	<widget name="info" position="119,8" zPosition="4" size="1681,256" font="Regular;33" foregroundColor="#ffff00" backgroundColor="#40000000" transparent="1" halign="left" valign="top" />
-<ePixmap position="1794,858" zPosition="4" size="40,40" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/info_on.png" />
 </screen>
