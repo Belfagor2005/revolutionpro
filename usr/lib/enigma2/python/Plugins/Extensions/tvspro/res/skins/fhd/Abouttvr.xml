@@ -1,6 +1,6 @@
 <screen name="AboutFHD" position="0,0" size="1920,1080" title="About">
-	<ePixmap position="157,0" zPosition="-2" size="1561,1080" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/fanartfhd.jpg" scale="stretch" />
-	<eLabel text="Se ti piace quello che facciamo e come lo facciamo ti invitiamo a contribuire alle nostre spese di hosting, domini .. Vieni su tivustream.com  Clicca sul logo PayPal e dona con il tuo account ...grazie DI CUORE ! " position="174,968" size="1534,98" font="Regular; 28" foregroundColor="green" backgroundColor="#10000000" transparent="1" zPosition="6" />
-	<widget name="title" position="185,70" size="1515,52" zPosition="3" halign="center" valign="center" foregroundColor="#389416" backgroundColor="#389416" font="Regular;38" transparent="1" />
-	<widget name="info" position="174,126" zPosition="4" size="1538,836" font="Regular;33" foregroundColor="#fcc000" backgroundColor="#40000000" transparent="1" halign="center" valign="center" />
+	<widget name="title" position="185,70" size="1515,52" zPosition="3" halign="center" valign="center" foregroundColor="#389416" backgroundColor="#389416" font="Regular;38" transparent="1"/>
+	<widget name="info" position="174,126" zPosition="4" size="1538,836" font="Regular;33" foregroundColor="#fcc000" backgroundColor="#40000000" transparent="1" halign="center" valign="center"/>
+	<eLabel text="Se ti piace quello che facciamo e come lo facciamo ti invitiamo a contribuire alle nostre spese di hosting, domini .. Vieni su tivustream.com  Clicca sul logo PayPal e dona con il tuo account ...grazie DI CUORE!" position="174,968" size="1534,98" font="Regular; 28" foregroundColor="green" backgroundColor="#10000000" transparent="1" zPosition="6"/>
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/fanartfhd.jpg" position="157,0" zPosition="-2" size="1561,1080"/>
 </screen>

@@ -1,5 +1,5 @@
 <screen name="AboutHD" position="0,0" size="1280,720" title="About">
-	<ePixmap position="0,0" zPosition="-2" size="1280,720" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/fanarthd.jpg" />
-	<widget name="title" position="120,63" size="1035,52" zPosition="3" halign="center" valign="center" foregroundColor="#389416" backgroundColor="black" font="Regular; 34" transparent="1" />
-	<widget name="info" position="115,112" zPosition="4" size="1045,483" font="Regular; 22" foregroundColor="#fcc000" backgroundColor="#40000000" transparent="1" halign="center" valign="center" />
+	<widget name="title" position="120,63" size="1035,52" zPosition="3" halign="center" valign="center" foregroundColor="#389416" backgroundColor="black" font="Regular; 34" transparent="1"/>
+	<widget name="info" position="115,112" zPosition="4" size="1045,483" font="Regular; 22" foregroundColor="#fcc000" backgroundColor="#40000000" transparent="1" halign="center" valign="center"/>
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/fanarthd.jpg" position="0,0" zPosition="-2" size="1280,720"/>
 </screen>

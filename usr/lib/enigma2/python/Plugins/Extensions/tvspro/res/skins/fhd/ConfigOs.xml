@@ -1,16 +1,15 @@
 <screen name="ConfigFHDos" position="0,0" size="1920,1080" title="Config">
-	<ePixmap position="157,0" zPosition="-2" size="999,1078" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/fanartfhd.jpg" scale="stretch" />
-	<!-- Menu List -->	 
-	<widget name="config" position="207,371" size="901,347" itemHeight="50" scrollbarMode="showOnDemand" transparent="1" zPosition="5" foregroundColor="#00a0a0a0" foregroundColorSelected="#ffffff" backgroundColor="#20000000" backgroundColorSelected="#0b2049" selectionPixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/sliderb.png" />
-	<widget name="description" position="206,728" zPosition="4" size="907,131" font="Regular; 28" foregroundColor="#fcc000" backgroundColor="#40000000" transparent="1" halign="left" valign="center" />
-	<widget name="statusbar" position="205,998" size="920,70" font="Regular; 36" halign="left" valign="center" foregroundColor="#ffffff" backgroundColor="#000000" transparent="1" zPosition="5" />
-	<widget name="status" position="207,925" size="917,70" font="Regular; 36" halign="left" valign="center" foregroundColor="yellow" backgroundColor="#000000" transparent="1" zPosition="5" />
-	
-	<!-- MButton -->	
-	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/key_red.png" position="223,890" size="30,30" alphatest="on" zPosition="5" />
-	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/key_green.png" position="498,890" size="30,30" alphatest="on" zPosition="5" />
-	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/key_yellow.png" position="771,891" size="30,30" alphatest="on" zPosition="5" />	
-	<widget name="key_red" position="273,890" size="200,30" font="Regular;30" halign="left" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" />
-	<widget name="key_green" position="545,890" size="200,30" font="Regular;30" halign="left" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" />
-	<widget name="key_yellow" position="819,890" size="200,30" font="Regular;30" halign="left" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" />
+	<widget name="description" position="206,728" zPosition="4" size="907,131" font="Regular; 28" foregroundColor="#fcc000" backgroundColor="#40000000" transparent="1" halign="left" valign="center"/>
+	<widget name="statusbar" position="205,998" size="920,70" font="Regular; 36" halign="left" valign="center" foregroundColor="#ffffff" backgroundColor="#000000" transparent="1" zPosition="5"/>
+	<widget name="status" position="207,925" size="917,70" font="Regular; 36" halign="left" valign="center" foregroundColor="yellow" backgroundColor="#000000" transparent="1" zPosition="5"/>
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/fanartfhd.jpg" position="157,0" zPosition="-2" size="999,1078"/>
+	<!-- Menu List -->
+	<widget name="config" position="207,371" size="901,347" itemHeight="50" scrollbarMode="showOnDemand" transparent="1" zPosition="5" foregroundColor="#00a0a0a0" foregroundColorSelected="#ffffff" backgroundColor="#20000000" backgroundColorSelected="#0b2049" selectionPixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/sliderb.png"/>
+	<!-- MButton -->
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/key_red.png" position="223,890" size="30,30" alphatest="on" zPosition="5"/>
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/key_green.png" position="498,890" size="30,30" alphatest="on" zPosition="5"/>
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/key_yellow.png" position="771,891" size="30,30" alphatest="on" zPosition="5"/>
+	<widget name="key_red" position="273,890" size="200,30" font="Regular;30" halign="left" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1"/>
+	<widget name="key_green" position="545,890" size="200,30" font="Regular;30" halign="left" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1"/>
+	<widget name="key_yellow" position="819,890" size="200,30" font="Regular;30" halign="left" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1"/>
 </screen>
