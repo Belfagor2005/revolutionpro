@@ -1,7 +1,11 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import os, re, sys
 from twisted.web.client import downloadPage
 PY3 = sys.version_info.major >= 3
 print("Update.py")
+
 def upd_done():        
     print( "In upd_done")
     xfile ='http://patbuweb.com/revolutionlite/tvspro.tar'

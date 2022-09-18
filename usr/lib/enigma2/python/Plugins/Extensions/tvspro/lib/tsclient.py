@@ -17,7 +17,7 @@ Original Code From:
 
 Depends on python-crypto (for secure stream)
 Modified for OpenPli enigma2 usage by athoik
-Modified for KodiDirect, KodiLite and IPTVworld by pcd 
+Modified for KodiDirect, KodiLite and IPTVworld by pcd
 """
 import sys
 import threading
@@ -37,7 +37,7 @@ from six.moves.urllib.parse import unquote
 from six.moves.urllib.parse import quote_plus
 from six.moves.urllib.parse import unquote_plus
 from six.moves.urllib.parse import parse_qs
-from six.moves.urllib.request import urlretrieve  
+from six.moves.urllib.request import urlretrieve
 from sys import version_info
 PY3 = sys.version_info.major >= 3
 
@@ -70,13 +70,13 @@ def getLastPTS(data,rpid,type="video"):
         else:
             currentpost=ff-1
     if spoint<=0: return None
-    
-    currentpost=   spoint 
+
+    currentpost=   spoint
     found=False
     while not found:
         if len(data)-currentpost>=188:
             bytes=data[currentpost:currentpost+188]
-            
+
             bits=bitstring.ConstBitStream(bytes=bytes)
             sign=bits.read(8).uint
             tei = bits.read(1).uint
@@ -195,7 +195,7 @@ def getLastPTS(data,rpid,type="video"):
                                 decodeddts =int(''.join([firstpartdts.bin, secondpartdts.bin, thirdpartdts.bin]),2)#
                 if decodedpts and (type=="" or av==type) and len(av)>0:
                     return decodedpts
-            
+
         currentpost=currentpost-packsize
         if currentpost<10:
             found=True
@@ -218,21 +218,21 @@ def getFirstPTSFrom(data,rpid, initpts,type="video" ):
         else:
             currentpost=ff+1
     if spoint>len(data)-packsize: return None
-    
-    currentpost=   spoint 
-    found=False    
+
+    currentpost=   spoint
+    found=False
 
     while not found:
         if len(data)-currentpost>=188:
             bytes=data[currentpost:currentpost+188]
-            
+
             bits=bitstring.ConstBitStream(bytes=bytes)
             sign=bits.read(8).uint
             tei = bits.read(1).uint
             pusi = bits.read(1).uint
             transportpri = bits.read(1).uint
             pid = bits.read(13).uint
-            if rpid==pid or rpid==0: 
+            if rpid==pid or rpid==0:
                 try:
                     packet = bits.read((packsize-3)*8)
                     scramblecontrol = packet.read(2).uint
@@ -351,11 +351,11 @@ def getFirstPTSFrom(data,rpid, initpts,type="video" ):
         if currentpost>=len(data):
             found=True
     return ret
-        
+
 ################################
 
 class hlsclient(threading.Thread):
- 
+
     def __init__(self):
         self._stop = False
         self.thread = None
@@ -415,7 +415,7 @@ class hlsclient(threading.Thread):
             elif variant:
                 variants.append((line, variant))
                 variant = None
-        pass#print "Here in hlsclient-py variants =", variants        
+        pass#print "Here in hlsclient-py variants =", variants
         if len(variants) == 1:
             self.url = urlparse.urljoin(self.url, variants[0][0])
         elif len(variants) >= 2:
@@ -461,7 +461,7 @@ class hlsclient(threading.Thread):
         while self.thread.isAlive():
                 if self._stop:
                     self.hread._Thread__stop()
-                """    
+                """
                 medialist = list(self.handle_basic_m3u(self.url))
                 pass#print 'Here in [hlsclient::play] medialist A=', medialist
                 if None in medialist:
@@ -479,7 +479,7 @@ class hlsclient(threading.Thread):
                     seq, enc, duration, targetduration, media_url = media
                     pass#print 'Here in [hlsclient::play] media_url =', media_url
                     if seq > last_seq:
-                """    
+                """
                 lastpts = 0
                 fixpid=256
                 lastchunk = ""
@@ -492,18 +492,18 @@ class hlsclient(threading.Thread):
                       if i == 0:
                             try:
                                    firstpts,pos= getFirstPTSFrom(chunk,fixpid,lastpts)
-                            except:       
+                            except:
                                    continue
 
-                      i = i+1      
+                      i = i+1
                       queue.put(chunk, block=True)
                    else:
-                         continue   
-                      
+                         continue
+
                 lc = len(lastchunk)
- 
+
                 fpts = firstpts
-                
+
                 lastpts=getLastPTS(lastchunk,fixpid,defualtype)
                 if (lastpts is None) or (lastpts == "None"):
                        lastpts = 0
@@ -514,18 +514,18 @@ class hlsclient(threading.Thread):
                 endtime = int(float(endtime))
                 timetaken = endtime - starttime
                 if videotime > timetaken:
-                       sleeptime = videotime - timetaken 
+                       sleeptime = videotime - timetaken
                 else:
                        sleeptime = 10
-              
+
                 time.sleep(sleeptime)
-                           
+
                 """
                         last_seq = seq
                         changed = 1
                   except:
-                        pass        
-                        
+                        pass
+
                 self._sleeping = True
                 if changed == 1:
                     # initial minimum reload delay
@@ -542,7 +542,7 @@ class hlsclient(threading.Thread):
                 self._sleeping = False
                 changed -= 1
 #        except Exception as ex:
-#            pass#print '[hlsclient::play] Exception %s; Stopping threads' % ex 
+#            pass#print '[hlsclient::play] Exception %s; Stopping threads' % ex
 #            self._stop = True
 #            self_downLoading = False
 #            self.thread._Thread__stop()

@@ -17,7 +17,7 @@ Original Code From:
 
 Depends on python-crypto (for secure stream)
 Modified for OpenPli enigma2 usage by athoik
-Modified for KodiDirect and IPTVworld by pcd 
+Modified for KodiDirect and IPTVworld by pcd
 """
 ##updated by pcd@xtrend-alliance 20140906##
 ##20180829 - back to v4.0 last version for mobdro (startecmob##
@@ -40,7 +40,7 @@ from six.moves.urllib.parse import unquote
 from six.moves.urllib.parse import quote_plus
 from six.moves.urllib.parse import unquote_plus
 from six.moves.urllib.parse import parse_qs
-from six.moves.urllib.request import urlretrieve  
+from six.moves.urllib.request import urlretrieve
 from sys import version_info
 PY3 = sys.version_info.major >= 3
 
@@ -55,7 +55,7 @@ STREAM_PFILE      = '/tmp/hls.avi'
         # response = urlopen(req)
         # link=response.read()
         # response.close()
-        # return link     
+        # return link
 
 # def getUrl2(url, referer = ""):
         # req = Request(url)
@@ -65,134 +65,134 @@ STREAM_PFILE      = '/tmp/hls.avi'
         # return response
 from random import choice
 ListAgent = [
-		  'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.15 (KHTML, like Gecko) Chrome/24.0.1295.0 Safari/537.15',
-		  'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.14 (KHTML, like Gecko) Chrome/24.0.1292.0 Safari/537.14',
-		  'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
-		  'Mozilla/5.0 (Windows NT 6.2) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
-		  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
-		  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
-		  'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1284.0 Safari/537.13',
-		  'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.8 (KHTML, like Gecko) Chrome/17.0.940.0 Safari/535.8',
-		  'Mozilla/6.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
-		  'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
-		  'Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
-		  'Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2',
-		  'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.1.16) Gecko/20120427 Firefox/15.0a1',
-		  'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:15.0) Gecko/20120427 Firefox/15.0a1',
-		  'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:15.0) Gecko/20120910144328 Firefox/15.0.2',
-		  'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:15.0) Gecko/20100101 Firefox/15.0.1',
-		  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:9.0a2) Gecko/20111101 Firefox/9.0a2',
-		  'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110613 Firefox/6.0a2',
-		  'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110612 Firefox/6.0a2',
-		  'Mozilla/5.0 (Windows NT 6.1; rv:6.0) Gecko/20110814 Firefox/6.0',
-		  'Mozilla/5.0 (compatible; MSIE 10.6; Windows NT 6.1; Trident/5.0; InfoPath.2; SLCC1; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET CLR 2.0.50727) 3gpp-gba UNTRUSTED/1.0',
-		  'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)',
-		  'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)',
-		  'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)',
-		  'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/4.0; InfoPath.2; SV1; .NET CLR 2.0.50727; WOW64)',
-		  'Mozilla/4.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)',
-		  'Mozilla/5.0 (compatible; MSIE 10.0; Macintosh; Intel Mac OS X 10_7_3; Trident/6.0)',
-		  'Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0;  it-IT)',
-		  'Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0; en-US)'
-		  'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; chromeframe/13.0.782.215)',
-		  'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; chromeframe/11.0.696.57)',
-		  'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0) chromeframe/10.0.648.205',
-		  'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/4.0; GTB7.4; InfoPath.1; SV1; .NET CLR 2.8.52393; WOW64; en-US)',
-		  'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/5.0; chromeframe/11.0.696.57)',
-		  'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/4.0; GTB7.4; InfoPath.3; SV1; .NET CLR 3.1.76908; WOW64; en-US)',
-		  'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; GTB7.4; InfoPath.2; SV1; .NET CLR 3.3.69573; WOW64; en-US)',
-		  'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 1.0.3705; .NET CLR 1.1.4322)',
-		  'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; InfoPath.1; SV1; .NET CLR 3.8.36217; WOW64; en-US)',
-		  'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)',
-		  'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; it-IT)',
-		  'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; en-US)',
-		  'Opera/12.80 (Windows NT 5.1; U; en) Presto/2.10.289 Version/12.02',
-		  'Opera/9.80 (Windows NT 6.1; U; es-ES) Presto/2.9.181 Version/12.00',
-		  'Opera/9.80 (Windows NT 5.1; U; zh-sg) Presto/2.9.181 Version/12.00',
-		  'Opera/12.0(Windows NT 5.2;U;en)Presto/22.9.168 Version/12.00',
-		  'Opera/12.0(Windows NT 5.1;U;en)Presto/22.9.168 Version/12.00',
-		  'Mozilla/5.0 (Windows NT 5.1) Gecko/20100101 Firefox/14.0 Opera/12.0',
-		  'Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25',
-		  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/537.13+ (KHTML, like Gecko) Version/5.1.7 Safari/534.57.2',
-		  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_3) AppleWebKit/534.55.3 (KHTML, like Gecko) Version/5.1.3 Safari/534.53.10',
-		  'Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko ) Version/5.1 Mobile/9B176 Safari/7534.48.3'
-		  ]
+          'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.15 (KHTML, like Gecko) Chrome/24.0.1295.0 Safari/537.15',
+          'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.14 (KHTML, like Gecko) Chrome/24.0.1292.0 Safari/537.14',
+          'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
+          'Mozilla/5.0 (Windows NT 6.2) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
+          'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1284.0 Safari/537.13',
+          'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.8 (KHTML, like Gecko) Chrome/17.0.940.0 Safari/535.8',
+          'Mozilla/6.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
+          'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
+          'Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
+          'Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2',
+          'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.1.16) Gecko/20120427 Firefox/15.0a1',
+          'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:15.0) Gecko/20120427 Firefox/15.0a1',
+          'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:15.0) Gecko/20120910144328 Firefox/15.0.2',
+          'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:15.0) Gecko/20100101 Firefox/15.0.1',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:9.0a2) Gecko/20111101 Firefox/9.0a2',
+          'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110613 Firefox/6.0a2',
+          'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110612 Firefox/6.0a2',
+          'Mozilla/5.0 (Windows NT 6.1; rv:6.0) Gecko/20110814 Firefox/6.0',
+          'Mozilla/5.0 (compatible; MSIE 10.6; Windows NT 6.1; Trident/5.0; InfoPath.2; SLCC1; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET CLR 2.0.50727) 3gpp-gba UNTRUSTED/1.0',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/4.0; InfoPath.2; SV1; .NET CLR 2.0.50727; WOW64)',
+          'Mozilla/4.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Macintosh; Intel Mac OS X 10_7_3; Trident/6.0)',
+          'Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0;  it-IT)',
+          'Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0; en-US)'
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; chromeframe/13.0.782.215)',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; chromeframe/11.0.696.57)',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0) chromeframe/10.0.648.205',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/4.0; GTB7.4; InfoPath.1; SV1; .NET CLR 2.8.52393; WOW64; en-US)',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/5.0; chromeframe/11.0.696.57)',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/4.0; GTB7.4; InfoPath.3; SV1; .NET CLR 3.1.76908; WOW64; en-US)',
+          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; GTB7.4; InfoPath.2; SV1; .NET CLR 3.3.69573; WOW64; en-US)',
+          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 1.0.3705; .NET CLR 1.1.4322)',
+          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; InfoPath.1; SV1; .NET CLR 3.8.36217; WOW64; en-US)',
+          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)',
+          'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; it-IT)',
+          'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; en-US)',
+          'Opera/12.80 (Windows NT 5.1; U; en) Presto/2.10.289 Version/12.02',
+          'Opera/9.80 (Windows NT 6.1; U; es-ES) Presto/2.9.181 Version/12.00',
+          'Opera/9.80 (Windows NT 5.1; U; zh-sg) Presto/2.9.181 Version/12.00',
+          'Opera/12.0(Windows NT 5.2;U;en)Presto/22.9.168 Version/12.00',
+          'Opera/12.0(Windows NT 5.1;U;en)Presto/22.9.168 Version/12.00',
+          'Mozilla/5.0 (Windows NT 5.1) Gecko/20100101 Firefox/14.0 Opera/12.0',
+          'Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/537.13+ (KHTML, like Gecko) Version/5.1.7 Safari/534.57.2',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_3) AppleWebKit/534.55.3 (KHTML, like Gecko) Version/5.1.3 Safari/534.53.10',
+          'Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko ) Version/5.1 Mobile/9B176 Safari/7534.48.3'
+          ]
 
 def RequestAgent():
-	RandomAgent = choice(ListAgent)
-	return RandomAgent
+    RandomAgent = choice(ListAgent)
+    return RandomAgent
 
 if PY3:
-	def getUrl(url):
-		req = Request(url)
-		req.add_header('User-Agent',RequestAgent())
-		try:
-			   response = urlopen(req)
-			   link=response.read().decode(errors='ignore')
-			   response.close()
-			   return link
-		except:
-			   import ssl
-			   gcontext = ssl._create_unverified_context()
-			   response = urlopen(req, context=gcontext)
-			   link=response.read().decode(errors='ignore')
-			   response.close()
-			   return link
+    def getUrl(url):
+        req = Request(url)
+        req.add_header('User-Agent',RequestAgent())
+        try:
+               response = urlopen(req)
+               link=response.read().decode(errors='ignore')
+               response.close()
+               return link
+        except:
+               import ssl
+               gcontext = ssl._create_unverified_context()
+               response = urlopen(req, context=gcontext)
+               link=response.read().decode(errors='ignore')
+               response.close()
+               return link
 
-	def getUrl2(url, referer):
-		req = Request(url)
-		req.add_header('User-Agent',RequestAgent())
-		req.add_header('Referer', referer)
-		try:
-			   response = urlopen(req)
-			   link=response.read().decode()
-			   response.close()
-			   return link
-		except:
-			   import ssl
-			   gcontext = ssl._create_unverified_context()
-			   response = urlopen(req, context=gcontext)
-			   link=response.read().decode()
-			   response.close()
-			   return link
+    def getUrl2(url, referer):
+        req = Request(url)
+        req.add_header('User-Agent',RequestAgent())
+        req.add_header('Referer', referer)
+        try:
+               response = urlopen(req)
+               link=response.read().decode()
+               response.close()
+               return link
+        except:
+               import ssl
+               gcontext = ssl._create_unverified_context()
+               response = urlopen(req, context=gcontext)
+               link=response.read().decode()
+               response.close()
+               return link
 
 else:
-	def getUrl(url):
-		req = Request(url)
-		req.add_header('User-Agent',RequestAgent())
-		try:
-			   response = urlopen(req)
-			   pass#print "Here in getUrl response =", response
-			   link=response.read()
-			   response.close()
-			   return link
-		except:
-			   import ssl
-			   gcontext = ssl._create_unverified_context()
-			   response = urlopen(req, context=gcontext)
-			   link=response.read()
-			   response.close()
-			   return link
+    def getUrl(url):
+        req = Request(url)
+        req.add_header('User-Agent',RequestAgent())
+        try:
+               response = urlopen(req)
+               pass#print "Here in getUrl response =", response
+               link=response.read()
+               response.close()
+               return link
+        except:
+               import ssl
+               gcontext = ssl._create_unverified_context()
+               response = urlopen(req, context=gcontext)
+               link=response.read()
+               response.close()
+               return link
 
-	def getUrl2(url, referer):
-		req = Request(url)
-		req.add_header('User-Agent',RequestAgent())
-		req.add_header('Referer', referer)
-		try:
-			   response = urlopen(req)
-			   link=response.read()
-			   response.close()
-			   return link
-		except:
-			   import ssl
-			   gcontext = ssl._create_unverified_context()
-			   response = urlopen(req, context=gcontext)
-			   link=response.read()
-			   response.close()
-			   return link
+    def getUrl2(url, referer):
+        req = Request(url)
+        req.add_header('User-Agent',RequestAgent())
+        req.add_header('Referer', referer)
+        try:
+               response = urlopen(req)
+               link=response.read()
+               response.close()
+               return link
+        except:
+               import ssl
+               gcontext = ssl._create_unverified_context()
+               response = urlopen(req, context=gcontext)
+               link=response.read()
+               response.close()
+               return link
 
 class hlsclient(threading.Thread):
- 
+
     def __init__(self):
         self._stop = False
         self.thread = None
@@ -218,9 +218,9 @@ class hlsclient(threading.Thread):
         pass#print "Here in hlsclient-py self.header =", self.header
 #        if self.header != "":
         hdr = 'User-Agent=ONLINETVCLIENT_X60000_X25000_X4000MEGA_V1770'
-	req.add_header('User-Agent', 'User-Agent=ONLINETVCLIENT_X60000_X25000_X4000MEGA_V1770')
+    req.add_header('User-Agent', 'User-Agent=ONLINETVCLIENT_X60000_X25000_X4000MEGA_V1770')
         conn = urllib2.urlopen(req)
-        pass#print "Here in hlsclient-py downloadUrl done"        
+        pass#print "Here in hlsclient-py downloadUrl done"
         """
         if "Referer" in self.header:
                 n1 = self.header.find("Referer", 0)
@@ -263,7 +263,7 @@ class hlsclient(threading.Thread):
         req = urllib2.Request(url)
         if self.header = "":
                req = urllib2.Request(url)
-	       req.add_header('User-Agent', str(self.header))
+           req.add_header('User-Agent', str(self.header))
         conn = urllib2.urlopen(req)
         """
         if "Referer" in self.header:
@@ -273,7 +273,7 @@ class hlsclient(threading.Thread):
                 refr = self.header[(n2+1):n3]
         else:
                 refr = ""
-        conn = getUrl2(url, refr)   
+        conn = getUrl2(url, refr)
         enc = 'utf8'
         for line in conn:
             line = line.rstrip('\r\n').decode(enc)
@@ -291,7 +291,7 @@ class hlsclient(threading.Thread):
             else:
                 # media file
                 yield line
- 
+
     def parse_m3u_tag(self, line):
         if ':' not in line:
             return line, []
@@ -322,7 +322,7 @@ class hlsclient(threading.Thread):
         return d
 
     def handle_basic_m3uX(self, hlsUrl):
-        base_key_url = 	re.sub('playlist-.*?.m3u8','',hlsUrl)
+        base_key_url =  re.sub('playlist-.*?.m3u8','',hlsUrl)
         seq = 1
         enc = None
         nextlen = 5
@@ -351,7 +351,7 @@ class hlsclient(threading.Thread):
                         assert 'URI' in attribs, '[hlsclient::handle_basic_m3u] EXT-X-KEY: METHOD=AES-128, but no URI found'
                         if 'https://' in attribs['URI']:
                             key = self.download_file(attribs['URI'].strip('"')) #key = self.download_file(base_key_url+attribs['URI'].strip('"'))
-                            print(attribs['URI'].strip('"')) 
+                            print(attribs['URI'].strip('"'))
                         else:
 #                            key = self.download_file(base_key_url+attribs['URI'].strip('"'))
                             key = self.download_file('m3u8http://hls.fra.rtlnow.de/hls-vod-enc-key/vodkey.bin')
@@ -486,7 +486,7 @@ class hlsclient(threading.Thread):
         videopipe = open(STREAM_PFILE, "w+b")
         variants = []
         variant = None
-        
+
         for line in self.gen_m3u(self.url):
             if line.startswith('#EXT'):
                 tag, attribs = self.parse_m3u_tag(line)
@@ -554,8 +554,8 @@ class hlsclient(threading.Thread):
                         last_seq = seq
                         changed = 1
                   except:
-                        pass        
-                        
+                        pass
+
                 self._sleeping = True
                 if changed == 1:
                     # initial minimum reload delay
@@ -572,7 +572,7 @@ class hlsclient(threading.Thread):
                 self._sleeping = False
                 changed -= 1
 
-        
+
     def stop(self):
         self._stop = True
         self._downLoading = False
