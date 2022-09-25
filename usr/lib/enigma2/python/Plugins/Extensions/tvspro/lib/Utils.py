@@ -1,1110 +1,1292 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from Components.AVSwitch import AVSwitch
-from Components.ActionMap import ActionMap
-from Components.ActionMap import NumberActionMap
-from Components.Button import Button
-from Components.ConfigList import ConfigList, ConfigListScreen
-from Components.FileList import FileList
-from Components.Input import Input
-from Components.Label import Label
-from Components.MenuList import MenuList
-from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaTest
-from Components.Pixmap import Pixmap
-from Components.Pixmap import MovingPixmap
-from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
-from Components.Sources.List import List
-from Components.Sources.StaticText import StaticText
-from Components.Task import Task, Job, job_manager as JobManager, Condition
-from Components.config import config
-from Components.config import ConfigSubsection, ConfigInteger, ConfigSelection, ConfigText, ConfigEnableDisable, KEY_LEFT, KEY_RIGHT, KEY_0, getConfigListEntry
-from Plugins.Plugin import PluginDescriptor
-from Screens.ChoiceBox import ChoiceBox
-from Screens.InfoBar import MoviePlayer
-from Screens.InfoBar import InfoBar
-from Screens.InfoBarGenerics import *
-from Screens.InputBox import InputBox
-from Screens.MessageBox import MessageBox
-from Screens.Screen import Screen
-from Screens.TaskView import JobView
-from ServiceReference import ServiceReference
-from Tools.Directories import resolveFilename, pathExists, fileExists, SCOPE_SKIN_IMAGE, SCOPE_MEDIA
-from Tools.LoadPixmap import LoadPixmap
-from enigma import eServiceCenter
-from enigma import eServiceReference
-from enigma import eTimer, quitMainloop, RT_HALIGN_LEFT, RT_VALIGN_CENTER, eListboxPythonMultiContent, eListbox, gFont, ePicLoad
-from enigma import getDesktop
-from enigma import loadPNG
-from skin import parseColor
-from socket import gaierror, error
-from threading import Thread
-from twisted.internet import reactor
-from twisted.web import client
-from twisted.web.client import getPage, downloadPage
+# 20.09.2022
+# a common tips used from Lululla
+#
+import sys
+import datetime
 import os
 import re
-import socket
-import sys
+import base64
+from random import choice
 
-PY3 = sys.version_info[0] == 3
+# from sys import version_info
+# pythonFull = float(str(sys.version_info.major) + "." + str(sys.version_info.minor))
+# pythonVer = sys.version_info.major
+# PY3 = version_info[0] == 3
+
+PY3 = sys.version_info.major >= 3
 if PY3:
-    from http.client import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
-    from urllib.parse import quote, unquote_plus, unquote
-    from urllib.request import Request, urlopen as urlopen2
-    from urllib.error import URLError
+    # Python 3
+    PY3 = True
+    unicode = str
+    unichr = chr
+    long = int
+    xrange = range
+    from urllib.parse import quote
     from urllib.request import urlopen
-    from urllib.parse import parse_qs
-    import http.client
-    import urllib.request, urllib.parse, urllib.error
+    from urllib.request import Request
+    from urllib.error import HTTPError, URLError
+
 else:
-    from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
-    from urllib import quote, unquote_plus, unquote
-    from urllib2 import Request, URLError, urlopen as urlopen2
+    # # Python 2
+    # _str = str
+    # str = unicode
+    # range = xrange
+    # unicode = unicode
+    # basestring = basestring
+    from urllib import quote
     from urllib2 import urlopen
-    from urlparse import parse_qs
-    import httplib
-    import urllib
-    import urlparse
+    from urllib2 import Request
+    from urllib2 import HTTPError, URLError
 
-HTTPConnection.debuglevel = 1
-DESKHEIGHT = getDesktop(0).size().height()
 
-THISPLUG = "/usr/lib/enigma2/python/Plugins/Extensions/tvspro"
-try:
-       from Plugins.Extensions.SubsSupport import SubsSupport, initSubsSettings
-except:
-       pass
+if sys.version_info >= (2, 7, 9):
+    try:
+        import ssl
+        sslContext = ssl._create_unverified_context()
+    except:
+        sslContext = None
 
-std_headers = {
-    'User-Agent': 'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2.6) Gecko/20100627 Firefox/3.6.6',
-    'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-    'Accept-Language': 'en-us,en;q=0.5',
-}
-#   Mainly Coded by pcd, July 2013
 
-SREF = " "
+def ssl_urlopen(url):
+    if sslContext:
+        return urlopen(url, context=sslContext)
+    else:
+        return urlopen(url)
 
-class PlayvidFHD():
-    skin = """
-            <screen name="playscreen" position="center,center" size="1920,1080" title="tvspro" flags="wfNoBorder" backgroundColor="transparent">
-            <eLabel position="93,33" zPosition="1" size="969,939" backgroundColor="#000000" />
-            <eLabel position="90,30" zPosition="-1" size="975,945" backgroundColor="#ffffff" />
-            <eLabel position="1278,528" zPosition="-1" size="519,444" backgroundColor="#000000" />
-            <eLabel position="1275,525" zPosition="-2" size="525,450" backgroundColor="#ffffff" />
-            <widget name="list" position="150,150" zPosition="4" size="870,444" itemHeight="40" backgroundColor="#000000" foregroundColor="#b3b3b9" foregroundColorSelected="#ffffff" backgroundColorSelected="#000000" scrollbarMode="showOnDemand" />
-            <widget name="info" position="120,660" zPosition="4" size="930,300" font="Regular;37" foregroundColor="#ffffff" backgroundColor="#40000000" transparent="1" halign="left" valign="center" />
-            <ePixmap position="150,975" zPosition="1" size="75,75" pixmap="~/images/Exit2.png" />
-            </screen>"""
 
-class PlayvidHD():
-    skin = """
-        <screen name="Playvid" position="center,center" size="1280,720" title="tvspro" flags="wfNoBorder" backgroundColor="transparent">
-        <eLabel position="62,22" zPosition="1" size="646,626" backgroundColor="#000000" />
-        <eLabel position="60,20" zPosition="-1" size="650,630" backgroundColor="#ffffff" />
-        <eLabel position="852,352" zPosition="-1" size="346,296" backgroundColor="#000000" />
-        <eLabel position="850,350" zPosition="-2" size="350,300" backgroundColor="#ffffff" />
-        <widget name="list" position="100,100" zPosition="4" size="580,296" itemHeight="40" backgroundColor="#000000" foregroundColor="#b3b3b9" foregroundColorSelected="#ffffff" backgroundColorSelected="#000000" scrollbarMode="showOnDemand" />
-        <widget name="info" position="80,440" zPosition="4" size="620,200" font="Regular;25" foregroundColor="#ffffff" backgroundColor="#40000000" transparent="1" halign="left" valign="center" />
-        </screen>"""
+def getDesktopSize():
+    from enigma import getDesktop
+    s = getDesktop(0).size()
+    return (s.width(), s.height())
 
-class Playvid(Screen):
-    def __init__(self, session, name, url, desc):
-        global SREF
-        Screen.__init__(self, session)
-        if DESKHEIGHT > 1000:
-           self.skin = PlayvidFHD.skin
-        else:
-           self.skin = PlayvidHD.skin
-        self.name = name
-        self.url = url
-        self["list"] = List([])
-        self["list"] = RSList([])
-        self['info'] = Label()
-        self['key_red'] = Button(_('Exit'))
-        self['key_green'] = Button(_('Download'))
-        self['key_yellow'] = Button(_('Play'))
-        self['key_blue'] = Button(_('Stop Download'))
-        self['setupActions'] = ActionMap(['SetupActions', 'ColorActions', 'TimerEditActions'], {'red': self.close,
-         'green': self.okClicked,
-         'yellow': self.play,
-         'blue': self.stopDL,
-         'cancel': self.cancel,
-         'ok': self.okClicked}, -2)
-        self.icount = 0
-        self.bLast = 0
-        self.useragent = "QuickTime/7.6.2 (qtver=7.6.2;os=Windows NT 5.1Service Pack 3)"
-        self.svfile = " "
-        self.list=[]
-        """
-        i=0
-        while i<7:
-               self.list.append(i)
-               i=i+1
-        self.list[0] =(_("Play"))
 
-        self.list[1] =(_("Play hls"))
-        self.list[2] =(_("Download"))
-        self.list[3] =(_("Stop download"))
-        self.list[4] =(_("Add to favorites"))
-        self.list[5] =(_("Add to bouquets"))
-        self.list[6] =(_("Current Downloads"))
-        """
-        self.name = name
-        self.url = url
-        print("Here in Playvid self.url =", self.url)
-        print("<<<Endurl")
-#        self.url = self.url.replace("|", "\|")
-        n1 = self.url.find("|", 0)
-        if n1 > -1:
-                self.url = self.url[:n1]
-        print("Here in Playvid self.url B=", self.url)
-        #self['info'].setText(txt)
+def isUHD():
+    desktopSize = getDesktopSize()
+    return desktopSize[0] == 3840
 
-        self.updateTimer = eTimer()
-        try:
-               self.updateTimer_conn = self.updateTimer.timeout.connect(self.updateStatus)
-        except AttributeError:
-               self.updateTimer.callback.append(self.updateStatus)
 
-        self['info'].setText(" ")
-        self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
-        SREF = self.srefOld
-        self.onLayoutFinish.append(self.start)
+def isFHD():
+    desktopSize = getDesktopSize()
+    return desktopSize[0] == 1920
 
-    def start2(self):
-        desc = " "
-        self.session.open(Playvid2, self.name, self.url, desc)
-        self.close()
 
-    def start3(self):
-        from stream import GreekStreamTVList
-        self.session.open(GreekStreamTVList, streamFile = "/tmp/stream.xml")
-        self.close()
+def isHD():
+    desktopSize = getDesktopSize()
+    return desktopSize[0] >= 1280 and desktopSize[0] < 1920
 
-    def start4(self):
-        from Playlist import Playlist
-        self.session.open(Playlist, self.url)
-        self.close()
 
-    def start5(self):
-         self.pop = 1
-         n1 = self.url.find("video_id", 0)
-         n2 = self.url.find("=", n1)
-         vid = self.url[(n2+1):]
-         cmd = "python '/usr/lib/enigma2/python/Plugins/Extensions/KodiDirect/plugins/plugin.video.youtube/default.py' '6' '?plugin://plugin.video.youtube/play/?video_id=" + vid + "' &"
-         self.p = os.popen(cmd)
+def DreamOS():
+    DreamOS = False
+    if os.path.exists('/var/lib/dpkg/status'):
+        DreamOS = True
+        return DreamOS
 
-    def start(self):
-        infotxt=" "
-        self['info'].setText(infotxt)
-        showlist(self.list, self['list'])
 
-    def openTest(self):
+def mySkin():
+    from Components.config import config
+    currentSkin = config.skin.primary_skin.value.replace('/skin.xml', '')
+    return currentSkin
+
+
+if os.path.exists('/usr/lib/enigma2/python/Plugins/Extensions/MediaPlayer'):
+    from Plugins.Extensions.MediaPlayer import *
+    MediaPlayerInstalled = True
+else:
+    MediaPlayerInstalled = False
+
+
+def listDir(what):
+    f = None
+    try:
+        f = os.listdir(what)
+    except:
+        pass
+    return f
+
+
+def purge(dir, pattern):
+    for f in os.listdir(dir):
+        file_path = os.path.join(dir, f)
+        if os.path.isfile(file_path):
+            if re.search(pattern, f):
+                os.remove(file_path)
+
+
+def get_safe_filename(filename, fallback=''):
+    """Convert filename to safe filename
+    """
+    import unicodedata
+    import six
+    name = filename.replace(" ", "_").replace("/", "_")
+    if isinstance(name, six.text_type):
+        name = name.encode('utf-8')
+    name = unicodedata.normalize('NFKD', six.text_type(name, 'utf_8', errors='ignore')).encode('ASCII', 'ignore')
+    name = re.sub(b'[^a-z0-9-_]', b'', name.lower())
+    if not name:
+        name = fallback
+    return six.ensure_str(name)
+
+
+def remove_line(filename, what):
+    if os.path.isfile(filename):
+        file_read = open(filename).readlines()
+        file_write = open(filename, 'w')
+        for line in file_read:
+            if what not in line:
+                file_write.write(line)
+        file_write.close()
+
+
+def badcar(name):
+    name = name
+    bad_chars = ["sd", "hd", "fhd", "uhd", "4k", "1080p", "720p", "blueray", "x264", "aac", "ozlem", "hindi", "hdrip", "(cache)", "(kids)", "[3d-en]", "[iran-dubbed]", "imdb", "top250", "multi-audio",
+                 "multi-subs", "multi-sub", "[audio-pt]", "[nordic-subbed]", "[nordic-subbeb]",
+                 "SD", "HD", "FHD", "UHD", "4K", "1080P", "720P", "BLUERAY", "X264", "AAC", "OZLEM", "HINDI", "HDRIP", "(CACHE)", "(KIDS)", "[3D-EN]", "[IRAN-DUBBED]", "IMDB", "TOP250", "MULTI-AUDIO",
+                 "MULTI-SUBS", "MULTI-SUB", "[AUDIO-PT]", "[NORDIC-SUBBED]", "[NORDIC-SUBBEB]",
+                 "-ae-", "-al-", "-ar-", "-at-", "-ba-", "-be-", "-bg-", "-br-", "-cg-", "-ch-", "-cz-", "-da-", "-de-", "-dk-", "-ee-", "-en-", "-es-", "-ex-yu-", "-fi-", "-fr-", "-gr-", "-hr-", "-hu-", "-in-", "-ir-", "-it-", "-lt-", "-mk-",
+                 "-mx-", "-nl-", "-no-", "-pl-", "-pt-", "-ro-", "-rs-", "-ru-", "-se-", "-si-", "-sk-", "-tr-", "-uk-", "-us-", "-yu-",
+                 "-AE-", "-AL-", "-AR-", "-AT-", "-BA-", "-BE-", "-BG-", "-BR-", "-CG-", "-CH-", "-CZ-", "-DA-", "-DE-", "-DK-", "-EE-", "-EN-", "-ES-", "-EX-YU-", "-FI-", "-FR-", "-GR-", "-HR-", "-HU-", "-IN-", "-IR-", "-IT-", "-LT-", "-MK-",
+                 "-MX-", "-NL-", "-NO-", "-PL-", "-PT-", "-RO-", "-RS-", "-RU-", "-SE-", "-SI-", "-SK-", "-TR-", "-UK-", "-US-", "-YU-",
+                 "|ae|", "|al|", "|ar|", "|at|", "|ba|", "|be|", "|bg|", "|br|", "|cg|", "|ch|", "|cz|", "|da|", "|de|", "|dk|", "|ee|", "|en|", "|es|", "|ex-yu|", "|fi|", "|fr|", "|gr|", "|hr|", "|hu|", "|in|", "|ir|", "|it|", "|lt|", "|mk|",
+                 "|mx|", "|nl|", "|no|", "|pl|", "|pt|", "|ro|", "|rs|", "|ru|", "|se|", "|si|", "|sk|", "|tr|", "|uk|", "|us|", "|yu|",
+                 "|AE|", "|AL|", "|AR|", "|AT|", "|BA|", "|BE|", "|BG|", "|BR|", "|CG|", "|CH|", "|CZ|", "|DA|", "|DE|", "|DK|", "|EE|", "|EN|", "|ES|", "|EX-YU|", "|FI|", "|FR|", "|GR|", "|HR|", "|HU|", "|IN|", "|IR|", "|IT|", "|LT|", "|MK|",
+                 "|MX|", "|NL|", "|NO|", "|PL|", "|PT|", "|RO|", "|RS|", "|RU|", "|SE|", "|SI|", "|SK|", "|TR|", "|UK|", "|US|", "|YU|",
+                 "|Ae|", "|Al|", "|Ar|", "|At|", "|Ba|", "|Be|", "|Bg|", "|Br|", "|Cg|", "|Ch|", "|Cz|", "|Da|", "|De|", "|Dk|", "|Ee|", "|En|", "|Es|", "|Ex-Yu|", "|Fi|", "|Fr|", "|Gr|", "|Hr|", "|Hu|", "|In|", "|Ir|", "|It|", "|Lt|", "|Mk|",
+                 "|Mx|", "|Nl|", "|No|", "|Pl|", "|Pt|", "|Ro|", "|Rs|", "|Ru|", "|Se|", "|Si|", "|Sk|", "|Tr|", "|Uk|", "|Us|", "|Yu|",
+                 "(", ")", "[", "]", "u-", "3d", "'", "#", "/",
+                 "PF1", "PF2", "PF3", "PF4", "PF5", "PF6", "PF7", "PF8", "PF9", "PF10", "PF11", "PF12", "PF13", "PF14", "PF15", "PF16", "PF17", "PF18", "PF19", "PF20", "PF21", "PF22", "PF23", "PF24", "PF25", "PF26", "PF27", "PF28", "PF29", "PF30",
+                 "480p", "4K", "720p", "ANIMAZIONE",  "AVVENTURA", "BIOGRAFICO",  "BDRip",  "BluRay",  "CINEMA", "COMMEDIA", "DOCUMENTARIO", "DRAMMATICO", "FANTASCIENZA", "FANTASY", "HDCAM", "HDTC", "HDTS", "LD", "MARVEL", "MD", "NEW_AUDIO",
+                 "R3", "R6", "SD", "SENTIMENTALE", "TC", "TELECINE", "TELESYNC", "THRILLER", "Uncensored", "V2", "WEBDL", "WEBRip", "WEB", "WESTERN", "-", "_", ".", "+", "[", "]"
+                 ]
+
+    for j in range(1900, 2025):
+        bad_chars.append(str(j))
+    for i in bad_chars:
+        name = name.replace(i, '')
+    return name
+
+
+def cleanTitle(x):
+    x = x.replace('~', '')
+    x = x.replace('#', '')
+    x = x.replace('%', '')
+    x = x.replace('&', '')
+    x = x.replace('*', '')
+    x = x.replace('{', '')
+    x = x.replace('}', '')
+    x = x.replace(':', '')
+    x = x.replace('<', '')
+    x = x.replace('>', '')
+    x = x.replace('?', '')
+    x = x.replace('/', '')
+    x = x.replace('+', '')
+    x = x.replace('|', '')
+    x = x.replace('"', '')
+    x = x.replace('\\', '')
+    x = x.replace('--', '-')
+    return x
+
+
+def getLanguage():
+    try:
+        from Components.config import config
+        language = config.osd.language.value
+        language = language[:-3]
+        return language
+    except:
+        language = 'en'
+        return language
         pass
 
-    def play(self):
-        url = self.url
-        name = self.name
-        self.session.open(Playvid3, name, url, desc = " ")
 
-    def getlocal_filename(self):
-           fold = config.plugins.kodiplug.cachefold.value+"/"
-           name = self.name.replace("/media/hdd/xbmc/vid/", "")
-           name = name.replace(" ", "-")
-           pattern = '[a-zA-Z0-9\-]'
-           input = name
-           output = ''.join(re.findall(pattern, input))
-           self.name = output
-           if self.url.endswith("mp4"):
-              svfile = fold + self.name+".mp4"
-           elif self.url.endswith("flv"):
-              svfile = fold + self.name+".flv"
-           elif self.url.endswith("avi"):
-              svfile = fold + self.name+".avi"
-           elif self.url.endswith("ts"):
-              svfile = fold + self.name+".ts"
-           else:
-              svfile = fold + self.name+".mpg"
-           filetitle=os.path.split(svfile)[1]
-           return svfile,filetitle
-
-
-    def okClicked(self):
-
-          idx=self["list"].getSelectionIndex()
-          print("idx",idx)
-          if idx==0:
-                self.start2()
-          elif idx==1:
-                self.play()
-
-    def playfile(self, serverint):
-          self.serverList[serverint].play(self.session, self.url, self.name)
-
-
-    def showError(self, error):
-               print("DownloadPage error = ", error)
-
-
-    def updateStatus(self):
-     if self.pop == 1:
-            try:
-               ptxt = self.p.read()
-               if "data B" in ptxt:
-                      n1 = ptxt.find("data B", 0)
-                      n2 = ptxt.find("&url", n1)
-                      n3 = ptxt.find("\n", n2)
-                      url = ptxt[(n2+5):n3]
-                      url = url.replace("AxNxD", "&")
-                      self.url = url.replace("ExQ", "=")
-                      name = "Video"
-                      desc = " "
-                      self.session.open(Playvid, self.name, self.url, desc)
-                      self.close()
-                      self.updateTimer.stop()
-
-            except:
-               self.openTest()
-#               return
-     else:
-        if not os.path.exists(self.svfile):
-            print("No self.svfile =", self.svfile)
-            self.openTest()
-            return
-
-        if self.icount == 0:
-            self.openTest()
-            return
-
-        b1 = os.path.getsize(self.svfile)
-        b = b1 / 1000
-        if b == self.bLast:
-            infotxt = _('Download Complete....') + str(b)
-            self['info'].setText(infotxt)
-            return
-        self.bLast = b
-        infotxt = _('Downloading....') + str(b) + ' kb'
-        self['info'].setText(infotxt)
-
-    def LastJobView(self):
-        currentjob = None
-        for job in JobManager.getPendingJobs():
-            currentjob = job
-
-        if currentjob is not None:
-            self.session.open(JobViewNew, currentjob)
-
-    def cancel(self):
-           if os.path.exists("/tmp/hls.avi"):
-                   os.remove("/tmp/hls.avi")
-           Screen.close(self, False)
-
-    def stopDL(self):
-                cmd = "rm -f " + self.svfile
-                os.system(cmd)
-                self.session.nav.playService(self.srefOld)
-                cmd1 = "killall -9 rtmpdump"
-                cmd2 = "killall -9 wget"
-                os.system(cmd1)
-                os.system(cmd2)
-                self['info'].setText("Current download task stopped")
-                self.close()
-
-    def keyLeft(self):
-        self['text'].left()
-
-    def keyRight(self):
-        self['text'].right()
-
-    def keyNumberGlobal(self, number):
-        self['text'].number(number)
-
-class Playvid2FHD():
-    skin = """
-        <screen name="Playvid" position="0,825" size="1920,225" title="InfoBar" backgroundColor="transparent" flags="wfNoBorder">
-        <!-- Background -->
-        <ePixmap position="0,3" zPosition="-1" size="1920,225" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/infobar2L.png"/>
-
-            <ePixmap position="600,34" size="30,30" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/yellow.png" alphatest="blend" />
-                <widget name="key_yellow" position="630,22" size="300,45" valign="center" halign="left" zPosition="4"  foregroundColor="#ffffff" font="Regular;24" transparent="1" shadowColor="#25062748" shadowOffset="-2,-2" />
-
-        <!-- Date -->
-        <widget source="global.CurrentTime" render="Label" position="105,25" size="187,33" font="Regular;28"  backgroundColor="black" foregroundColor="white" transparent="1" >
-            <convert type="ClockToText">Format:%d.%m.%Y</convert>
-        </widget>
-        <!-- Time -->
-        <ePixmap position="1650,31" zPosition="2" size="33,33" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/clock.png" alphatest="on" />
-        <widget source="global.CurrentTime" render="Label" position="1695,25" size="300,39" zPosition="2" font="Regular;28"  foregroundColor="grey" backgroundColor="black" transparent="1">
-            <convert type="ClockToText">Format %H:%M:%S</convert>
-        </widget>
-        <!-- Servicename -->
-        <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/icon_event.png" position="309,85" size="30,19" alphatest="on" />
-        <!-- Elapsed time -->
-        <widget source="session.CurrentService" render="Label" position="360,75" size="150,39" font="Regular;33"  foregroundColor="grey"  backgroundColor="black" transparent="1" >
-            <convert type="ServicePosition">Position,ShowHours</convert>
-        </widget>
-        <widget source="session.CurrentService" render="Label" position="525,75" size="1110,37" zPosition="2" font="Regular;30" halign="center" noWrap="1" foregroundColor="white" transparent="1" backgroundColor="background">
-            <convert type="ServiceName">Name</convert>
-        </widget>
-        <!-- movie length -->
-        <!-- Remaining time -->
-        <widget source="session.CurrentService" render="Label" position="1635,72" size="180,39" font="Regular;33" halign="right"  foregroundColor="red" backgroundColor="black" transparent="1" >
-            <convert type="ServicePosition">Remaining,Negate,ShowHours</convert>
-        </widget>
-        <widget source="session.CurrentService" render="PositionGauge" position="315,114" size="1335,21" zPosition="2" pointer="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/pointerdvd.png:890,0" transparent="1" >
-            <convert type="ServicePosition">Gauge</convert>
-        </widget>
-        <!-- Audio icon (is there multichannel audio?) -->
-        <ePixmap position="309,150" size="150,30" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/ico_dolby_off.png" alphatest="blend" />
-        <widget source="session.CurrentService" render="Pixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/ico_dolby_on.png" position="309,150" size="150,30" zPosition="2" alphatest="blend">
-            <convert type="ServiceInfo">IsMultichannel</convert>
-            <convert type="ConditionalShowHide"/>
-        </widget>
-        <!-- Videoformat icon (16:9?) -->
-        <ePixmap position="435,150" size="150,30" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/ico_format_off.png" alphatest="blend" />
-        <widget source="session.CurrentService" render="Pixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/ico_format_on.png" position="435,150" zPosition="4" size="150,27" alphatest="blend" >
-            <convert type="ServiceInfo">IsWidescreen</convert>
-            <convert type="ConditionalShowHide" />
-        </widget>
-        <!-- HDTV icon -->
-        <ePixmap position="525,147" size="150,36" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/ico_hd_off.png" alphatest="blend" />
-        <widget source="session.CurrentService" render="Pixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/ico_hd_on.png" position="525,147" size="75,36" zPosition="4" alphatest="blend">
-            <convert type="ServiceInfo">VideoWidth</convert>
-            <convert type="ValueRange">721,1980</convert>
-            <convert type="ConditionalShowHide" />
-        </widget>
-        <!-- VideoFormat -->
-        <eLabel text="Res" font="Regular;30" position="600,142" size="75,30"  foregroundColor="grey" backgroundColor="black" transparent="1"/>
-        <widget source="session.CurrentService" render="Label" font="Regular;30" position="660,142" size="82,30" halign="right"  foregroundColor="white" backgroundColor="black" transparent="1">
-            <convert type="ServiceInfo">VideoWidth</convert>
-        </widget>
-        <eLabel text="x" font="Regular;24" position="757,145" size="22,33" halign="center"  backgroundColor="black" transparent="1"/>
-        <widget source="session.CurrentService" render="Label" font="Regular;30" position="795,142" size="82,33"   foregroundColor="white" backgroundColor="black" transparent="1">
-            <convert type="ServiceInfo">VideoHeight</convert>
-        </widget>
-        <widget source="session.CurrentService" render="Label" position="1740,142" size="180,39" font="Regular;33"  foregroundColor="yellow" backgroundColor="black" transparent="1" >
-            <convert type="ServicePosition">Length</convert>
-        </widget>
-    </screen>"""
-
-class PlayvidB():
-    skin = """
-        <screen name="Playvid" position="0,550" size="1280,150" title="InfoBar" backgroundColor="transparent" flags="wfNoBorder">
-        <!-- Background -->
-        <ePixmap position="0,2" zPosition="-1" size="1280,150" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/infobar2.png"/>
-
-            <ePixmap position="400,23" size="20,20" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/yellow.png" alphatest="blend" />
-                <widget name="key_yellow" position="420,15" size="200,30" valign="center" halign="left" zPosition="4"  foregroundColor="#ffffff" font="Regular;16" transparent="1" shadowColor="#25062748" shadowOffset="-2,-2" />
-
-        <!-- Date -->
-        <widget source="global.CurrentTime" render="Label" position="70,17" size="125,22" font="Regular;19"  backgroundColor="black" foregroundColor="white" transparent="1" >
-            <convert type="ClockToText">Format:%d.%m.%Y</convert>
-        </widget>
-        <!-- Time -->
-        <ePixmap position="1100,21" zPosition="2" size="22,22" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/clock.png" alphatest="on" />
-        <widget source="global.CurrentTime" render="Label" position="1130,17" size="200,26" zPosition="2" font="Regular;19"  foregroundColor="#062748" backgroundColor="black" transparent="1">
-            <convert type="ClockToText">Format %H:%M:%S</convert>
-        </widget>
-        <!-- Servicename -->
-        <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/icon_event.png" position="206,57" size="20,13" alphatest="on" />
-        <!-- Elapsed time -->
-        <widget source="session.CurrentService" render="Label" position="240,50" size="100,26" font="Regular;22"  foregroundColor="#062748"  backgroundColor="black" transparent="1" >
-            <convert type="ServicePosition">Position,ShowHours</convert>
-        </widget>
-        <widget source="session.CurrentService" render="Label" position="350,50" size="740,25" zPosition="2" font="Regular;20" halign="center" noWrap="1" foregroundColor="white" transparent="1" backgroundColor="background">
-            <convert type="ServiceName">Name</convert>
-        </widget>
-        <!-- movie length -->
-        <!-- Remaining time -->
-        <widget source="session.CurrentService" render="Label" position="1090,48" size="120,26" font="Regular;22" halign="right"  foregroundColor="red" backgroundColor="black" transparent="1" >
-            <convert type="ServicePosition">Remaining,Negate,ShowHours</convert>
-        </widget>
-        <widget source="session.CurrentService" render="PositionGauge" position="210,76" size="890,14" zPosition="2" pointer="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/pointerdvd.png:890,0" transparent="1" >
-            <convert type="ServicePosition">Gauge</convert>
-        </widget>
-        <!-- Audio icon (is there multichannel audio?) -->
-        <ePixmap position="206,100" size="100,20" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/ico_dolby_off.png" alphatest="blend" />
-        <widget source="session.CurrentService" render="Pixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/ico_dolby_on.png" position="206,100" size="100,20" zPosition="2" alphatest="blend">
-            <convert type="ServiceInfo">IsMultichannel</convert>
-            <convert type="ConditionalShowHide"/>
-        </widget>
-        <!-- Videoformat icon (16:9?) -->
-        <ePixmap position="290,100" size="100,20" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/ico_format_off.png" alphatest="blend" />
-        <widget source="session.CurrentService" render="Pixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/ico_format_on.png" position="290,100" zPosition="4" size="100,18" alphatest="blend" >
-            <convert type="ServiceInfo">IsWidescreen</convert>
-            <convert type="ConditionalShowHide" />
-        </widget>
-        <!-- HDTV icon -->
-        <ePixmap position="350,98" size="100,24" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/ico_hd_off.png" alphatest="blend" />
-        <widget source="session.CurrentService" render="Pixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/icon/ico_hd_on.png" position="350,98" size="50,24" zPosition="4" alphatest="blend">
-            <convert type="ServiceInfo">VideoWidth</convert>
-            <convert type="ValueRange">721,1980</convert>
-            <convert type="ConditionalShowHide" />
-        </widget>
-        <!-- VideoFormat -->
-        <eLabel text="Res" font="Regular;20" position="400,95" size="50,20"  foregroundColor="#062748" backgroundColor="black" transparent="1"/>
-        <widget source="session.CurrentService" render="Label" font="Regular;20" position="440,95" size="55,20" halign="right"  foregroundColor="white" backgroundColor="black" transparent="1">
-            <convert type="ServiceInfo">VideoWidth</convert>
-        </widget>
-        <eLabel text="x" font="Regular;16" position="505,97" size="15,22" halign="center"  backgroundColor="black" transparent="1"/>
-        <widget source="session.CurrentService" render="Label" font="Regular;20" position="530,95" size="55,22"   foregroundColor="white" backgroundColor="black" transparent="1">
-            <convert type="ServiceInfo">VideoHeight</convert>
-        </widget>
-        <widget source="session.CurrentService" render="Label" position="1160,95" size="120,26" font="Regular;22"  foregroundColor="yellow" backgroundColor="black" transparent="1" >
-            <convert type="ServicePosition">Length</convert>
-        </widget>
-    </screen>"""
-
-class Playvid3(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarShowHide):
-    STATE_PLAYING = 1
-    STATE_PAUSED = 2
-
-    def __init__(self, session, name, url, desc):
-
-        Screen.__init__(self, session)
-        if DESKHEIGHT > 1000:
-              self.skin = Playvid2FHD.skin
-        else:
-        #                      self.skin = Playvid2HD.skin
-              self.skin = PlayvidB.skin
-        title = "Play"
-        self.sref=None
-        self["title"] = Button(title)
-        self["list"] = MenuList([])
-        self["info"] = Label()
-        self['key_yellow'] = Button(_('Subtitles'))
-        InfoBarMenu.__init__(self)
-        InfoBarNotifications.__init__(self)
-        InfoBarBase.__init__(self)
-        InfoBarShowHide.__init__(self)
-        self.statusScreen = self.session.instantiateDialog(StatusScreen)
-        try:
-            self.init_aspect = int(self.getAspect())
-        except:
-            self.init_aspect = 0
-
-        self.new_aspect = self.init_aspect
-
-        self["actions"] = ActionMap(["WizardActions", "MoviePlayerActions", "EPGSelectActions", "MediaPlayerSeekActions", "ColorActions", "InfobarShowHideActions", "InfobarSeekActions", "InfobarActions"],
-            {
-             "leavePlayer": self.cancel,
-             "back":    self.cancel,
-             "info":self.showinfo,
-             "playpauseService":    self.playpauseService,
-             "yellow":  self.subtitles,
-             'down': self.av,
-            }, -1)
-
-        self.allowPiP = False
-        #   initSubsSettings()
-        #   SubsSupport.__init__(self, embeddedSupport=True, searchSupport=True)
-        #   self.subs = True
-        InfoBarSeek.__init__(self, actionmap = "MediaPlayerSeekActions")
-        self.icount = 0
-        self.name = name
-        self.url = url
-        print("Here in Playvid2 self.url = ", self.url)
-        self.desc = desc
-        self.pcip = "None"
-        self.state = self.STATE_PLAYING
-        self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
-        self.onLayoutFinish.append(self.openTest)
-
-    def getAspect(self):
-        return AVSwitch().getAspectRatioSetting()
-
-    def getAspectString(self, aspectnum):
-        return {0: _('4:3 Letterbox'),
-         1: _('4:3 PanScan'),
-         2: _('16:9'),
-         3: _('16:9 always'),
-         4: _('16:10 Letterbox'),
-         5: _('16:10 PanScan'),
-         6: _('16:9 Letterbox')}[aspectnum]
-
-    def setAspect(self, aspect):
-        map = {0: '4_3_letterbox',
-         1: '4_3_panscan',
-         2: '16_9',
-         3: '16_9_always',
-         4: '16_10_letterbox',
-         5: '16_10_panscan',
-         6: '16_9_letterbox'}
-        config.av.aspectratio.setValue(map[aspect])
-        try:
-            AVSwitch().setAspectRatio(aspect)
-        except:
-            pass
-
-    def av(self):
-        temp = int(self.getAspect())
-        print(self.getAspectString(temp))
-        temp = temp + 1
-        if temp > 6:
-            temp = 0
-        self.new_aspect = temp
-        self.setAspect(temp)
-        print(self.getAspectString(temp))
-        self.statusScreen.setStatus(self.getAspectString(temp))
-
-    def showinfo(self):
-            debug=True
-            try:
-                 servicename,serviceurl=getserviceinfo(self.sref)
-                 if servicename is not None:
-                         sTitle=servicename
-                 else:
-                        sTitle=''
-
-                 if serviceurl is not None:
-                     sServiceref=serviceurl
-                 else:
-                   sServiceref=''
-
-                 currPlay = self.session.nav.getCurrentService()
-
-                 sTagCodec = currPlay.info().getInfoString(iServiceInformation.sTagCodec)
-                 sTagVideoCodec = currPlay.info().getInfoString(iServiceInformation.sTagVideoCodec)
-                 sTagAudioCodec = currPlay.info().getInfoString(iServiceInformation.sTagAudioCodec)
-
-                 message='stitle:'+str(sTitle)+"\n"+'sServiceref:'+str(sServiceref)+"\n"+'sTagCodec:'+str(sTagCodec)+"\n"+ 'sTagVideoCodec:'+str(sTagVideoCodec)+"\n"+'sTagAudioCodec :'+str(sTagAudioCodec)
-                 # from XBMCAddonsinfo import XBMCAddonsinfoScreen
-                 # self.session.open(XBMCAddonsinfoScreen,None,'XBMCAddonsPlayer',message)
-                    # from XBMCAddonsinfo import XBMCAddonsinfoScreen
-                    # self.session.open(XBMCAddonsinfoScreen, None, 'XBMCAddonsPlayer', message)
-                 self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
-            except:
-                  pass
-
-    def playpauseService(self):
-        print("playpauseService")
-        if self.state == self.STATE_PLAYING:
-                self.pause()
-                self.state = self.STATE_PAUSED
-        elif self.state == self.STATE_PAUSED:
-                self.unpause()
-                self.state = self.STATE_PLAYING
-
-    def pause(self):
-                self.session.nav.pause(True)
-
-    def unpause(self):
-                self.session.nav.pause(False)
-
-    def openTest(self):
-                if "plugin://plugin.video.youtube" in self.url or "youtube.com/" in self.url :
-
-                      from tube_resolver.plugin import getvideo
-                      self.url,error = getvideo(self.url)
-                      if error is not None or self.url is None:
-                         print("failed to get valid youtube stream link")
-                         return
-
-                elif "pcip" in self.url:
-                       n1 = self.url.find("pcip")
-                       urlA = self.url
-                       self.url = self.url[:n1]
-                       self.pcip = urlA[(n1+4):]
-
-                url = self.url
-                name = self.name
-                print("Here in Playvid name A =", name)
-                name = name.replace(":", "-")
-                name = name.replace("&", "-")
-                name = name.replace(" ", "-")
-                name = name.replace("/", "-")
-                name = name.replace("›", "-")
-                name = name.replace(",", "-")
-                print("Here in Playvid name B2 =", name)
-
-                if url is not None:
-                    url = str(url)
-                    print("url final= ", url)
-                    ref = eServiceReference(0x1001, 0, url)
-                    ref.setName(name)
-                    self.sref=ref
-                    self.session.nav.stopService()
-                    self.session.nav.playService(ref)
-                else:
-                       return
-
-    def subtitles(self):
-        try:
-           self.subsMenu()
-        except:
-           pass
-    def subtitlesX(self):
-        if not os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/DD_Subt/plugin.pyo"):
-                self.session.open(MessageBox, _("Subtitle Player plugin is not installed\nPlease install it."), MessageBox.TYPE_ERROR, timeout = 10)
-        else:
-                found = 0
-                pluginlist = []
-                pluginlist = plugins.getPlugins(PluginDescriptor.WHERE_PLUGINMENU)
-                for plugin in pluginlist:
-                        if "Subtitle player" in str(plugin.name):
-                                found = 1
-                                break
-                if found == 0:
-                        self.session.open(MessageBox, _("Subtitle Player plugin Missing"), MessageBox.TYPE_ERROR, timeout = 5)
-                else:
-                    try:
-                        plugin(session=self.session)
-                    except:
-                        self.session.open(MessageBox, _("Subtitle Player not working"), MessageBox.TYPE_ERROR, timeout = 5)
-
-    def cancel(self):
-                if os.path.exists("/tmp/hls.avi"):
-                        os.remove("/tmp/hls.avi")
-                self.session.nav.stopService()
-                self.session.nav.playService(self.srefOld)
-                if self.pcip != "None":
-                        url2 = "http://" + self.pcip + ":8080/requests/status.xml?command=pl_stop"
-                        print("In Playvid2 url2 =", url2)
-                        resp = urlopen(url2)
-
-                if not self.new_aspect == self.init_aspect:
-                    try:
-                        self.setAspect(self.init_aspect)
-                    except:
-                        pass
-                self.close()
-
-    def keyLeft(self):
-        self["text"].left()
-
-    def keyRight(self):
-        self["text"].right()
-
-    def keyNumberGlobal(self, number):
-        self["text"].number(number)
-
-class Playvid2X(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarShowHide):
-
-    STATE_PLAYING = 1
-    STATE_PAUSED = 2
-
-    def __init__(self, session, name, url, desc):
-
-                Screen.__init__(self, session)
-                self.skinName = "Playvid"
-                title = "Play"
-                self.sref=None
-                self["title"] = Button(title)
-                self["list"] = MenuList([])
-                self["info"] = Label()
-                self['key_yellow'] = Button(_('Subtitles'))
-                InfoBarMenu.__init__(self)
-                InfoBarNotifications.__init__(self)
-                InfoBarBase.__init__(self)
-                InfoBarShowHide.__init__(self)
-                self.statusScreen = self.session.instantiateDialog(StatusScreen)
-                try:
-                    self.init_aspect = int(self.getAspect())
-                except:
-                    self.init_aspect = 0
-
-                self.new_aspect = self.init_aspect
-                self["actions"] = ActionMap(["WizardActions", "MoviePlayerActions", "EPGSelectActions", "MediaPlayerSeekActions", "ColorActions", "InfobarShowHideActions", "InfobarSeekActions", "InfobarActions"],
-                {
-                        "leavePlayer":                  self.cancel,
-                        "back":                         self.cancel,
-                        "info":self.showinfo,
-                        "playpauseService":             self.playpauseService,
-                        "yellow":                          self.subtitles,
-                        'down': self.av,
-                }, -1)
-
-                self.allowPiP = False
-                initSubsSettings()
-                SubsSupport.__init__(self, embeddedSupport=True, searchSupport=True)
-                self.subs = True
-                InfoBarSeek.__init__(self, actionmap = "MediaPlayerSeekActions")
-                self.icount = 0
-                self.name = name
-                self.url = url
-                print("Here in Playvid2 self.url = ", self.url)
-                self.desc = desc
-                self.pcip = "None"
-                self.state = self.STATE_PLAYING
-                self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
-                self.onLayoutFinish.append(self.openTest)
-
-    def getAspect(self):
-        return AVSwitch().getAspectRatioSetting()
-
-    def getAspectString(self, aspectnum):
-        return {0: _('4:3 Letterbox'),
-         1: _('4:3 PanScan'),
-         2: _('16:9'),
-         3: _('16:9 always'),
-         4: _('16:10 Letterbox'),
-         5: _('16:10 PanScan'),
-         6: _('16:9 Letterbox')}[aspectnum]
-
-    def setAspect(self, aspect):
-        map = {0: '4_3_letterbox',
-         1: '4_3_panscan',
-         2: '16_9',
-         3: '16_9_always',
-         4: '16_10_letterbox',
-         5: '16_10_panscan',
-         6: '16_9_letterbox'}
-        config.av.aspectratio.setValue(map[aspect])
-        try:
-            AVSwitch().setAspectRatio(aspect)
-        except:
-            pass
-
-    def av(self):
-        temp = int(self.getAspect())
-        print(self.getAspectString(temp))
-        temp = temp + 1
-        if temp > 6:
-            temp = 0
-        self.new_aspect = temp
-        self.setAspect(temp)
-        print(self.getAspectString(temp))
-        self.statusScreen.setStatus(self.getAspectString(temp))
-
-
-
-    def showinfo(self):
-            debug=True
-            try:
-
-                 servicename,serviceurl=getserviceinfo(self.sref)
-                 if servicename is not None:
-                         sTitle=servicename
-                 else:
-                        sTitle=''
-
-                 if serviceurl is not None:
-                     sServiceref=serviceurl
-                 else:
-                   sServiceref=''
-
-                 currPlay = self.session.nav.getCurrentService()
-
-                 sTagCodec = currPlay.info().getInfoString(iServiceInformation.sTagCodec)
-                 sTagVideoCodec = currPlay.info().getInfoString(iServiceInformation.sTagVideoCodec)
-                 sTagAudioCodec = currPlay.info().getInfoString(iServiceInformation.sTagAudioCodec)
-                 message='stitle:'+str(sTitle)+"\n"+'sServiceref:'+str(sServiceref)+"\n"+'sTagCodec:'+str(sTagCodec)+"\n"+ 'sTagVideoCodec:'+str(sTagVideoCodec)+"\n"+'sTagAudioCodec :'+str(sTagAudioCodec)
-                 self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
-
-            except:
-                  pass
-
-    def playpauseService(self):
-        print("playpauseService")
-        if self.state == self.STATE_PLAYING:
-            self.pause()
-            self.state = self.STATE_PAUSED
-        elif self.state == self.STATE_PAUSED:
-            self.unpause()
-            self.state = self.STATE_PLAYING
-
-    def pause(self):
-                self.session.nav.pause(True)
-
-    def unpause(self):
-                self.session.nav.pause(False)
-
-    def openTest(self):
-                if "plugin://plugin.video.youtube" in self.url or "youtube.com/" in self.url :
-
-                      from tube_resolver.plugin import getvideo
-                      self.url,error = getvideo(self.url)
-                      if error is not None or self.url is None:
-                         print("failed to get valid youtube stream link")
-                         return
-
-                elif "pcip" in self.url:
-                       n1 = self.url.find("pcip")
-                       urlA = self.url
-                       self.url = self.url[:n1]
-                       self.pcip = urlA[(n1+4):]
-
-                url = self.url
-                name = self.name
-                print("Here in Playvid name A =", name)
-                name = name.replace(":", "-")
-                name = name.replace("&", "-")
-                name = name.replace(" ", "-")
-                name = name.replace("/", "-")
-                name = name.replace("›", "-")
-                name = name.replace(",", "-")
-                print("Here in Playvid name B2 =", name)
-
-                if url is not None:
-                    url = str(url)
-                    print("url final= ", url)
-                    ref = eServiceReference(0x1001, 0, url)
-                    ref.setName(name)
-                    self.sref=ref
-                    self.session.nav.stopService()
-                    self.session.nav.playService(ref)
-                else:
-                       return
-
-    def subtitles(self):
-        try:
-           self.subsMenu()
-        except:
-           self['programm'].setText('Unable to start subtitles player')
-
-    def subtitlesX(self):
-        if not os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/DD_Subt/plugin.pyo"):
-                self.session.open(MessageBox, _("Subtitle Player plugin is not installed\nPlease install it."), MessageBox.TYPE_ERROR, timeout = 10)
-        else:
-                found = 0
-                pluginlist = []
-                pluginlist = plugins.getPlugins(PluginDescriptor.WHERE_PLUGINMENU)
-                for plugin in pluginlist:
-                        if "Subtitle player" in str(plugin.name):
-                                found = 1
-                                break
-                if found == 0:
-                        self.session.open(MessageBox, _("Subtitle Player plugin Missing"), MessageBox.TYPE_ERROR, timeout = 5)
-                else:
-                    try:
-                        plugin(session=self.session)
-                    except:
-                        self.session.open(MessageBox, _("Subtitle Player not working"), MessageBox.TYPE_ERROR, timeout = 5)
-
-    def cancel(self):
-                if os.path.exists("/tmp/hls.avi"):
-                        os.remove("/tmp/hls.avi")
-                self.session.nav.stopService()
-                self.session.nav.playService(self.srefOld)
-#                try:
-                if self.pcip != "None":
-                        url2 = "http://" + self.pcip + ":8080/requests/status.xml?command=pl_stop"
-                        print("In Playvid2 url2 =", url2)
-                        resp = urlopen(url2)
-
-                if not self.new_aspect == self.init_aspect:
-                    try:
-                        self.setAspect(self.init_aspect)
-                    except:
-                        pass
-                self.close()
-
-    def keyLeft(self):
-        self["text"].left()
-
-    def keyRight(self):
-        self["text"].right()
-
-    def keyNumberGlobal(self, number):
-        self["text"].number(number)
-
-
-
-class downloadJob(Job):
-        def __init__(self, toolbox, cmdline, filename, filetitle):
-                Job.__init__(self, _("Saving Video"))
-                self.toolbox = toolbox
-                self.retrycount = 0
-                downloadTask(self, cmdline, filename, filetitle)
-
-        def retry(self):
-                assert self.status == self.FAILED
-                self.retrycount += 1
-                self.restart()
-
-class downloadTask(Task):
-        ERROR_CORRUPT_FILE, ERROR_RTMP_ReadPacket, ERROR_SEGFAULT, ERROR_SERVER, ERROR_UNKNOWN = range(5)
-        def __init__(self, job, cmdline, filename, filetitle):
-                Task.__init__(self, job, filetitle)
-                self.setCmdline(cmdline)
-                self.filename = filename
-                self.toolbox = job.toolbox
-                self.error = None
-                self.lasterrormsg = None
-
-        def processOutput(self, data):
-                try:
-                        if data.endswith('%)'):
-                                startpos = data.rfind("sec (")+5
-                                if startpos and startpos != -1:
-                                        self.progress = int(float(data[startpos:-4]))
-                        elif data.find('%') != -1:
-                                tmpvalue = data[:data.find("%")]
-                                tmpvalue = tmpvalue[tmpvalue.rfind(" "):].strip()
-                                tmpvalue = tmpvalue[tmpvalue.rfind("(")+1:].strip()
-                                self.progress = int(float(tmpvalue))
-                        else:
-                                Task.processOutput(self, data)
-                except Exception as errormsg:
-                        Task.processOutput(self, data)
-
-        def processOutputLine(self, line):
-                        self.error = self.ERROR_SERVER
-
-        def afterRun(self):
-                pass
-
-
-class RSList(MenuList):
-
-    def __init__(self, list):
-        MenuList.__init__(self, list, False, eListboxPythonMultiContent)
-        self.l.setFont(0, gFont('Regular', 20))
-        self.l.setFont(1, gFont('Regular', 22))
-        self.l.setFont(2, gFont('Regular', 24))
-        self.l.setFont(3, gFont('Regular', 26))
-        self.l.setFont(4, gFont('Regular', 28))
-        self.l.setFont(5, gFont('Regular', 30))
-        self.l.setFont(6, gFont('Regular', 32))
-        self.l.setFont(7, gFont('Regular', 34))
-        self.l.setFont(8, gFont('Regular', 36))
-        self.l.setFont(9, gFont('Regular', 40))
-        if DESKHEIGHT > 1000:
-            self.l.setItemHeight(50)
-        else:
-            self.l.setItemHeight(40)
-
-def RSListEntry(download):
-    res = [download]
-    # white = 16777215
-    # yellow = 16776960
-    # green = 3828297
-    # col = 16777215
-    # backcol = 0
-    # blue = 4282611429
-    white = 0xffffff
-    grey = 0xb3b3b9
-    green = 0x389416
-    black = 0x000000
-    yellow = 0xe5b243
-    blue = 0x002d39
-    red = 0xf07655
-    col = int("0xffffff", 16)
-    colsel = int("0xf07655", 16)
-    backcol = int("0x000000", 16)
-    backsel = int("0x000000", 16)
-
-    png = '/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/setting2.png'
-    if DESKHEIGHT > 1000:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(png)))
-        res.append(MultiContentEntryText(pos=(60, 0), size=(1900, 50), font=7, text=download, color=col, color_sel = colsel, backcolor = backcol, backcolor_sel = backcol))
-        # res.append(MultiContentEntryText(pos=(60, 0), size=(1200, 50), font=7, text=download, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
-    else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 6), size=(34, 25), png=loadPNG(png)))
-        res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=2, text=download, color=col, color_sel = colsel, backcolor = backcol, backcolor_sel = backcol))
-        # res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=2, text=download, color = 0xa6d1fe, flags=RT_HALIGN_LEFT))# | RT_VALIGN_CENTER
-    return res
-
-def showlist(data, list):
-        icount = 0
-        plist = []
-        for line in data:
-            name = data[icount]
-            plist.append(RSListEntry(name))
-            icount = icount+1
-        list.setList(plist)
+def downloadFile(url, target):
+    import socket
+    try:
+        from urllib.error import HTTPError, URLError
+    except:
+        from urllib2 import HTTPError, URLError
+    try:
+        response = urlopen(url, None, 5)
+        with open(target, 'w') as output:
+            # print('response: ', response)
+            output.write(response.read())
+        response.close()
+        return True
+    except HTTPError:
+        print("Http error")
+        return False
+    except URLError:
+        print("Url error")
+        return False
+    except socket.timeout:
+        print("sochet error")
+        return False
+
+
+def downloadFilest(url, target):
+    try:
+        req = Request(url)
+        req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+        # context=ssl._create_unverified_context()
+        response = ssl_urlopen(req)
+        with open(target, 'w') as output:
+            if PY3:
+                output.write(response.read().decode('utf-8'))
+            else:
+                output.write(response.read())
+            print('response: ', response)
+        return True
+    except HTTPError as e:
+        print('HTTP Error code: ', e.code)
+    except URLError as e:
+        print('URL Error: ', e.reason)
 
 
 def getserviceinfo(sref):  # this def returns the current playing service name and stream_url from give sref
     try:
-        p=ServiceReference(sref)
-        servicename=str(p.getServiceName())
-        serviceurl=str(p.getPath())
-        return servicename,serviceurl
+        from ServiceReference import ServiceReference
+        p = ServiceReference(sref)
+        servicename = str(p.getServiceName())
+        serviceurl = str(p.getPath())
+        return servicename, serviceurl
     except:
         return None, None
 
-def addstreamboq(bouquetname=None):
-           boqfile="/etc/enigma2/bouquets.tv"
-           if not os.path.exists(boqfile):
-              pass
-           else:
-              fp=open(boqfile,"r")
-              lines=fp.readlines()
-              fp.close()
-              add=True
-              for line in lines:
 
-                 if "userbouquet."+bouquetname+".tv" in line :
+def sortedDictKeys(adict):
+    keys = list(adict.keys())
+    keys.sort()
+    return keys
 
-                    add=False
-                    break
-           if add==True:
-              fp=open(boqfile,"a")
-              fp.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "userbouquet.%s.tv" ORDER BY bouquet\n'% bouquetname)
-              fp.close()
-              add=True
 
-def stream2bouquet(url=None,name=None,bouquetname=None):
-          error='none'
-          bouquetname='TVSPROAddons'
-          fileName ="/etc/enigma2/userbouquet.%s.tv" % bouquetname
-          out = '#SERVICE 4097:0:0:0:0:0:0:0:0:0:%s:%s\r\n' % (quote(url), quote(name))
-          try:
-              addstreamboq(bouquetname)
-              if not os.path.exists(fileName):
-                 fp = open(fileName, 'w')
-                 fp.write("#NAME %s\n"%bouquetname)
-                 fp.close()
-                 fp = open(fileName, 'a')
-                 fp.write(out)
-              else:
-                 fp=open(fileName,'r')
-                 lines=fp.readlines()
-                 fp.close()
-                 for line in lines:
-                     if out in line:
-                        error=(_('Stream already added to bouquet'))
-                        return error
-                 fp = open(fileName, 'a')
-                 fp.write(out)
-              fp.write("")
-              fp.close()
-          except:
-             error=(_('Adding to bouquet failed'))
-          return error
+def daterange(start_date, end_date):
+    for n in range((end_date - start_date).days + 1):
+        yield end_date - datetime.timedelta(n)
 
-#  added for need of aspect ratio
-class StatusScreen(Screen):
 
-    def __init__(self, session):
-        desktop = getDesktop(0)
-        size = desktop.size()
-        self.sc_width = size.width()
-        self.sc_height = size.height()
-        statusPositionX = 50
-        statusPositionY = 100
-        self.delayTimer = eTimer()
+global CountConnOk
+CountConnOk = 0
+
+
+def zCheckInternet(opt=1, server=None, port=None):  # opt=5 custom server and port.
+    global CountConnOk
+    sock = False
+    checklist = [("8.8.44.4", 53), ("8.8.88.8", 53), ("www.lululla.altervista.org/", 80), ("www.linuxsat-support.com", 443), ("www.google.com", 443)]
+    if opt < 5:
+        srv = checklist[opt]
+    else:
+        srv = (server, port)
+    try:
+        import socket
+        socket.setdefaulttimeout(0.5)
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(srv)
+        sock = True
+        # print("[iSettingE2] - Internet OK")
+        CountConnOk = 0
+        print(_("Status Internet: %s:%s -> OK" % (srv[0], srv[1])))
+    except:
+        sock = False
+        # print("[iSettingE2] - Internet KO")
+        print(_("Status Internet: %s:%s -> KO" % (srv[0], srv[1])))
+        if CountConnOk == 0 and opt != 2 and opt != 3:
+            CountConnOk = 1
+            print(_("Restart Check 1 Internet."))
+            return zCheckInternet(0)
+        elif CountConnOk == 1 and opt != 2 and opt != 3:
+            CountConnOk = 2
+            print(_("Restart Check 2 Internet."))
+            return zCheckInternet(4)
+    return sock
+
+
+def checkInternet():
+    try:
+        import socket
+        socket.setdefaulttimeout(0.5)
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(("8.8.8.8", 53))
+        return True
+    except:
+        return False
+
+
+def check(url):
+    import socket
+    try:
+        from urllib.error import HTTPError, URLError
+    except:
+        from urllib2 import HTTPError, URLError
+    try:
+        response = checkStr(urlopen(url, None, 5))
+        response.close()
+        return True
+    except HTTPError:
+        return False
+    except URLError:
+        return False
+    except socket.timeout:
+        return False
+
+
+def testWebConnection(host="www.google.com", port=80, timeout=3):
+    import socket
+    try:
+        socket.setdefaulttimeout(timeout)
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
+        return True
+    except Exception as e:
+        print('error: ', str(e))
+        return False
+
+
+def checkStr(text, encoding="utf8"):
+    if PY3 is False:
+        if isinstance(text, unicode):
+            return text.encode(encoding)
+        else:
+            return text
+    else:
+        return text
+
+
+# def checkStr(txt):
+    # # convert variable to type str both in Python 2 and 3
+    # if PY3:
+        # # Python 3
+        # if type(txt) == type(bytes()):
+            # txt = txt.decode('utf-8')
+    # else:
+        # #Python 2
+        # if type(txt) == type(unicode()):
+            # txt = txt.encode('utf-8')
+    # return txt
+
+# def checkStr(txt):
+    # import six
+    # if six.PY3:
+        # if isinstance(txt, type(bytes())):
+            # txt = txt.decode('utf-8')
+    # else:
+        # if isinstance(txt, type(six.text_type())):
+            # txt = txt.encode('utf-8')
+    # return txt
+
+
+def checkRedirect(url):
+    # print("*** check redirect ***")
+    try:
+        import requests
+        x = requests.get(url, timeout=15, verify=False, stream=True)
+        print("**** redirect url 1 *** %s" % x.url)
+        return str(x.url)
+    except Exception as e:
+        print('checkRedirect get failed: ', str(e))
+        print("**** redirect url 2 *** %s" % url)
+        return str(url)
+
+
+def freespace():
+    try:
+        diskSpace = os.statvfs('/')
+        capacity = float(diskSpace.f_bsize * diskSpace.f_blocks)
+        available = float(diskSpace.f_bsize * diskSpace.f_bavail)
+        fspace = round(float(available / 1048576.0), 2)
+        tspace = round(float(capacity / 1048576.0), 1)
+        spacestr = 'Free space(' + str(fspace) + 'MB) Total space(' + str(tspace) + 'MB)'
+        return spacestr
+    except:
+        return ''
+
+
+def b64encoder(source):
+    import base64
+    if PY3:
+        source = source.encode('utf-8')
+    content = base64.b64encode(source).decode('utf-8')
+    return content
+
+
+def b64decoder(s):
+    """Add missing padding to string and return the decoded base64 string."""
+    import base64
+    s = str(s).strip()
+    try:
+        # return base64.b64decode(s)
+        outp = base64.b64decode(s)
+        print('outp1 ', outp)
+        if PY3:
+            outp = outp.decode('utf-8')
+            print('outp2 ', outp)
+        return outp
+
+    except TypeError:
+        padding = len(s) % 4
+        if padding == 1:
+            print("Invalid base64 string: {}".format(s))
+            return ''
+        elif padding == 2:
+            s += b'=='
+        elif padding == 3:
+            s += b'='
+        outp = base64.b64decode(s)
+        print('outp1 ', outp)
+        if PY3:
+            outp = outp.decode('utf-8')
+            print('outp2 ', outp)
+        return outp
+
+
+def MemClean():
+    try:
+        os.system("sync")
+        os.system("echo 1 > /proc/sys/vm/drop_caches")
+        os.system("echo 2 > /proc/sys/vm/drop_caches")
+        os.system("echo 3 > /proc/sys/vm/drop_caches")
+    except:
+        pass
+
+
+def __createdir(list):
+    dir = ''
+    for line in list[1:].split('/'):
+        dir += '/' + line
+        if not os.path.exists(dir):
+            try:
+                os.mkdir(dir)
+            except:
+                print('Mkdir Failed', dir)
+
+
+try:
+    from Plugins.Extensions.tmdb import tmdb
+    is_tmdb = True
+except Exception as e:
+    print('error: ', str(e))
+    is_tmdb = False
+
+
+try:
+    from Plugins.Extensions.IMDb.plugin import main as imdb
+    is_imdb = True
+except Exception as e:
+    print('error: ', str(e))
+    is_imdb = False
+
+
+def substr(data, start, end):
+    i1 = data.find(start)
+    i2 = data.find(end, i1)
+    return data[i1:i2]
+
+
+def uniq(inlist):
+    uniques = []
+    for item in inlist:
+        if item not in uniques:
+            uniques.append(item)
+    return uniques
+
+
+def ReloadBouquets():
+    # global set
+    print('\n----Reloading bouquets----\n')
+    # if set == 1:
+        # set = 0
+        # terrestrial_rest()
+    try:
+        from enigma import eDVBDB
+        eDVBDB.getInstance().reloadBouquets()
+        print('bouquets reloaded...')
+    except:
+        eDVBDB = None
+        os.system('wget -qO - http://127.0.0.1/web/servicelistreload?mode=2 > /dev/null 2>&1 &')
+        print('bouquets reloaded...')
+
+
+def deletetmp():
+    os.system('rm -rf /tmp/unzipped;rm -f /tmp/*.ipk;rm -f /tmp/*.tar;rm -f /tmp/*.zip;rm -f /tmp/*.tar.gz;rm -f /tmp/*.tar.bz2;rm -f /tmp/*.tar.tbz2;rm -f /tmp/*.tar.tbz;rm -f /tmp/*.m3u')
+    return
+
+
+def del_jpg():
+    import glob
+    for i in glob.glob(os.path.join("/tmp", "*.jpg")):
         try:
-               self.delayTimer_conn = self.delayTimer.timeout.connect(self.hideStatus)
-        except AttributeError:
-               self.delayTimer.callback.append(self.hideStatus)
+            os.chmod(i, 0o777)
+            os.remove(i)
+        except OSError:
+            pass
 
-        self.delayTimerDelay = 1500
-        self.shown = True
-        self.skin = '\n            <screen name="StatusScreen" position="%s,%s" size="%s,90" zPosition="0" backgroundColor="transparent" flags="wfNoBorder">\n                    <widget name="status" position="0,0" size="%s,70" valign="center" halign="left" font="Regular;22" transparent="1" foregroundColor="yellow" shadowColor="#40101010" shadowOffset="3,3" />\n            </screen>' % (str(statusPositionX),
-         str(statusPositionY),
-         str(self.sc_width),
-         str(self.sc_width))
-        Screen.__init__(self, session)
-        self.stand_alone = True
-        print('initializing status display')
-        self['status'] = Label('')
-        self.onClose.append(self.__onClose)
 
-    def setStatus(self, text, color = 'yellow'):
-        self['status'].setText(text)
-        self['status'].instance.setForegroundColor(parseColor(color))
-        self.show()
-        self.delayTimer.start(self.delayTimerDelay, True)
+def OnclearMem():
+    try:
+        os.system("sync")
+        os.system("echo 1 > /proc/sys/vm/drop_caches")
+        os.system("echo 2 > /proc/sys/vm/drop_caches")
+        os.system("echo 3 > /proc/sys/vm/drop_caches")
+    except:
+        pass
 
-    def hideStatus(self):
-        self.hide()
-        self['status'].setText('')
 
-    def __onClose(self):
-        self.delayTimer.stop()
-        del self.delayTimer
+def findSoftCamKey():
+    paths = ["/usr/keys",
+             "/etc/tuxbox/config/oscam-emu",
+             "/etc/tuxbox/config/oscam-trunk",
+             "/etc/tuxbox/config/oscam",
+             "/etc/tuxbox/config/ncam",
+             "/etc/tuxbox/config/gcam",
+             "/etc/tuxbox/config",
+             "/etc",
+             "/var/keys"]
+    from os import path as os_path
+    if os_path.exists("/tmp/.oscam/oscam.version"):
+        data = open("/tmp/.oscam/oscam.version", "r").readlines()
+    elif os_path.exists("/tmp/.ncam/ncam.version"):
+        data = open("/tmp/.ncam/ncam.version", "r").readlines()
+    elif os_path.exists("/tmp/.gcam/gcam.version"):
+        data = open("/tmp/.gcam/gcam.version", "r").readlines()
+        for line in data:
+            if "configdir:" in line.lower():
+                paths.insert(0, line.split(":")[1].strip())
+    for path in paths:
+        softcamkey = os_path.join(path, "SoftCam.Key")
+        print("[key] the %s exists %d" % (softcamkey, os_path.exists(softcamkey)))
+        if os_path.exists(softcamkey):
+            return softcamkey
+        else:
+            return "/usr/keys/SoftCam.Key"
+    return "/usr/keys/SoftCam.Key"
 
+
+def web_info(message):
+    try:
+        try:
+            from urllib import quote_plus
+        except:
+            from urllib.parse import quote_plus
+        message = quote_plus(message)
+        cmd = "wget -qO - 'http://127.0.0.1/web/message?type=2&timeout=10&text=%s' > /dev/null 2>&1 &" % message
+        # debug(cmd, "CMD -> Console -> WEBIF")
+        os.popen(cmd)
+    except Exception as e:
+        print('error: ', str(e))
+        print("web_info ERROR")
+
+
+def trace_error():
+    import traceback
+    try:
+        traceback.print_exc(file=sys.stdout)
+        traceback.print_exc(file=open('/tmp/Error.log', 'a'))
+    except Exception as e:
+        print('error: ', str(e))
+        pass
+
+
+def log(label, data):
+    data = str(data)
+    open("/tmp/my__debug.log", "a").write("\n" + label + ":>" + data)
+
+
+def ConverDate(data):
+    year = data[:2]
+    month = data[-4:][:2]
+    day = data[-2:]
+    return day + '-' + month + '-20' + year
+
+
+def ConverDateBack(data):
+    year = data[-2:]
+    month = data[-7:][:2]
+    day = data[:2]
+    return year + month + day
+
+
+def isExtEplayer3Available():
+    from enigma import eEnv
+    return os.path.isfile(eEnv.resolve('$bindir/exteplayer3'))
+
+
+def isStreamlinkAvailable():
+    from enigma import eEnv
+    return os.path.isdir(eEnv.resolve('/usr/lib/python2.7/site-packages/streamlink'))
+
+# def Controlexteplayer():
+    # exteplayer = False
+    # if os.path.exists("/usr/bin/exteplayer3") or os.path.exists("/bin/exteplayer3")  or os.path.exists("exteplayer3"):
+      # exteplayer = True
+    # return exteplayer
+
+# if not Controlexteplayer():
+  # os.system("opkg update")
+  # os.popen("opkg list | grep exteplayer > /tmp/exteplayer")
+  # if os.path.exists("/tmp/exteplayer"):
+    # File = open("/tmp/exteplayer", 'r')
+    # for line in File:
+      # linesplit = line.split(' ')
+      # if len(linesplit) >1 :
+        # if linesplit[0].find("exteplayer") != -1:
+          # os.system("opkg install %s"%linesplit[0])
+          # break
+    # File.close()
+    # os.system("rm -fr /tmp/exteplayer")
+
+# PluginDescriptor:
+# WHERE_EXTENSIONSMENU = 0
+# WHERE_MAINMENU = 1
+# WHERE_PLUGINMENU = 2
+# WHERE_MOVIELIST = 3
+# WHERE_MENU = 4
+# WHERE_AUTOSTART = 5
+# WHERE_WIZARD = 6
+# WHERE_SESSIONSTART = 7
+# WHERE_TELETEXT = 8
+# WHERE_FILESCAN = 9
+# WHERE_NETWORKSETUP = 10
+# WHERE_EVENTINFO = 11
+# WHERE_NETWORKCONFIG_READ = 12
+# WHERE_AUDIOMENU = 13
+# WHERE_SOFTWAREMANAGER = 14
+# WHERE_CHANNEL_CONTEXT_MENU = 15
+
+
+def AdultUrl(url):
+    import sys
+    if sys.version_info.major == 3:
+        import urllib.request as urllib2
+    elif sys.version_info.major == 2:
+        import urllib2
+    req = urllib2.Request(url)
+    req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
+    r = urllib2.urlopen(req, None, 15)
+    link = r.read()
+    r.close()
+    tlink = link
+    if str(type(tlink)).find('bytes') != -1:
+        try:
+            tlink = tlink.decode("utf-8")
+        except Exception as e:
+            print('error: ', str(e))
+    return tlink
+
+
+std_headers = {
+        'User-Agent': 'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2.6) Gecko/20100627 Firefox/3.6.6',
+        'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'en-us,en;q=0.5',
+}
+
+
+ListAgent = [
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36',
+          'Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2919.83 Safari/537.36',
+          'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.15 (KHTML, like Gecko) Chrome/24.0.1295.0 Safari/537.15',
+          'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.14 (KHTML, like Gecko) Chrome/24.0.1292.0 Safari/537.14',
+          'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
+          'Mozilla/5.0 (Windows NT 6.2) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
+          'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1284.0 Safari/537.13',
+          'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.8 (KHTML, like Gecko) Chrome/17.0.940.0 Safari/535.8',
+          'Mozilla/6.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
+          'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
+          'Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
+          'Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2',
+          'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.1.16) Gecko/20120427 Firefox/15.0a1',
+          'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:15.0) Gecko/20120427 Firefox/15.0a1',
+          'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:15.0) Gecko/20120910144328 Firefox/15.0.2',
+          'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:15.0) Gecko/20100101 Firefox/15.0.1',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:9.0a2) Gecko/20111101 Firefox/9.0a2',
+          'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110613 Firefox/6.0a2',
+          'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110612 Firefox/6.0a2',
+          'Mozilla/5.0 (Windows NT 6.1; rv:6.0) Gecko/20110814 Firefox/6.0',
+          'Mozilla/5.0 (compatible; MSIE 10.6; Windows NT 6.1; Trident/5.0; InfoPath.2; SLCC1; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET CLR 2.0.50727) 3gpp-gba UNTRUSTED/1.0',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/4.0; InfoPath.2; SV1; .NET CLR 2.0.50727; WOW64)',
+          'Mozilla/4.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Macintosh; Intel Mac OS X 10_7_3; Trident/6.0)',
+          'Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0;  it-IT)',
+          'Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0; en-US)'
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; chromeframe/13.0.782.215)',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; chromeframe/11.0.696.57)',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0) chromeframe/10.0.648.205',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/4.0; GTB7.4; InfoPath.1; SV1; .NET CLR 2.8.52393; WOW64; en-US)',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/5.0; chromeframe/11.0.696.57)',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/4.0; GTB7.4; InfoPath.3; SV1; .NET CLR 3.1.76908; WOW64; en-US)',
+          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; GTB7.4; InfoPath.2; SV1; .NET CLR 3.3.69573; WOW64; en-US)',
+          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 1.0.3705; .NET CLR 1.1.4322)',
+          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; InfoPath.1; SV1; .NET CLR 3.8.36217; WOW64; en-US)',
+          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)',
+          'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; it-IT)',
+          'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; en-US)',
+          'Opera/9.80 (X11; Linux i686; Ubuntu/14.10) Presto/2.12.388 Version/12.16.2',
+          'Opera/12.80 (Windows NT 5.1; U; en) Presto/2.10.289 Version/12.02',
+          'Opera/9.80 (Windows NT 6.1; U; es-ES) Presto/2.9.181 Version/12.00',
+          'Opera/9.80 (Windows NT 5.1; U; zh-sg) Presto/2.9.181 Version/12.00',
+          'Opera/12.0(Windows NT 5.2;U;en)Presto/22.9.168 Version/12.00',
+          'Opera/12.0(Windows NT 5.1;U;en)Presto/22.9.168 Version/12.00',
+          'Mozilla/5.0 (Windows NT 5.1) Gecko/20100101 Firefox/14.0 Opera/12.0',
+          'Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/537.13+ (KHTML, like Gecko) Version/5.1.7 Safari/534.57.2',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_3) AppleWebKit/534.55.3 (KHTML, like Gecko) Version/5.1.3 Safari/534.53.10',
+          'Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko ) Version/5.1 Mobile/9B176 Safari/7534.48.3'
+          ]
+
+
+def RequestAgent():
+    RandomAgent = choice(ListAgent)
+    return RandomAgent
+
+
+def ReadUrl2(url):
+    if sys.version_info.major == 3:
+        import urllib.request as urllib2
+    elif sys.version_info.major == 2:
+        import urllib2
+    req = urllib2.Request(url)
+    req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
+    r = urllib2.urlopen(req, None, 15)
+    link = r.read()
+    r.close()
+    content = link
+    if str(type(content)).find('bytes') != -1:
+        try:
+            content = content.decode("utf-8")
+        except Exception as e:
+            print('error: ', str(e))
+    return content
+
+
+def ReadUrl(url):
+    if sys.version_info.major == 3:
+        import urllib.request as urllib2
+    elif sys.version_info.major == 2:
+        import urllib2
+
+    try:
+        import ssl
+        CONTEXT = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+    except:
+        CONTEXT = None
+
+    TIMEOUT_URL = 15
+    print(_("ReadUrl1:\n  url = %s") % url)
+    try:
+        req = urllib2.Request(url)
+        req.add_header('User-Agent', RequestAgent())
+        try:
+            r = urllib2.urlopen(req, None, TIMEOUT_URL, context=CONTEXT)
+        except Exception as e:
+            r = urllib2.urlopen(req, None, TIMEOUT_URL)
+            print("CreateLog Codifica ReadUrl: %s." % str(e))
+        link = r.read()
+        r.close()
+
+        dec = "Null"
+        dcod = 0
+        tlink = link
+        if str(type(link)).find('bytes') != -1:
+            try:
+                tlink = link.decode("utf-8")
+                dec = "utf-8"
+            except Exception as e:
+                dcod = 1
+                print("ReadUrl2 - Error: ", str(e))
+            if dcod == 1:
+                dcod = 0
+                try:
+                    tlink = link.decode("cp437")
+                    dec = "cp437"
+                except Exception as e:
+                    dcod = 1
+                    print("ReadUrl3 - Error:", str(e))
+            if dcod == 1:
+                dcod = 0
+                try:
+                    tlink = link.decode("iso-8859-1")
+                    dec = "iso-8859-1"
+                except Exception as e:
+                    dcod = 1
+                    print("CreateLog Codific ReadUrl: ", str(e))
+            link = tlink
+
+        elif str(type(link)).find('str') != -1:
+            dec = "str"
+
+        print("CreateLog Codifica ReadUrl: %s." % dec)
+    except Exception as e:
+        print("ReadUrl5 - Error: ", str(e))
+        link = None
+    return link
+
+
+if PY3:
+    def getUrl(url):
+        req = Request(url)
+        req.add_header('User-Agent', RequestAgent())
+        try:
+            response = urlopen(req)
+            link = response.read().decode(errors='ignore')
+            response.close()
+            return link
+        except:
+            import ssl
+            gcontext = ssl._create_unverified_context()
+            response = urlopen(req, context=gcontext)
+            link = response.read().decode(errors='ignore')
+            response.close()
+            return link
+
+    def getUrl2(url, referer):
+        req = Request(url)
+        req.add_header('User-Agent', RequestAgent())
+        req.add_header('Referer', referer)
+        try:
+            response = urlopen(req)
+            link = response.read().decode()
+            response.close()
+            return link
+        except:
+            import ssl
+            gcontext = ssl._create_unverified_context()
+            response = urlopen(req, context=gcontext)
+            link = response.read().decode()
+            response.close()
+            return link
+
+    def getUrlresp(url):
+        req = Request(url)
+        req.add_header('User-Agent', RequestAgent())
+        try:
+            response = urlopen(req)
+            return response
+        except:
+            import ssl
+            gcontext = ssl._create_unverified_context()
+            response = urlopen(req, context=gcontext)
+            return response
+else:
+    def getUrl(url):
+        req = Request(url)
+        req.add_header('User-Agent', RequestAgent())
+        try:
+            response = urlopen(req)
+            link = response.read()
+            response.close()
+            return link
+        except:
+            import ssl
+            gcontext = ssl._create_unverified_context()
+            response = urlopen(req, context=gcontext)
+            link = response.read()
+            response.close()
+            return link
+
+    def getUrl2(url, referer):
+        req = Request(url)
+        req.add_header('User-Agent', RequestAgent())
+        req.add_header('Referer', referer)
+        try:
+            response = urlopen(req)
+            link = response.read()
+            response.close()
+            return link
+        except:
+            import ssl
+            gcontext = ssl._create_unverified_context()
+            response = urlopen(req, context=gcontext)
+            link = response.read()
+            response.close()
+            return link
+
+    def getUrlresp(url):
+        req = Request(url)
+        req.add_header('User-Agent', RequestAgent())
+        try:
+            response = urlopen(req)
+            return response
+        except:
+            import ssl
+            gcontext = ssl._create_unverified_context()
+            response = urlopen(req, context=gcontext)
+            return response
+
+
+def decodeUrl(text):
+    text = text.replace('%20', ' ')
+    text = text.replace('%21', '!')
+    text = text.replace('%22', '"')
+    text = text.replace('%23', '&')
+    text = text.replace('%24', '$')
+    text = text.replace('%25', '%')
+    text = text.replace('%26', '&')
+    text = text.replace('%2B', '+')
+    text = text.replace('%2F', '/')
+    text = text.replace('%3A', ':')
+    text = text.replace('%3B', ';')
+    text = text.replace('%3D', '=')
+    text = text.replace('&#x3D;', '=')
+    text = text.replace('%3F', '?')
+    text = text.replace('%40', '@')
+    return text
+
+
+def decodeHtml(text):
+    text = text.replace('&auml;', 'ä')
+    text = text.replace('\u00e4', 'ä')
+    text = text.replace('&#228;', 'ä')
+
+    text = text.replace('&Auml;', 'Ä')
+    text = text.replace('\u00c4', 'Ä')
+    text = text.replace('&#196;', 'Ä')
+
+    text = text.replace('&ouml;', 'ö')
+    text = text.replace('\u00f6', 'ö')
+    text = text.replace('&#246;', 'ö')
+
+    text = text.replace('&ouml;', 'Ö')
+    text = text.replace('&Ouml;', 'Ö')
+    text = text.replace('\u00d6', 'Ö')
+    text = text.replace('&#214;', 'Ö')
+
+    text = text.replace('&uuml;', 'ü')
+    text = text.replace('\u00fc', 'ü')
+    text = text.replace('&#252;', 'ü')
+
+    text = text.replace('&Uuml;', 'Ü')
+    text = text.replace('\u00dc', 'Ü')
+    text = text.replace('&#220;', 'Ü')
+
+    text = text.replace('&szlig;', 'ß')
+    text = text.replace('\u00df', 'ß')
+    text = text.replace('&#223;', 'ß')
+
+    text = text.replace('&amp;', '&')
+    text = text.replace('&quot;', '\"')
+    text = text.replace('&gt;', '>')
+    text = text.replace('&apos;', "'")
+    text = text.replace('&acute;', '\'')
+    text = text.replace('&ndash;', '-')
+    text = text.replace('&bdquo;', '"')
+    text = text.replace('&rdquo;', '"')
+    text = text.replace('&ldquo;', '"')
+    text = text.replace('&lsquo;', '\'')
+    text = text.replace('&rsquo;', '\'')
+    text = text.replace('&#034;', '"')
+    text = text.replace('&#34;', '"')
+    text = text.replace('&#038;', '&')
+    text = text.replace('&#039;', '\'')
+    text = text.replace('&#39;', '\'')
+    text = text.replace('&#160;', ' ')
+    text = text.replace('\u00a0', ' ')
+    text = text.replace('\u00b4', '\'')
+    text = text.replace('\u003d', '=')
+    text = text.replace('\u0026', '&')
+    text = text.replace('&#174;', '')
+    text = text.replace('&#225;', 'a')
+    text = text.replace('&#233;', 'e')
+    text = text.replace('&#243;', 'o')
+    text = text.replace('&#8211;', "-")
+    text = text.replace('&#8212;', "—")
+    text = text.replace('&mdash;', '—')
+    text = text.replace('\u2013', "–")
+    text = text.replace('&#8216;', "'")
+    text = text.replace('&#8217;', "'")
+    text = text.replace('&#8220;', "'")
+    text = text.replace('&#8221;', '"')
+    text = text.replace('&#8222;', ',')
+    text = text.replace('\u014d',  'ō')
+    text = text.replace('\u016b', 'ū')
+    text = text.replace('\u201a', '\"')
+    text = text.replace('\u2018', '\"')
+    text = text.replace('\u201e', '\"')
+    text = text.replace('\u201c', '\"')
+    text = text.replace('\u201d', '\'')
+    text = text.replace('\u2019s', '’')
+    text = text.replace('\u00e0', 'à')
+    text = text.replace('\u00e7', 'ç')
+    text = text.replace('\u00e8', 'é')
+    text = text.replace('\u00e9', 'é')
+    text = text.replace('\u00c1', 'Á')
+    text = text.replace('\u00c6', 'Æ')
+    text = text.replace('\u00e1', 'á')
+
+    text = text.replace('&#xC4;', 'Ä')
+    text = text.replace('&#xD6;', 'Ö')
+    text = text.replace('&#xDC;', 'Ü')
+    text = text.replace('&#xE4;', 'ä')
+    text = text.replace('&#xF6;', 'ö')
+    text = text.replace('&#xFC;', 'ü')
+    text = text.replace('&#xDF;', 'ß')
+    text = text.replace('&#xE9;', 'é')
+    text = text.replace('&#xB7;', '·')
+    text = text.replace("&#x27;", "'")
+    text = text.replace("&#x26;", "&")
+    text = text.replace("&#xFB;", "û")
+    text = text.replace("&#xF8;", "ø")
+    text = text.replace("&#x21;", "!")
+    text = text.replace("&#x3f;", "?")
+
+    text = text.replace('&#8230;', '...')
+    text = text.replace('\u2026', '...')
+    text = text.replace('&hellip;', '...')
+
+    text = text.replace('&#8234;', '')
+    return text
+
+
+conversion = {
+    str("\xd0\xb0"): "a",
+    str("\xd0\x90"): "A",
+    str("\xd0\xb1"): "b",
+    str("\xd0\x91"): "B",
+    str("\xd0\xb2"): "v",
+    str("\xd0\x92"): "V",
+    str("\xd0\xb3"): "g",
+    str("\xd0\x93"): "G",
+    str("\xd0\xb4"): "d",
+    str("\xd0\x94"): "D",
+    str("\xd0\xb5"): "e",
+    str("\xd0\x95"): "E",
+    str("\xd1\x91"): "jo",
+    str("\xd0\x81"): "jo",
+    str("\xd0\xb6"): "zh",
+    str("\xd0\x96"): "ZH",
+    str("\xd0\xb7"): "z",
+    str("\xd0\x97"): "Z",
+    str("\xd0\xb8"): "i",
+    str("\xd0\x98"): "I",
+    str("\xd0\xb9"): "j",
+    str("\xd0\x99"): "J",
+    str("\xd0\xba"): "k",
+    str("\xd0\x9a"): "K",
+    str("\xd0\xbb"): "l",
+    str("\xd0\x9b"): "L",
+    str("\xd0\xbc"): "m",
+    str("\xd0\x9c"): "M",
+    str("\xd0\xbd"): "n",
+    str("\xd0\x9d"): "N",
+    str("\xd0\xbe"): "o",
+    str("\xd0\x9e"): "O",
+    str("\xd0\xbf"): "p",
+    str("\xd0\x9f"): "P",
+    str("\xd1\x80"): "r",
+    str("\xd0\xa0"): "R",
+    str("\xd1\x81"): "s",
+    str("\xd0\xa1"): "S",
+    str("\xd1\x82"): "t",
+    str("\xd0\xa2"): "T",
+    str("\xd1\x83"): "u",
+    str("\xd0\xa3"): "U",
+    str("\xd1\x84"): "f",
+    str("\xd0\xa4"): "F",
+    str("\xd1\x85"): "h",
+    str("\xd0\xa5"): "H",
+    str("\xd1\x86"): "c",
+    str("\xd0\xa6"): "C",
+    str("\xd1\x87"): "ch",
+    str("\xd0\xa7"): "CH",
+    str("\xd1\x88"): "sh",
+    str("\xd0\xa8"): "SH",
+    str("\xd1\x89"): "sh",
+    str("\xd0\xa9"): "SH",
+    str("\xd1\x8a"): "",
+    str("\xd0\xaa"): "",
+    str("\xd1\x8b"): "y",
+    str("\xd0\xab"): "Y",
+    str("\xd1\x8c"): "j",
+    str("\xd0\xac"): "J",
+    str("\xd1\x8d"): "je",
+    str("\xd0\xad"): "JE",
+    str("\xd1\x8e"): "ju",
+    str("\xd0\xae"): "JU",
+    str("\xd1\x8f"): "ja",
+    str("\xd0\xaf"): "JA"}
+
+
+def cyr2lat(text):
+    i = 0
+    text = text.strip(" \t\n\r")
+    text = str(text)
+    retval = ""
+    bukva_translit = ""
+    bukva_original = ""
+    while i < len(text):
+        bukva_original = text[i]
+        try:
+            bukva_translit = conversion[bukva_original]
+        except:
+            bukva_translit = bukva_original
+        i = i + 1
+        retval += bukva_translit
+    return retval
+
+
+def charRemove(text):
+    char = ["1080p",
+            "PF1",
+            "PF2",
+            "PF3",
+            "PF4",
+            "PF5",
+            "PF6",
+            "PF7",
+            "PF8",
+            "PF9",
+            "PF10",
+            "PF11",
+            "PF12",
+            "PF13",
+            "PF14",
+            "PF15",
+            "PF16",
+            "PF17",
+            "PF18",
+            "PF19",
+            "PF20",
+            "PF21",
+            "PF22",
+            "PF23",
+            "PF24",
+            "PF25",
+            "PF26",
+            "PF27",
+            "PF28",
+            "PF29",
+            "PF30"
+            "480p",
+            "4K",
+            "720p",
+            "ANIMAZIONE",
+            # "APR",
+            # "AVVENTURA",
+            "BIOGRAFICO",
+            "BDRip",
+            "BluRay",
+            "CINEMA",
+            # "COMMEDIA",
+            "DOCUMENTARIO",
+            "DRAMMATICO",
+            "FANTASCIENZA",
+            "FANTASY",
+            # "FEB",
+            # "GEN",
+            # "GIU",
+            "HDCAM",
+            "HDTC",
+            "HDTS",
+            "LD",
+            "MAFIA",
+            # "MAG",
+            "MARVEL",
+            "MD",
+            # "ORROR",
+            "NEW_AUDIO",
+            "POLIZ",
+            "R3",
+            "R6",
+            "SD",
+            "SENTIMENTALE",
+            "TC",
+            "TEEN",
+            "TELECINE",
+            "TELESYNC",
+            "THRILLER",
+            "Uncensored",
+            "V2",
+            "WEBDL",
+            "WEBRip",
+            "WEB",
+            "WESTERN",
+            "-",
+            "_",
+            ".",
+            "+",
+            "[",
+            "]", ]
+
+    myreplace = text  #.lower()
+    for ch in char:  #.lower():
+        # ch = ch  #.lower()
+        if text == ch:
+            myreplace = text.replace(ch, "").replace("  ", " ").replace("   ", " ").strip()
+    print('myreplace: ', myreplace)
+    return myreplace
+
+
+def clean_html(html):
+    """Clean an HTML snippet into a readable string"""
+    import xml.sax.saxutils as saxutils
+    # saxutils.unescape("Suzy &amp; John")
+    if type(html) == type(u''):
+        strType = 'unicode'
+    elif type(html) == type(''):
+        strType = 'utf-8'
+        html = html.decode("utf-8", 'ignore')
+    # Newline vs <br />
+    html = html.replace('\n', ' ')
+    html = re.sub(r'\s*<\s*br\s*/?\s*>\s*', '\n', html)
+    html = re.sub(r'<\s*/\s*p\s*>\s*<\s*p[^>]*>', '\n', html)
+    # Strip html tags
+    html = re.sub('<.*?>', '', html)
+    # Replace html entities
+    html = saxutils.unescape(html)  # and for py3 ?
+    if strType == 'utf-8':
+        html = html.encode("utf-8")
+    return html.strip()
+
+
+def addstreamboq(bouquetname=None):
+    boqfile = "/etc/enigma2/bouquets.tv"
+    if not os.path.exists(boqfile):
+        pass
+    else:
+        fp = open(boqfile, "r")
+        lines = fp.readlines()
+        fp.close()
+        add = True
+        for line in lines:
+            if "userbouquet." + bouquetname+".tv" in line:
+                add = False
+                break
+            if add is True:
+                fp = open(boqfile, "a")
+                fp.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "userbouquet.%s.tv" ORDER BY bouquet\n' % bouquetname)
+                fp.close()
+                add = True
+
+
+def stream2bouquet(url=None, name=None, bouquetname=None):
+    error = 'none'
+    bouquetname = 'XBMCAddons'
+    fileName = "/etc/enigma2/userbouquet.%s.tv" % bouquetname
+    out = '#SERVICE 4097:0:0:0:0:0:0:0:0:0:%s:%s\r\n' % (quote(url), quote(name))
+
+    try:
+        addstreamboq(bouquetname)
+        if not os.path.exists(fileName):
+            fp = open(fileName, 'w')
+            fp.write("#NAME %s\n" % bouquetname)
+            fp.close()
+            fp = open(fileName, 'a')
+            fp.write(out)
+        else:
+            fp = open(fileName, 'r')
+            lines = fp.readlines()
+            fp.close()
+            for line in lines:
+                if out in line:
+                    error = (_('Stream already added to bouquet'))
+                    return error
+                fp = open(fileName, 'a')
+                fp.write(out)
+            fp.write("")
+            fp.close()
+    except:
+        error = (_('Adding to bouquet failed'))
+    return error
