@@ -18,7 +18,7 @@ exit 1
 fi
 fi
 
-EXTDIR="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/"
+EXTDIR="/usr/lib/enigma2/python/Plugins/Extensions/tvspro"
 
 if [ -d "$EXTDIR" ]; then
    rm -rf "$EXTDIR" > /dev/null 2>&1

@@ -37,6 +37,7 @@ from Screens.LocationBox import LocationBox
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
 from Screens.VirtualKeyBoard import VirtualKeyBoard
+from Tools.Directories import SCOPE_PLUGINS, resolveFilename
 from Tools.Directories import fileExists
 from Tools.Downloader import downloadWithProgress
 from enigma import iPlayableService
@@ -103,6 +104,17 @@ pngx = res_plugin_path + 'pics/setting2.png'
 skin_path = THISPLUG
 SREF = ""
 folder_path = "/tmp/tvspro/"
+
+piccons = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/img/".format('tvspro'))
+piconlive = piccons + 'tv.png'
+piconmovie = piccons + 'cinema.png'
+piconseries = piccons + 'series.png'
+piconsearch = piccons + 'search.png'
+piconinter = piccons + 'inter.png'
+pixmaps = piccons + 'backg.png'
+nextpng = 'next.png'
+prevpng = 'prev.png'
+
 if not os.path.exists(folder_path):
     os.makedirs(folder_path)
 
@@ -130,6 +142,144 @@ if sslverify:
             if self.hostname:
                 ClientTLSOptions(self.hostname, ctx)
             return ctx
+
+
+def piconlocal(name):
+    picolocal = 'backg.png'
+    if 'tv' in name.lower():
+        picolocal = 'movie.png'
+    elif 'commedia' in name.lower():
+        picolocal = 'commedia.png'
+    elif 'comedy' in name.lower():
+        picolocal = 'commedia.png'
+    elif 'thriller' in name.lower():
+        picolocal = 'thriller.png'
+    elif 'azione' in name.lower():
+        picolocal = 'azione.png'
+    elif 'dramma' in name.lower():
+        picolocal = 'dramma.png'
+    elif 'drama' in name.lower():
+        picolocal = 'dramma.png'
+    elif 'western' in name.lower():
+        picolocal = 'western.png'
+    elif 'biografico' in name.lower():
+        picolocal = 'biografico.png'
+    elif 'romantico' in name.lower():
+        picolocal = 'romantico.png'
+    elif 'romance' in name.lower():
+        picolocal = 'romantico.png'
+    elif 'horror' in name.lower():
+        picolocal = 'horror.png'
+    elif 'music' in name.lower():
+        picolocal = 'musical.png'
+    elif 'guerra' in name.lower():
+        picolocal = 'guerra.png'
+    elif 'bambini' in name.lower():
+        picolocal = 'bambini.png'
+    elif 'bianco' in name.lower():
+        picolocal = 'bianconero.png'
+    elif 'tutto' in name.lower():
+        picolocal = 'toto.png'
+    elif 'cartoni' in name.lower():
+        picolocal = 'cartoni.png'
+    elif 'bud' in name.lower():
+        picolocal = 'budterence.png'
+    elif 'documentary' in name.lower():
+        picolocal = 'documentary.png'
+    elif 'crime' in name.lower():
+        picolocal = 'crime.png'
+    elif 'mystery' in name.lower():
+        picolocal = 'mistery.png'
+    elif 'fiction' in name.lower():
+        picolocal = 'fiction.png'
+    elif 'adventure' in name.lower():
+        picolocal = 'mistery.png'
+    elif 'action' in name.lower():
+        picolocal = 'azione.png'
+    elif '007' in name.lower():
+        picolocal = '007.png'
+    elif 'sport' in name.lower():
+        picolocal = 'sport.png'
+    elif 'teatr' in name.lower():
+        picolocal = 'teatro.png'
+    elif 'extra' in name.lower():
+        picolocal = 'extra.png'
+    elif 'search' in name.lower():
+        picolocal = 'search.png'
+    elif 'abruzzo' in name.lower():
+        picolocal = 'regioni/abruzzo.png'
+    elif 'basilicata' in name.lower():
+        picolocal = 'regioni/basilicata.png'
+    elif 'calabria' in name.lower():
+        picolocal = 'regioni/calabria.png'
+    elif 'campania' in name.lower():
+        picolocal = 'regioni/campania.png'
+    elif 'emilia' in name.lower():
+        picolocal = 'regioni/emiliaromagna.png'
+    elif 'friuli' in name.lower():
+        picolocal = 'regioni/friuliveneziagiulia.png'
+    elif 'lazio' in name.lower():
+        picolocal = 'regioni/lazio.png'
+    elif 'liguria' in name.lower():
+        picolocal = 'regioni/liguria.png'
+    elif 'lombardia' in name.lower():
+        picolocal = 'regioni/lombardia.png'
+    elif 'marche' in name.lower():
+        picolocal = 'regioni/marche.png'
+    elif 'mediaset' in name.lower():
+        picolocal = 'mediaset.png'
+    elif 'molise' in name.lower():
+        picolocal = 'regioni/molise.png'
+    elif 'nazionali' in name.lower():
+        picolocal = 'nazionali.png'
+    elif 'news' in name.lower():
+        picolocal = 'news.png'
+    elif 'piemonte' in name.lower():
+        picolocal = 'regioni/piemonte.png'
+    elif 'pluto' in name.lower():
+        picolocal = 'plutotv.png'
+    elif 'puglia' in name.lower():
+        picolocal = 'regioni/puglia.png'
+    elif 'rai' in name.lower():
+        picolocal = 'rai.png'
+    elif 'webcam' in name.lower():
+        picolocal = 'relaxweb.png'
+    elif 'relax' in name.lower():
+        picolocal = 'relaxweb.png'
+    elif 'samsung' in name.lower():
+        picolocal = 'samsung.png'
+    elif 'sardegna' in name.lower():
+        picolocal = 'regioni/sardegna.png'
+    elif 'sicilia' in name.lower():
+        picolocal = 'regioni/sicilia.png'
+    elif 'toscana' in name.lower():
+        picolocal = 'regioni/toscana.png'
+    elif 'trentino' in name.lower():
+        picolocal = 'regioni/trentino.png'
+    elif 'umbria' in name.lower():
+        picolocal = 'regioni/umbria.png'
+    elif 'veneto' in name.lower():
+        picolocal = 'regioni/veneto.png'
+    elif 'aosta' in name.lower():
+        picolocal = 'regioni/valledaosta.png'
+    elif 'vecchi' in name.lower():
+        picolocal = 'vecchi.png'
+    elif 'italiani' in name.lower():
+        picolocal = 'movie.png'
+    elif 'fantascienza' in name.lower():
+        picolocal = 'fantascienza.png'
+    elif 'fantasy' in name.lower():
+        picolocal = 'fantasy.png'
+    elif 'fantasia' in name.lower():
+        picolocal = 'fantasia.png'
+    elif 'film' in name.lower():
+        picolocal = 'movie.png'
+    elif 'prev' in name.lower():
+        picolocal = prevpng
+    elif 'next' in name.lower():
+        picolocal = nextpng
+    print('>>>>>>>> ' + str(piccons) + str(picolocal))
+    return str(piccons) + str(picolocal)
 
 
 class rvList(MenuList):
@@ -398,6 +548,11 @@ def getpics(names, pics, tmpfold, picfold):
         if name is None or name == '':
             name = "Video"
         name = cleanName(name)
+        print(name)
+        # test
+        name = name.replace(' ', '-').replace("'", '').replace('&', '')
+        print(name)
+        # end test
         url = pics[j]
         if url is None:
             url = ""
@@ -436,15 +591,20 @@ def getpics(names, pics, tmpfold, picfold):
                         referer = url[n2:]
                         p = Utils.getUrl2(url, referer)
                         # -----------------
-                        f1 = open(tpicf, "wb")
-                        f1.write(p)
-                        f1.close()
+                        # f1 = open(tpicf, "wb")
+                        # f1.write(p)
+                        # f1.close()
+                        with open(tpicf, 'wb') as f1:
+                            f1.write(p)
                     else:
                         print("Going in urlopen url =", url)
                         p = Utils.ReadUrl2(url)
-                        f1 = open(tpicf, "wb")
-                        f1.write(p)
-                        f1.close()
+                        # p = p.decode('utf-8', 'ignore')
+                        with open(tpicf, 'wb') as f1:
+                            f1.write(p)
+                        # f1 = open(tpicf, "wb")
+                        # f1.write(p)
+                        # f1.close()
                 except:
                     cmd = "cp " + defpic + " " + tpicf
                     os.system(cmd)
@@ -979,7 +1139,7 @@ class GridMain(Screen):
             print("x in list =", x)
         self["frame"] = MovingPixmap()
         i = 0
-        while i < 16:
+        while i < 20:
             self["label" + str(i+1)] = StaticText()
             self["pixmap" + str(i+1)] = Pixmap()
             i = i+1
@@ -1038,20 +1198,23 @@ class GridMain(Screen):
     def paintFrame(self):
         print("In paintFrame self.index, self.minentry, self.maxentry =", self.index, self.minentry, self.maxentry)
         print("In paintFrame self.ipage = ", self.ipage)
-        ifr = self.index - (10*(self.ipage-1))
-        print("ifr =", ifr)
-        ipos = self.pos[ifr]
-        print("ipos =", ipos)
-        inf = self.index
-        if inf:
-            try:
-                self["info"].setText(self.infos[inf])
-                print('infos: ', inf)
-            except:
-                self["info"].setText('')
-                print('except info')
-        self["frame"].moveTo(ipos[0], ipos[1], 1)
-        self["frame"].startMoving()
+        try:
+            ifr = self.index - (10*(self.ipage-1))
+            print("ifr =", ifr)
+            ipos = self.pos[ifr]
+            print("ipos =", ipos)
+            inf = self.index
+            if inf:
+                try:
+                    self["info"].setText(self.infos[inf])
+                    print('infos: ', inf)
+                except:
+                    self["info"].setText('')
+                    print('except info')
+            self["frame"].moveTo(ipos[0], ipos[1], 1)
+            self["frame"].startMoving()
+        except Exception as e:
+            print('error  in paintframe: ', str(e))
 
     def openTest(self):
         print("self.index, openTest self.ipage, self.npage =", self.index, self.ipage, self.npage)
@@ -1116,7 +1279,7 @@ class GridMain(Screen):
             self.openTest()
         self.index += 1
         if self.index > self.maxentry:
-            # self.index = 0
+            self.index = 0
             self.key_down()
         else:
             self.paintFrame()
@@ -1135,6 +1298,8 @@ class GridMain(Screen):
             else:
                 self.index = 0
             self.paintFrame()
+        else:
+            self.paintFrame()
 
     def key_down(self):
         print("keydown self.index, self.maxentry = ", self.index, self.maxentry)
@@ -1152,6 +1317,8 @@ class GridMain(Screen):
             else:
                 print("keydown self.index, self.maxentry 3= ", self.index, self.maxentry)
                 self.index = 0
+            self.paintFrame()
+        else:
             self.paintFrame()
 
     def okClicked(self):
@@ -1395,6 +1562,12 @@ class Videos2(Screen):
                 url = (y["items"][i]["externallink"])
                 url = url.replace("\\", "")
                 pic = (y["items"][i]["thumbnail"])
+                if 'next' in name.lower():
+                    pic = str(piccons) + nextpng
+                if 'prev' in name.lower():
+                    pic = str(piccons) + prevpng
+                if 'tvseriesId' not in str(url):
+                    pic = piconlocal(name)
                 info = (y["items"][i]["info"])
                 info = info.replace("\r\n", "")
                 self.names.append(Utils.checkStr(name))
@@ -1415,6 +1588,7 @@ class Videos2(Screen):
         print("In Videos2 config.plugins.tvspro.thumb.value =", config.plugins.tvspro.thumb.value)
         if config.plugins.tvspro.thumb.value == "True":
             print("In Videos2 Going in GridMain")
+            # menuTitle, nextmodule, names, urls, infos, pics=[]
             self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics=self.pics)
         else:
             self.session.open(AnimMain, title, nextmodule, self.names, self.urls, self.infos, pics=self.pics)
