@@ -170,7 +170,7 @@ def piconlocal(name):
         picolocal = 'romantico.png'
     elif 'horror' in name.lower():
         picolocal = 'horror.png'
-    elif 'music' in name.lower():
+    elif 'musica' in name.lower():
         picolocal = 'musical.png'
     elif 'guerra' in name.lower():
         picolocal = 'guerra.png'
@@ -236,8 +236,8 @@ def piconlocal(name):
         picolocal = 'news.png'
     elif 'piemonte' in name.lower():
         picolocal = 'regioni/piemonte.png'
-    elif 'pluto' in name.lower():
-        picolocal = 'plutotv.png'
+    # elif 'pluto' in name.lower():
+        # picolocal = 'plutotv.png'
     elif 'puglia' in name.lower():
         picolocal = 'regioni/puglia.png'
     elif 'rai' in name.lower():
@@ -246,8 +246,6 @@ def piconlocal(name):
         picolocal = 'relaxweb.png'
     elif 'relax' in name.lower():
         picolocal = 'relaxweb.png'
-    elif 'samsung' in name.lower():
-        picolocal = 'samsung.png'
     elif 'sardegna' in name.lower():
         picolocal = 'regioni/sardegna.png'
     elif 'sicilia' in name.lower():
@@ -274,6 +272,10 @@ def piconlocal(name):
         picolocal = 'fantasia.png'
     elif 'film' in name.lower():
         picolocal = 'movie.png'
+    elif 'samsung' in name.lower():
+        picolocal = 'samsung.png'
+    elif 'plutotv' in name.lower():
+        picolocal = 'plutotv.png'
     elif 'prev' in name.lower():
         picolocal = prevpng
     elif 'next' in name.lower():
@@ -550,7 +552,7 @@ def getpics(names, pics, tmpfold, picfold):
         name = cleanName(name)
         print(name)
         # test
-        name = name.replace(' ', '-').replace("'", '').replace('&', '')
+        name = name.replace(' ', '-').replace("'", '').replace('&', '').replace('(','').replace(')','')
         print(name)
         # end test
         url = pics[j]
@@ -1562,12 +1564,16 @@ class Videos2(Screen):
                 url = (y["items"][i]["externallink"])
                 url = url.replace("\\", "")
                 pic = (y["items"][i]["thumbnail"])
+                pic = pic.replace("\\", "")
+                if 'serie' not in self.name.lower():
+                    pic = piconlocal(name)
                 if 'next' in name.lower():
                     pic = str(piccons) + nextpng
                 if 'prev' in name.lower():
                     pic = str(piccons) + prevpng
-                if 'tvseriesId' not in str(url):
-                    pic = piconlocal(name)
+                if 'plutotv' in name.lower():
+                    pic = str(piccons) + 'plutotv.png'
+                print("In Videos2 pic =", pic)
                 info = (y["items"][i]["info"])
                 info = info.replace("\r\n", "")
                 self.names.append(Utils.checkStr(name))
@@ -1584,8 +1590,6 @@ class Videos2(Screen):
             nextmodule = "Videos4"
         elif "Serie" in self.name:
             nextmodule = "Videos1"
-
-        print("In Videos2 config.plugins.tvspro.thumb.value =", config.plugins.tvspro.thumb.value)
         if config.plugins.tvspro.thumb.value == "True":
             print("In Videos2 Going in GridMain")
             # menuTitle, nextmodule, names, urls, infos, pics=[]
@@ -1647,6 +1651,14 @@ class Videos6(Screen):
                     url = (y["items"][i]["yatse"])
                 url = url.replace("\\", "")
                 pic = (y["items"][i]["thumbnail"])
+                pic = pic.replace("\\", "")
+                if 'next' in name.lower():
+                    pic = str(piccons) + nextpng
+                if 'prev' in name.lower():
+                    pic = str(piccons) + prevpng
+                if 'plutotv' in name.lower():
+                    pic = str(piccons) + 'plutotv.png'
+                print("In Videos6 pic =", pic)
                 info = (y["items"][i]["info"])
                 info = info.replace("\r\n", "")
                 self.names.append(Utils.checkStr(name))
@@ -1658,7 +1670,6 @@ class Videos6(Screen):
                 break
         # nextmodule = "Play"
         nextmodule = "Videos1"
-        print("In Videos6 config.plugins.tvspro.thumb.value =", config.plugins.tvspro.thumb.value)
         if config.plugins.tvspro.thumb.value == "True":
             print("In Videos6 Going in GridMain")
             self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics=self.pics)
@@ -1718,6 +1729,14 @@ class Videos1(Screen):
                     url = (y["items"][i]["yatse"])
                 url = url.replace("\\", "")
                 pic = (y["items"][i]["thumbnail"])
+                pic = pic.replace("\\", "")
+                if 'next' in name.lower():
+                    pic = str(piccons) + nextpng
+                if 'prev' in name.lower():
+                    pic = str(piccons) + prevpng
+                if 'plutotv' in name.lower():
+                    pic = str(piccons) + 'plutotv.png'
+                print("In Videos1 pic =", pic)
                 info = (y["items"][i]["info"])
                 info = info.replace("\r\n", "")
                 self.names.append(Utils.checkStr(name))
@@ -1730,7 +1749,6 @@ class Videos1(Screen):
         title = name_plug
         # nextmodule = "Play"
         nextmodule = "Videos1"
-        print("In Videos1 config.plugins.tvspro.thumb.value =", config.plugins.tvspro.thumb.value)
         if config.plugins.tvspro.thumb.value == "True":
             print("In Videos1 Going in GridMain")
             self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics=self.pics)
@@ -1790,6 +1808,14 @@ class nextVideos1(Screen):
                     url = (y["items"][i]["yatse"])
                 url = url.replace("\\", "")
                 pic = (y["items"][i]["thumbnail"])
+                pic = pic.replace("\\", "")
+                if 'next' in name.lower():
+                    pic = str(piccons) + nextpng
+                if 'prev' in name.lower():
+                    pic = str(piccons) + prevpng
+                if 'plutotv' in name.lower():
+                    pic = str(piccons) + 'plutotv.png'
+                print("In nextVideos1 pic =", pic)
                 info = (y["items"][i]["info"])
                 info = info.replace("\r\n", "")
                 self.names.append(Utils.checkStr(name))
@@ -1802,7 +1828,6 @@ class nextVideos1(Screen):
         title = name_plug
         # nextmodule = "Play"
         nextmodule = "Videos1"
-        print("In nextVideos1 config.plugins.tvspro.thumb.value =", config.plugins.tvspro.thumb.value)
         if config.plugins.tvspro.thumb.value == "True":
             print("In nextVideos1 Going in GridMain")
             self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics=self.pics)
@@ -1864,6 +1889,13 @@ class Videos3(Screen):
                 url = url.replace("\\", "")
                 pic = (y["items"][i]["thumbnail"])
                 pic = pic.replace("\\", "")
+                if 'next' in name.lower():
+                    pic = str(piccons) + nextpng
+                if 'prev' in name.lower():
+                    pic = str(piccons) + prevpng
+                if 'plutotv' in name.lower():
+                    pic = str(piccons) + 'plutotv.png'
+                print("In Videos3 pic =", pic)
                 info = (y["items"][i]["info"])
                 info = info.replace("\r\n", "")
                 self.names.append(Utils.checkStr(name))
@@ -1875,7 +1907,6 @@ class Videos3(Screen):
                 break
         title = name_plug
         nextmodule = "Play"
-        print("In Videos3 config.plugins.tvspro.thumb.value =", config.plugins.tvspro.thumb.value)
         print("In Videos3 nextmodule =", nextmodule)
         if config.plugins.tvspro.thumb.value == "True":
             print("In Videos3 Going in GridMain")
@@ -1937,6 +1968,12 @@ class Videos4(Screen):
                 print("In Videos4 url =", url)
                 pic = (y["items"][i]["thumbnail"])
                 pic = pic.replace("\\", "")
+                if 'next' in name.lower():
+                    pic = str(piccons) + nextpng
+                if 'prev' in name.lower():
+                    pic = str(piccons) + prevpng
+                if 'plutotv' in name.lower():
+                    pic = str(piccons) + 'plutotv.png'
                 print("In Videos4 pic =", pic)
                 info = (y["items"][i]["info"])
                 info = info.replace("\r\n", "")
@@ -1949,7 +1986,6 @@ class Videos4(Screen):
                 break
         title = name_plug
         nextmodule = "Videos5"
-        print("In Videos4 config.plugins.tvspro.thumb.value =", config.plugins.tvspro.thumb.value)
         print("In Videos4 nextmodule =", nextmodule)
         if config.plugins.tvspro.thumb.value == "True":
             print("In Videos4 Going in GridMain")
@@ -2014,6 +2050,12 @@ class nextVideos4(Screen):
                 print("In nextVideos4 url =", url)
                 pic = (y["items"][i]["thumbnail"])
                 pic = pic.replace("\\", "")
+                if 'next' in name.lower():
+                    pic = str(piccons) + nextpng
+                if 'prev' in name.lower():
+                    pic = str(piccons) + prevpng
+                if 'plutotv' in name.lower():
+                    pic = str(piccons) + 'plutotv.png'
                 print("In nextVideos4 pic =", pic)
                 info = (y["items"][i]["info"])
                 info = info.replace("\r\n", "")
@@ -2026,7 +2068,6 @@ class nextVideos4(Screen):
                 break
         title = name_plug
         nextmodule = "Videos4"
-        print("In nextVideos4 config.plugins.tvspro.thumb.value =", config.plugins.tvspro.thumb.value)
         print("In nextVideos4 nextmodule =", nextmodule)
         if config.plugins.tvspro.thumb.value == "True":
             print("In nextVideos4 Going in GridMain")
@@ -2088,6 +2129,13 @@ class Videos5(Screen):
                 url = url.replace("\\", "")
                 pic = (y["items"][i]["thumbnail"])
                 pic = pic.replace("\\", "")
+                if 'next' in name.lower():
+                    pic = str(piccons) + nextpng
+                if 'prev' in name.lower():
+                    pic = str(piccons) + prevpng
+                if 'plutotv' in name.lower():
+                    pic = str(piccons) + 'plutotv.png'
+                print("In Videos5 pic =", pic)
                 info = (y["items"][i]["info"])
                 info = info.replace("\r\n", "")
                 self.names.append(Utils.checkStr(name))
@@ -2099,7 +2147,6 @@ class Videos5(Screen):
                 break
         title = name_plug
         nextmodule = "Play"
-        print("In Videos5 config.plugins.tvspro.thumb.value =", config.plugins.tvspro.thumb.value)
         print("In Videos5 nextmodule =", nextmodule)
         if config.plugins.tvspro.thumb.value == "True":
             print("In Videos5 Going in GridMain")
