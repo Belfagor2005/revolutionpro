@@ -426,7 +426,7 @@ class ConfigEx(Screen, ConfigListScreen):
         self.list.append(getConfigListEntry(_("Movie folder"), cfg.movie, _("Folder Movie Path (eg.: /media/hdd/movie), Enigma restart required")))
         self.list.append(getConfigListEntry(_("Show thumbpic ?"), cfg.thumb, _("Show Thumbpics ? Enigma restart required")))
         self['config'].list = self.list
-        self["config"].setList(self.list)
+        self["config"].l.setList(self.list)
         self.setInfo()
 
     def setInfo(self):
