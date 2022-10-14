@@ -17,7 +17,8 @@ from Components.Button import Button
 from Components.ConfigList import ConfigListScreen
 from Components.Label import Label
 from Components.MenuList import MenuList
-from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaTest
+from Components.MultiContent import MultiContentEntryText
+from Components.MultiContent import MultiContentEntryPixmapAlphaTest
 from Components.Pixmap import MovingPixmap
 from Components.Pixmap import Pixmap
 from Components.ProgressBar import ProgressBar
@@ -306,11 +307,11 @@ class rvList(MenuList):
 def rvoneListEntry(name):
     res = [name]
     if Utils.isFHD():
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(pngx)))
-        res.append(MultiContentEntryText(pos=(60, 0), size=(1900, 50), font=7, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 0), size=(50, 50), png=loadPNG(pngx)))
+        res.append(MultiContentEntryText(pos=(80, 0), size=(1900, 50), font=7, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 6), size=(34, 25), png=loadPNG(pngx)))
-        res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=2, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 0), size=(50, 50), png=loadPNG(pngx)))
+        res.append(MultiContentEntryText(pos=(80, 0), size=(1000, 50), font=2, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT))
     return res
 
 
@@ -552,7 +553,7 @@ def getpics(names, pics, tmpfold, picfold):
         name = cleanName(name)
         print(name)
         # test
-        name = name.replace(' ', '-').replace("'", '').replace('&', '').replace('(','').replace(')','')
+        name = name.replace(' ', '-').replace("'", '').replace('&', '').replace('(', '').replace(')', '')
         print(name)
         # end test
         url = pics[j]
@@ -1111,16 +1112,16 @@ class GridMain(Screen):
             self.pos.append([1134, 468])
             self.pos.append([1504, 468])
         else:
-            self.pos.append([14, 5])
-            self.pos.append([260, 5])
-            self.pos.append([504, 5])
-            self.pos.append([744, 5])
-            self.pos.append([984, 5])
-            self.pos.append([14, 305])
-            self.pos.append([260, 305])
-            self.pos.append([504, 305])
-            self.pos.append([744, 305])
-            self.pos.append([984, 305])
+            self.pos.append([26, 15])
+            self.pos.append([272, 15])
+            self.pos.append([516, 15])
+            self.pos.append([756, 15])
+            self.pos.append([996, 15])
+            self.pos.append([26, 315])
+            self.pos.append([272, 315])
+            self.pos.append([516, 315])
+            self.pos.append([756, 315])
+            self.pos.append([996, 315])
 
         print("self.pos =", self.pos)
         tmpfold = config.plugins.tvspro.cachefold.value + "/tvspro/tmp"
@@ -1145,7 +1146,7 @@ class GridMain(Screen):
             self["label" + str(i+1)] = StaticText()
             self["pixmap" + str(i+1)] = Pixmap()
             i = i+1
-        i = 0
+        # i = 0
         self.index = 0
         self.ipage = 1
         ln = len(self.names)
