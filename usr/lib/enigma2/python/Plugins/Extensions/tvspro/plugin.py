@@ -105,7 +105,7 @@ pngx = res_plugin_path + 'pics/setting2.png'
 skin_path = THISPLUG
 SREF = ""
 folder_path = "/tmp/tvspro/"
-
+_firstStarttvspro = True
 piccons = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/res/img/".format('tvspro'))
 piconlive = piccons + 'tv.png'
 piconmovie = piccons + 'cinema.png'
@@ -363,6 +363,32 @@ def cleanName(name):
     name = name.replace('\xc2\x86', '').replace('\xc2\x87', '')
     name = ''.join(['_' if c in non_allowed_characters or ord(c) < 32 else c for c in name])
     return name
+
+
+def returnIMDB(text_clear):
+    TMDB = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('TMDB'))
+    IMDb = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('IMDb'))
+    if TMDB:
+        try:
+            from Plugins.Extensions.TMBD.plugin import TMBD
+            text = decodeHtml(text_clear)
+            _session.open(TMBD.tmdbScreen, text, 0)
+        except Exception as ex:
+            print("[XCF] Tmdb: ", str(ex))
+        return True
+    elif IMDb:
+        try:
+            from Plugins.Extensions.IMDb.plugin import main as imdb
+            text = decodeHtml(text_clear)
+            imdb(_session, text)
+        except Exception as ex:
+            print("[XCF] imdb: ", str(ex))
+        return True
+    else:
+        text_clear = decodeHtml(text_clear)
+        _session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+        return True
+    return
 
 
 class ConfigEx(Screen, ConfigListScreen):
@@ -2716,27 +2742,44 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.close()
 
 
+class AutoStartTimertvspro:
+
+    def __init__(self, session):
+        self.session = session
+        global _firstStarttvspro
+        print("*** running AutoStartTimertvspro ***")
+        if _firstStarttvspro:
+            self.runUpdate()
+
+    def runUpdate(self):
+        print("*** running update ***")
+        try:
+            from . import Update
+            Update.upd_done()
+            _firstStarttvspro = False
+        except Exception as e:
+            print('error Fxy', str(e))
+
+def autostart(reason, session=None, **kwargs):
+    print("*** running autostart ***")
+    global autoStartTimertvspro
+    global _firstStarttvspro
+    if reason == 0:
+        if session is not None:
+            _firstStarttvspro = True
+            autoStartTimertvspro = AutoStartTimertvspro(session)
+    return
+
+
 def main(session, **kwargs):
     try:
-        from . import Utils
-        if Utils.zCheckInternet(1):
-            try:
-                from . import Update
-                Update.upd_done()
-            except Exception as e:
-                print('error ', str(e))
-            _session = session
-            os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro")
-            os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro/vid")
-            os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro/pic")
-            os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro/tmp")
-            exo = tvspromain(_session)
-            exo.startSession()
-
-        else:
-            from Screens.MessageBox import MessageBox
-            from Tools.Notifications import AddPopup
-            AddPopup(_("Sorry but No Internet :("), MessageBox.TYPE_INFO, 10, 'Sorry')
+        _session = session
+        os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro")
+        os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro/vid")
+        os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro/pic")
+        os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro/tmp")
+        exo = tvspromain(_session)
+        exo.startSession()
     except:
         import traceback
         traceback.print_exc()
@@ -2746,6 +2789,7 @@ def main(session, **kwargs):
 def Plugins(**kwargs):
     icona = 'icon.png'
     extDescriptor = PluginDescriptor(name=name_plug, description=_(title_plug), where=PluginDescriptor.WHERE_EXTENSIONSMENU, icon=icona, fnc=main)
-    result = [PluginDescriptor(name=name_plug, description=_(title_plug), where=[PluginDescriptor.WHERE_PLUGINMENU], icon=icona, fnc=main)]
+    result = [PluginDescriptor(name=name_plug, description=title_plug, where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=autostart),
+              PluginDescriptor(name=name_plug, description=title_plug, where=PluginDescriptor.WHERE_PLUGINMENU, icon=icona, fnc=main)]
     result.append(extDescriptor)
     return result
