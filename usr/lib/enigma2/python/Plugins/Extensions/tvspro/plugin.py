@@ -367,13 +367,13 @@ def cleanName(name):
 
 class ConfigEx(Screen, ConfigListScreen):
     def __init__(self, session):
+        Screen.__init__(self, session)    
         skin = skin_path + 'Config.xml'
         if os.path.exists('/var/lib/dpkg/status'):
             skin = skin_path + 'ConfigOs.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
             f.close()
-        Screen.__init__(self, session)
         self.setup_title = _("SETUP PLUGIN")
         self.onChangedEntry = []
         self.session = session
@@ -802,26 +802,8 @@ class AnimMain(Screen):
         else:
             idx = self.index - 1
         text_clear = self.names[idx]
-        if Utils.is_tmdb:
-            try:
-                from Plugins.Extensions.TMBD.plugin import TMBD
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                _session.open(TMBD.tmdbScreen, text, 0)
-            except Exception as ex:
-                print("[XCF] Tmdb: ", str(ex))
-        elif Utils.is_imdb:
-            try:
-                from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                imdb(_session, text)
-            except Exception as ex:
-                print("[XCF] imdb: ", str(ex))
-        else:
-            text = Utils.badcar(text_clear)
-            text = Utils.charRemove(text_clear)
-            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+        if returnIMDB(text_clear):
+            print('show imdb/tmdb')
 
     def cancel(self):
         self.close()
@@ -1176,27 +1158,8 @@ class GridMain(Screen):
     def showIMDB(self):
         idx = self.index
         text_clear = self.names[idx]
-        if Utils.is_tmdb:
-            try:
-                from Plugins.Extensions.TMBD.plugin import TMBD
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                _session.open(TMBD.tmdbScreen, text, 0)
-            except Exception as ex:
-                print("[XCF] Tmdb: ", str(ex))
-        elif Utils.is_imdb:
-            try:
-                from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                # _session.open(imdb, text)
-                imdb(_session, text)
-            except Exception as ex:
-                print("[XCF] imdb: ", str(ex))
-        else:
-            text = Utils.badcar(text_clear)
-            text = Utils.charRemove(text_clear)
-            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+        if returnIMDB(text_clear):
+            print('show imdb/tmdb')
 
     def paintFrame(self):
         print("In paintFrame self.index, self.minentry, self.maxentry =", self.index, self.minentry, self.maxentry)
@@ -1522,6 +1485,9 @@ class tvspromain(Screen):
 class Videos2(Screen):
     def __init__(self, session, name, url):
         Screen.__init__(self, session)
+        self.session = session
+        global _session
+        _session = session
         self.list = []
         self["menu"] = List(self.list)
         self["menu"] = rvList([])
@@ -1605,6 +1571,9 @@ class Videos2(Screen):
 class Videos6(Screen):
     def __init__(self, session, name, url):
         Screen.__init__(self, session)
+        self.session = session
+        global _session
+        _session = session
         self.list = []
         self["menu"] = List(self.list)
         self["menu"] = rvList([])
@@ -1684,6 +1653,9 @@ class Videos6(Screen):
 class Videos1(Screen):
     def __init__(self, session, name, url):
         Screen.__init__(self, session)
+        self.session = session
+        global _session
+        _session = session
         self.list = []
         self["menu"] = List(self.list)
         self["menu"] = rvList([])
@@ -1763,6 +1735,9 @@ class Videos1(Screen):
 class nextVideos1(Screen):
     def __init__(self, session, name, url):
         Screen.__init__(self, session)
+        self.session = session
+        global _session
+        _session = session
         self.list = []
         self["menu"] = List(self.list)
         self["menu"] = rvList([])
@@ -1842,6 +1817,9 @@ class nextVideos1(Screen):
 class Videos3(Screen):
     def __init__(self, session, name, url):
         Screen.__init__(self, session)
+        self.session = session
+        global _session
+        _session = session
         self.list = []
         self["menu"] = List(self.list)
         self["menu"] = rvList([])
@@ -1922,6 +1900,9 @@ class Videos3(Screen):
 class Videos4(Screen):
     def __init__(self, session, name, url):
         Screen.__init__(self, session)
+        self.session = session
+        global _session
+        _session = session
         self.list = []
         self["menu"] = List(self.list)
         self["menu"] = rvList([])
@@ -2001,6 +1982,9 @@ class Videos4(Screen):
 class nextVideos4(Screen):
     def __init__(self, session, name, url):
         Screen.__init__(self, session)
+        self.session = session
+        global _session
+        _session = session
         self.list = []
         self["menu"] = List(self.list)
         self["menu"] = rvList([])
@@ -2083,6 +2067,9 @@ class nextVideos4(Screen):
 class Videos5(Screen):
     def __init__(self, session, name, url):
         Screen.__init__(self, session)
+        self.session = session
+        global _session
+        _session = session
         self.list = []
         self["menu"] = List(self.list)
         self["menu"] = rvList([])
@@ -2233,6 +2220,8 @@ class Playstream1(Screen):
     def __init__(self, session, name, url):
         Screen.__init__(self, session)
         self.session = session
+        global _session
+        _session = session
         skin = skin_path + 'Playstream1.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
@@ -2636,26 +2625,8 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
 
     def showIMDB(self):
         text_clear = self.name
-        if Utils.is_tmdb:
-            try:
-                from Plugins.Extensions.TMBD.plugin import TMBD
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                _session.open(TMBD.tmdbScreen, text, 0)
-            except Exception as ex:
-                print("[XCF] Tmdb: ", str(ex))
-        elif Utils.is_imdb:
-            try:
-                from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                imdb(_session, text)
-            except Exception as ex:
-                print("[XCF] imdb: ", str(ex))
-        else:
-            text = Utils.badcar(text_clear)
-            text = Utils.charRemove(text_clear)
-            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+        if returnIMDB(text_clear):
+            print('show imdb/tmdb')
 
     def slinkPlay(self):
         ref = str(self.url)
