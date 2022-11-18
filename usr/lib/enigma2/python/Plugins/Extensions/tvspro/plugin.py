@@ -97,7 +97,7 @@ def getversioninfo():
 global defpic, dblank
 _session = None
 currversion = getversioninfo()
-Version = currversion + ' - 25.09.2022'
+Version = currversion + ' - 05.11.2022'
 title_plug = '..:: TivuStream Pro Revolution V. %s ::..' % Version
 name_plug = 'TivuStream Pro Revolution'
 res_plugin_path = THISPLUG + 'res/'
@@ -155,6 +155,8 @@ def piconlocal(name):
         picolocal = 'commedia.png'
     elif 'thriller' in name.lower():
         picolocal = 'thriller.png'
+    elif 'family' in name.lower():
+        picolocal = 'family.png'        
     elif 'azione' in name.lower():
         picolocal = 'azione.png'
     elif 'dramma' in name.lower():
@@ -2758,7 +2760,7 @@ class AutoStartTimertvspro:
             Update.upd_done()
             _firstStarttvspro = False
         except Exception as e:
-            print('error Fxy', str(e))
+            print('error _firstStarttvspro', str(e))
 
 def autostart(reason, session=None, **kwargs):
     print("*** running autostart ***")

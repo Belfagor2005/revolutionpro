@@ -274,7 +274,7 @@ CountConnOk = 0
 def zCheckInternet(opt=1, server=None, port=None):  # opt=5 custom server and port.
     global CountConnOk
     sock = False
-    checklist = [("8.8.44.4", 53), ("8.8.88.8", 53), ("www.lululla.altervista.org/", 80), ("www.linuxsat-support.com", 443), ("www.google.com", 443)]
+    checklist = [("8.8.4.4", 53), ("8.8.8.8", 53), ("www.lululla.altervista.org/", 80), ("www.linuxsat-support.com", 443), ("www.google.com", 443)]
     if opt < 5:
         srv = checklist[opt]
     else:
@@ -604,14 +604,31 @@ def ConverDateBack(data):
     return year + month + day
 
 
-def isExtEplayer3Available():
-    from enigma import eEnv
-    return os.path.isfile(eEnv.resolve('$bindir/exteplayer3'))
+def isPythonFolder():
+    import os
+    path = ('/usr/lib/')
+    for name in os.listdir(path):
+        fullname = path + name
+        if not os.path.isfile(fullname) and 'python' in fullname:
+            print(fullname)
+            import sys
+            print("sys.version_info =", sys.version_info)
+            pythonvr = fullname
+            print('pythonvr is ', pythonvr)
+            x = ('%s/site-packages/streamlink' % pythonvr)
+            print(x)
+            # /usr/lib/python3.9/site-packages/streamlink
+    return x
 
 
 def isStreamlinkAvailable():
+    pythonvr = isPythonFolder()
+    return pythonvr
+
+
+def isExtEplayer3Available():
     from enigma import eEnv
-    return os.path.isdir(eEnv.resolve('/usr/lib/python2.7/site-packages/streamlink'))
+    return os.path.isfile(eEnv.resolve('$bindir/exteplayer3'))
 
 # def Controlexteplayer():
     # exteplayer = False
