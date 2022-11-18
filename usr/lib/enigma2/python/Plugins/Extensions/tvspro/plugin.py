@@ -156,7 +156,7 @@ def piconlocal(name):
     elif 'thriller' in name.lower():
         picolocal = 'thriller.png'
     elif 'family' in name.lower():
-        picolocal = 'family.png'        
+        picolocal = 'family.png'
     elif 'azione' in name.lower():
         picolocal = 'azione.png'
     elif 'dramma' in name.lower():
@@ -373,7 +373,7 @@ def returnIMDB(text_clear):
     if TMDB:
         try:
             from Plugins.Extensions.TMBD.plugin import TMBD
-            text = decodeHtml(text_clear)
+            text = Utils.decodeHtml(text_clear)
             _session.open(TMBD.tmdbScreen, text, 0)
         except Exception as ex:
             print("[XCF] Tmdb: ", str(ex))
@@ -381,13 +381,13 @@ def returnIMDB(text_clear):
     elif IMDb:
         try:
             from Plugins.Extensions.IMDb.plugin import main as imdb
-            text = decodeHtml(text_clear)
+            text = Utils.decodeHtml(text_clear)
             imdb(_session, text)
         except Exception as ex:
             print("[XCF] imdb: ", str(ex))
         return True
     else:
-        text_clear = decodeHtml(text_clear)
+        text_clear = Utils.decodeHtml(text_clear)
         _session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
         return True
     return
@@ -2761,6 +2761,7 @@ class AutoStartTimertvspro:
             _firstStarttvspro = False
         except Exception as e:
             print('error _firstStarttvspro', str(e))
+
 
 def autostart(reason, session=None, **kwargs):
     print("*** running autostart ***")
