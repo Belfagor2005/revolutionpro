@@ -1164,7 +1164,8 @@ class GridMain(Screen):
         print("self.npage =", self.npage)
         self["actions"] = ActionMap(["OkCancelActions",
                                      "EPGSelectActions",
-                                     "MenuActions", "DirectionActions",
+                                     "MenuActions",
+                                     "DirectionActions",
                                      "NumberActions"], {"ok": self.okClicked,
                                                         "epg": self.showIMDB,
                                                         "info": self.showIMDB,
@@ -2586,7 +2587,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
                                      'MediaPlayerActions',
                                      'EPGSelectActions',
                                      'MediaPlayerSeekActions',
-                                     'SetupActions',
                                      'ColorActions',
                                      'InfobarShowHideActions',
                                      'InfobarActions',
