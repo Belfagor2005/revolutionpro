@@ -10,7 +10,8 @@ Info http://t.me/tivustream
 ****************************************
 '''
 from __future__ import print_function
-from .__init__ import _
+# from .__init__ import _
+from . import _
 from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap
 from Components.Button import Button
@@ -357,7 +358,10 @@ Path_Movies = str(config.plugins.tvspro.movie.value) + "/"
 if Path_Movies.endswith("\/\/") is True:
     Path_Movies = Path_Movies[:-1]
 print('patch movies: ', Path_Movies)
-
+Path_Cache = str(config.plugins.tvspro.cachefold.value) + "/"
+if Path_Cache.endswith("\/\/") is True:
+    Path_Cache = Path_Cache[:-1]
+print('Path Cache: ', Path_Cache)
 
 def cleanName(name):
     name = name.strip()
@@ -442,7 +446,7 @@ class ConfigEx(Screen, ConfigListScreen):
             self.session.openWithCallback(self.VirtualKeyBoardCallback, VirtualKeyBoard, title=self['config'].getCurrent()[0], text=self['config'].getCurrent()[1].value)
 
     def cachedel(self):
-        fold = config.plugins.tvspro.cachefold.value + "/tvspro/pic"
+        fold = config.plugins.tvspro.cachefold.value + "tvspro/pic"
         cmd = "rm " + fold + "/*"
         os.system(cmd)
         self.mbox = self.session.open(MessageBox, _('All cache fold empty!'), MessageBox.TYPE_INFO, timeout=5)
@@ -1136,8 +1140,8 @@ class GridMain(Screen):
             self.pos.append([996, 315])
 
         print("self.pos =", self.pos)
-        tmpfold = config.plugins.tvspro.cachefold.value + "/tvspro/tmp"
-        picfold = config.plugins.tvspro.cachefold.value + "/tvspro/pic"
+        tmpfold = config.plugins.tvspro.cachefold.value + "tvspro/tmp"
+        picfold = config.plugins.tvspro.cachefold.value + "tvspro/pic"
         pics = getpics(names, pics, tmpfold, picfold)
         print("In Gridmain pics = ", pics)
 
@@ -2280,17 +2284,20 @@ class Playstream1(Screen):
         self['progresstext'] = StaticText()
         self["progress"].hide()
         self.downloading = False
-        self['setupActions'] = ActionMap(['ButtonSetupActions',
-                                          'ColorActions',
-                                          'TimerEditActions',
-                                          'InfobarInstantRecord'], {'red': self.cancel,
-                                                                    'green': self.okClicked,
-                                                                    'back': self.cancel,
-                                                                    'cancel': self.cancel,
-                                                                    'rec': self.runRec,
-                                                                    'instantRecord': self.runRec,
-                                                                    'ShortRecord': self.runRec,
-                                                                    'ok': self.okClicked}, -2)
+        self['actions'] = ActionMap(['MoviePlayerActions',
+                                     'MovieSelectionActions',
+                                     'ColorActions',
+                                     'DirectionActions',
+                                     'ButtonSetupActions',
+                                     'OkCancelActions',], {'red': self.cancel,
+                                                             'green': self.okClicked,
+                                                             'back': self.cancel,
+                                                             'cancel': self.cancel,
+                                                             'leavePlayer': self.cancel,
+                                                             'rec': self.runRec,
+                                                             'instantRecord': self.runRec,
+                                                             'ShortRecord': self.runRec,
+                                                             'ok': self.okClicked}, -2)
         self.name1 = name
         self.url = url
         print('In Playstream1 self.url =', url)
@@ -2357,9 +2364,9 @@ class Playstream1(Screen):
         url = self.url
         self.names = []
         self.urls = []
-        self.names.append('Download Now')
-        self.urls.append(Utils.checkStr(url))
         self.names.append('Play Now')
+        self.urls.append(Utils.checkStr(url))
+        self.names.append('Download Now')
         self.urls.append(Utils.checkStr(url))
         self.names.append('Play HLS')
         self.urls.append(Utils.checkStr(url))
@@ -2390,17 +2397,18 @@ class Playstream1(Screen):
                 except:
                     pass
                 self.session.open(Playstream2, self.name, self.url, desc)
-
             if idx == 0:
-                self.url = self.urls[idx]
-                print('In playVideo url D=', self.url)
-                self.runRec()
-
-            if idx == 1:
                 self.name = self.names[idx]
                 self.url = self.urls[idx]
                 print('In playVideo url D=', self.url)
                 self.play()
+                
+                
+            if idx == 1:
+                self.url = self.urls[idx]
+                print('In playVideo url D=', self.url)
+                self.runRec()
+
             elif idx == 2:
                 print('In playVideo url B=', self.url)
                 self.name = self.names[idx]
@@ -2702,13 +2710,13 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         # if "youtube" in str(self.url):
             # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
             # return
-        if Utils.isStreamlinkAvailable():
-            streamtypelist.append("5002")  # ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
-            streaml = True
-        if os.path.exists("/usr/bin/gstplayer"):
-            streamtypelist.append("5001")
-        if os.path.exists("/usr/bin/exteplayer3"):
-            streamtypelist.append("5002")
+        # if Utils.isStreamlinkAvailable():
+            # streamtypelist.append("5002")  # ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
+            # streaml = True
+        # elif os.path.exists("/usr/bin/gstplayer"):
+            # streamtypelist.append("5001")
+        # if os.path.exists("/usr/bin/exteplayer3"):
+            # streamtypelist.append("5002")
         if os.path.exists("/usr/bin/apt-get"):
             streamtypelist.append("8193")
         for index, item in enumerate(streamtypelist, start=0):
@@ -2791,10 +2799,10 @@ def autostart(reason, session=None, **kwargs):
 def main(session, **kwargs):
     try:
         _session = session
-        os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro")
-        os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro/vid")
-        os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro/pic")
-        os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "/tvspro/tmp")
+        os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "tvspro")
+        os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "tvspro/vid")
+        os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "tvspro/pic")
+        os.system("mkdir -p " + config.plugins.tvspro.cachefold.value + "tvspro/tmp")
         exo = tvspromain(_session)
         exo.startSession()
     except:
