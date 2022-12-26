@@ -1551,9 +1551,9 @@ class Videos2(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
+        referer = 'https://tivustream.website'
         url = self.url
-        print("Videos2 url =", url)
-        content = Utils.ReadUrl2(url)
+        content = Utils.ReadUrl2(url, referer)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -1639,9 +1639,9 @@ class Videos6(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
+        referer = 'https://tivustream.website'
         url = self.url
-        print("Videos1 url =", url)
-        content = Utils.ReadUrl2(url)
+        content = Utils.ReadUrl2(url, referer)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -1721,9 +1721,9 @@ class Videos1(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
+        referer = 'https://tivustream.website'
         url = self.url
-        print("Videos1 url =", url)
-        content = Utils.ReadUrl2(url)
+        content = Utils.ReadUrl2(url, referer)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -1804,9 +1804,9 @@ class nextVideos1(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
+        referer = 'https://tivustream.website'
         url = self.url
-        print("nextVideos1 url =", url)
-        content = Utils.ReadUrl2(url)
+        content = Utils.ReadUrl2(url, referer)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -1888,9 +1888,9 @@ class Videos3(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
+        referer = 'https://tivustream.website'
         url = self.url
-        print("Videos3 url =", url)
-        content = Utils.ReadUrl2(url)
+        content = Utils.ReadUrl2(url, referer)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -1966,16 +1966,15 @@ class Videos4(Screen):
         self.url = url
         self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
         self.onLayoutFinish.append(self.startSession)
-#       self.onClose.append(self.__onClose)
 
     def startSession(self):
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
+        referer = 'https://tivustream.website'
         url = self.url
-        print("Videos4 url =", url)
-        content = Utils.ReadUrl2(url)
+        content = Utils.ReadUrl2(url, referer)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -2049,16 +2048,15 @@ class nextVideos4(Screen):
         self.url = url
         self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
         self.onLayoutFinish.append(self.startSession)
-        # self.onClose.append(self.__onClose)
 
     def startSession(self):
         self.names = []
         self.urls = []
         self.pics = []
         self.infos = []
+        referer = 'https://tivustream.website'
         url = self.url
-        print("nextVideos4 url =", url)
-        content = Utils.ReadUrl2(url)
+        content = Utils.ReadUrl2(url, referer)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
@@ -2141,9 +2139,9 @@ class Videos5(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
+        referer = 'https://tivustream.website'
         url = self.url
-        print("Videos5 url =", url)
-        content = Utils.ReadUrl2(url)
+        content = Utils.ReadUrl2(url, referer)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
