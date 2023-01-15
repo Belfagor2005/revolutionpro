@@ -291,31 +291,26 @@ def piconlocal(name):
 
 class rvList(MenuList):
     def __init__(self, list):
-        MenuList.__init__(self, list, False, eListboxPythonMultiContent)
-        self.l.setFont(0, gFont('Regular', 20))
-        self.l.setFont(1, gFont('Regular', 22))
-        self.l.setFont(2, gFont('Regular', 24))
-        self.l.setFont(3, gFont('Regular', 26))
-        self.l.setFont(4, gFont('Regular', 28))
-        self.l.setFont(5, gFont('Regular', 30))
-        self.l.setFont(6, gFont('Regular', 32))
-        self.l.setFont(7, gFont('Regular', 34))
-        self.l.setFont(8, gFont('Regular', 36))
-        self.l.setFont(9, gFont('Regular', 40))
+        MenuList.__init__(self, list, True, eListboxPythonMultiContent)
         if Utils.isFHD():
             self.l.setItemHeight(50)
+            textfont = int(30)
+            self.l.setFont(0, gFont('Regular', textfont))
         else:
-            self.l.setItemHeight(40)
+            self.l.setItemHeight(30)
+            textfont = int(24)
+            self.l.setFont(0, gFont('Regular', textfont))
 
 
 def rvoneListEntry(name):
     res = [name]
+    pngx = res_plugin_path + 'pics/setting2.png'
     if Utils.isFHD():
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 0), size=(50, 50), png=loadPNG(pngx)))
-        res.append(MultiContentEntryText(pos=(80, 0), size=(1900, 50), font=7, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(40, 40), png=loadPNG(pngx)))
+        res.append(MultiContentEntryText(pos=(70, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 0), size=(50, 50), png=loadPNG(pngx)))
-        res.append(MultiContentEntryText(pos=(80, 0), size=(1000, 50), font=2, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(3, 3), size=(30, 30), png=loadPNG(pngx)))
+        res.append(MultiContentEntryText(pos=(50, 0), size=(500, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 
@@ -355,12 +350,12 @@ cfg = config.plugins.tvspro
 
 global Path_Movies
 Path_Movies = str(config.plugins.tvspro.movie.value) + "/"
+Path_Cache = str(config.plugins.tvspro.cachefold.value) + "/"
 if Path_Movies.endswith("\/\/") is True:
     Path_Movies = Path_Movies[:-1]
-print('patch movies: ', Path_Movies)
-Path_Cache = str(config.plugins.tvspro.cachefold.value) + "/"
 if Path_Cache.endswith("\/\/") is True:
     Path_Cache = Path_Cache[:-1]
+print('Path Movies: ', Path_Movies)
 print('Path Cache: ', Path_Cache)
 
 def cleanName(name):
