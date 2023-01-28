@@ -294,7 +294,7 @@ def downloadFile(url, target):
         from urllib2 import HTTPError, URLError
     try:
         response = urlopen(url, None, 5)
-        with open(target, 'w') as output:
+        with open(target, 'wb') as output:
             # print('response: ', response)
             output.write(response.read())
         response.close()
@@ -316,7 +316,7 @@ def downloadFilest(url, target):
         req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
         # context=ssl._create_unverified_context()
         response = ssl_urlopen(req)
-        with open(target, 'w') as output:
+        with open(target, 'wb') as output:
             if PY3:
                 output.write(response.read().decode('utf-8'))
             else:

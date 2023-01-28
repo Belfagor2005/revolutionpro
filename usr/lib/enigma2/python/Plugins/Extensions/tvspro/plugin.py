@@ -10,7 +10,6 @@ Info http://t.me/tivustream
 ****************************************
 '''
 from __future__ import print_function
-# from .__init__ import _
 from . import _
 from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap
@@ -55,8 +54,12 @@ import re
 import json
 import six
 import sys
+import requests
 from . import Utils
 from . import html_conv
+from PIL import Image, ImageChops, ImageFile, PngImagePlugin
+
+
 _session = None
 THISPLUG = '/usr/lib/enigma2/python/Plugins/Extensions/tvspro/'
 PY3 = sys.version_info.major >= 3
@@ -65,19 +68,11 @@ PY3 = sys.version_info.major >= 3
 if PY3:
     from http.client import HTTPConnection
     from urllib.parse import urlparse
-    unicode = str
-    unichr = chr
-    long = int
     PY3 = True
 else:
     from httplib import HTTPConnection
     from urlparse import urlparse
 
-
-try:
-    from PIL import Image
-except:
-    import Image
 
 HTTPConnection.debuglevel = 1
 
@@ -99,7 +94,7 @@ def getversioninfo():
 global defpic, dblank
 _session = None
 currversion = getversioninfo()
-Version = currversion + ' - 05.11.2022'
+Version = currversion + ' - 05.01.2023'
 title_plug = '..:: TivuStream Pro Revolution V. %s ::..' % Version
 name_plug = 'TivuStream Pro Revolution'
 res_plugin_path = THISPLUG + 'res/'
@@ -348,15 +343,16 @@ except:
         config.plugins.tvspro.movie = ConfigDirectory(default='/media/hdd/movie')
 cfg = config.plugins.tvspro
 
-global Path_Movies
+global Path_Movies, Path_Cache
 Path_Movies = str(config.plugins.tvspro.movie.value) + "/"
 Path_Cache = str(config.plugins.tvspro.cachefold.value) + "/"
-if Path_Movies.endswith("\/\/") is True:
+if Path_Movies.endswith("//") is True:
     Path_Movies = Path_Movies[:-1]
-if Path_Cache.endswith("\/\/") is True:
+if Path_Cache.endswith("//") is True:
     Path_Cache = Path_Cache[:-1]
 print('Path Movies: ', Path_Movies)
 print('Path Cache: ', Path_Cache)
+
 
 def cleanName(name):
     name = name.strip()
@@ -395,7 +391,7 @@ def returnIMDB(text_clear):
 
 class ConfigEx(Screen, ConfigListScreen):
     def __init__(self, session):
-        Screen.__init__(self, session)    
+        Screen.__init__(self, session)
         skin = skin_path + 'Config.xml'
         if os.path.exists('/var/lib/dpkg/status'):
             skin = skin_path + 'ConfigOs.xml'
@@ -441,7 +437,7 @@ class ConfigEx(Screen, ConfigListScreen):
             self.session.openWithCallback(self.VirtualKeyBoardCallback, VirtualKeyBoard, title=self['config'].getCurrent()[0], text=self['config'].getCurrent()[1].value)
 
     def cachedel(self):
-        fold = config.plugins.tvspro.cachefold.value + "tvspro/pic"
+        fold = config.plugins.tvspro.cachefold.value + "/tvspro/pic"
         cmd = "rm " + fold + "/*"
         os.system(cmd)
         self.mbox = self.session.open(MessageBox, _('All cache fold empty!'), MessageBox.TYPE_INFO, timeout=5)
@@ -481,7 +477,6 @@ class ConfigEx(Screen, ConfigListScreen):
         return
 
     def changedEntry(self):
-        # sel = self['config'].getCurrent()
         for x in self.onChangedEntry:
             x()
         try:
@@ -579,16 +574,12 @@ def getpics(names, pics, tmpfold, picfold):
         if name is None or name == '':
             name = "Video"
         name = cleanName(name)
-        print(name)
-        # test
         name = name.replace(' ', '-').replace("'", '').replace('&', '').replace('(', '').replace(')', '')
         print(name)
-        # end test
         url = pics[j]
-        if url is None:
-            url = ""
         url = url.replace(" ", "%20").replace("ExQ", "=").replace("AxNxD", "&")
-        # print("In getpics url =", url)
+        # if PY3:
+            # url = url.encode()
         ext = str(os.path.splitext(url)[-1])
         picf = picfold + "/" + name + ext
         tpicf = tmpfold + "/" + name + ext
@@ -621,104 +612,62 @@ def getpics(names, pics, tmpfold, picfold):
                         url = url[:n3]
                         referer = url[n2:]
                         p = Utils.getUrl2(url, referer)
-                        # -----------------
-                        # f1 = open(tpicf, "wb")
-                        # f1.write(p)
-                        # f1.close()
                         with open(tpicf, 'wb') as f1:
                             f1.write(p)
                     else:
-                        print("Going in urlopen url =", url)
-                        p = Utils.ReadUrl2(url)
-                        # p = p.decode('utf-8', 'ignore')
-                        with open(tpicf, 'wb') as f1:
-                            f1.write(p)
-                        # f1 = open(tpicf, "wb")
-                        # f1.write(p)
-                        # f1.close()
+                        poster = Utils.checkRedirect(url)
+                        if poster:
+                            try:
+                                open(tpicf, 'wb').write(requests.get(poster, stream=True, allow_redirects=True).content)
+                                print('=============11111111=================\n')
+                            except:
+                                savePoster(tpicf, poster)
+                                print('===========2222222222=================\n')
+
+                        if Utils.isFHD():
+                            nw = 220
+                        else:
+                            nw = 147
+                        if os.path.exists(tpicf):
+                            try:
+                                im = Image.open(tpicf)  # .convert('RGBA')
+                                w = im.size[0]
+                                d = im.size[1]
+                                r = float(d) / float(w)
+                                d1 = r * nw
+                                if w != nw:
+                                    x = int(nw)
+                                    y = int(d1)
+                                    im = im.resize((x, y), Image.ANTIALIAS) 
+                                im.save(tpicf, quality=100, optimize=True)
+                            
+                            except Exception as e:
+                                print("******* picon resize failed *******")
+                                print(e)
                 except:
                     cmd = "cp " + defpic + " " + tpicf
                     os.system(cmd)
 
         if not fileExists(tpicf):
             cmd = "cp " + defpic + " " + tpicf
-            # print("In getpics not fileExists(tpicf) cmd=", cmd)
             os.system(cmd)
-        # try:
-            # #start kiddac code
-            # size = [200, 200]
-            # if screenwidth.width() > 1280:
-                # size = [300, 300]
-            # if os.path.exists(tpicf):
-                    # try:
-                        # im = Image.open(tpicf).convert('RGBA')
-                        # im.thumbnail(size, Image.ANTIALIAS)
-                        # # crop and center image
-                        # bg = Image.new('RGBA', size, (255, 255, 255, 0))
-                        # imagew, imageh = im.size
-                        # im_alpha = im.convert('RGBA').split()[-1]
-                        # bgwidth, bgheight = bg.size
-                        # bg_alpha = bg.convert('RGBA').split()[-1]
-                        # temp = Image.new('L', (bgwidth, bgheight), 0)
-                        # temp.paste(im_alpha, (int((bgwidth - imagew) / 2), int((bgheight - imageh) / 2)), im_alpha)
-                        # bg_alpha = ImageChops.screen(bg_alpha, temp)
-                        # bg.paste(im, (int((bgwidth - imagew) / 2), int((bgheight - imageh) / 2)))
-                        # im = bg
-                        # im.save(tpicf, 'PNG')
-                    # except Exception as e:
-                        # print("******* picon resize failed *******")
-                        # print(e)
-            # else:
-                # tpicf = defpic
-            # # end kiddac code
-        if Utils.isFHD():
-            nw = 220
-        else:
-            nw = 150
-        if os.path.exists(tpicf):
-            try:
-                im = Image.open(tpicf)  # .convert('RGBA')
-                # imode = im.mode
-                # if im.mode == "JPEG":
-                    # im.save(tpicf)
-                    # # in most case, resulting jpg file is resized small one
-                # if imode.mode in ["RGBA", "P"]:
-                    # imode = imode.convert("RGB")
-                    # rgb_im.save(tpicf)
-                # if imode != "P":
-                    # im = im.convert("P")
-                # if im.mode != "P":
-                    # im = im.convert("P")
-                w = im.size[0]
-                d = im.size[1]
-                r = float(d)/float(w)
-                d1 = r * nw
-                if w != nw:
-                    x = int(nw)
-                    y = int(d1)
-                    im = im.resize((x, y), Image.ANTIALIAS)
-                im.save(tpicf, quality=100, optimize=True)
-                # im.save(tpicf, 'PNG')
-                # im.save(tpicf, 'JPG')
-                # # im.save(tpicf)
-            except Exception as e:
-                print("******* picon resize failed *******")
-                print(e)
+
         else:
             print("******* make picon failed *******")
             tpicf = defpic
-        # except:
-            # print("******* make picon failed *******")
-            # tpicf = defpic
+
         pix.append(j)
         pix[j] = picf
         j = j+1
     cmd1 = "cp " + tmpfold + "/* " + picfold + " && rm " + tmpfold + "/* &"
-    # print("In getpics final cmd1=", cmd1)
     os.system(cmd1)
     return pix
-
-
+    
+def savePoster(dwn_poster, url_poster):
+    with open(dwn_poster, 'wb') as f:
+        f.write(requests.get(url_poster, stream=True, allow_redirects=True).content)
+        f.close()
+            
 class AnimMain(Screen):
     def __init__(self, session, menuTitle, nextmodule, names, urls, infos, pics=[]):
         Screen.__init__(self, session)
@@ -734,7 +683,6 @@ class AnimMain(Screen):
         self.pics = pics
         self.infos = infos
         self.nextmodule = nextmodule
-        # list = []
         print("self.names =", names)
         print("self.urls =", urls)
         print("menuTitle =", menuTitle)
@@ -992,7 +940,10 @@ class AnimMain(Screen):
                     pass
             else:
                 print('video1 and play next xx : ', self.nextmodule)
-                self.session.open(Playstream1, name, url)
+                inf = self.index
+                if inf:
+                    inf = self.infos[inf]
+                self.session.open(Playstream1, name, url, inf)
 
         elif '&page' in str(url) and self.nextmodule == 'Videos4':
             print("AnimMain Going in nextVideos4")
@@ -1021,7 +972,10 @@ class AnimMain(Screen):
         elif self.nextmodule == "Play":
             print("In AnimMain Going in Playstream1")
             try:
-                self.session.open(Playstream1, name, url)
+                inf = self.index
+                if inf:
+                    inf = self.infos[inf]
+                self.session.open(Playstream1, name, url, inf)
             except:
                 pass
 
@@ -1135,8 +1089,8 @@ class GridMain(Screen):
             self.pos.append([996, 315])
 
         print("self.pos =", self.pos)
-        tmpfold = config.plugins.tvspro.cachefold.value + "tvspro/tmp"
-        picfold = config.plugins.tvspro.cachefold.value + "tvspro/pic"
+        tmpfold = Path_Cache + "tvspro/tmp"
+        picfold = Path_Cache + "tvspro/pic"
         pics = getpics(names, pics, tmpfold, picfold)
         print("In Gridmain pics = ", pics)
 
@@ -1249,7 +1203,7 @@ class GridMain(Screen):
             if os.path.exists(pic):
                 print("pic path exists")
             else:
-                print("pic path exists not")
+                print("pic path not exists")
             picd = defpic
             try:
                 self["pixmap" + str(i+1)].instance.setPixmapFromFile(pic)  # ok
@@ -1353,7 +1307,13 @@ class GridMain(Screen):
                     pass
             else:
                 print('In GridMain video1 and play next xx : ', self.nextmodule)
-                self.session.open(Playstream1, name, url)
+                
+                inf = self.index
+                if inf:
+                    inf = self.infos[inf]
+                
+                
+                self.session.open(Playstream1, name, url, inf)
 
         elif '&page' in str(url) and self.nextmodule == 'Videos4':
             print("In GridMain Going in nextVideos4")
@@ -1382,7 +1342,11 @@ class GridMain(Screen):
         elif self.nextmodule == "Play":
             print("In GridMain Going in Playstream1")
             try:
-                self.session.open(Playstream1, name, url)
+                inf = self.index
+                if inf:
+                    inf = self.infos[inf]
+            
+                self.session.open(Playstream1, name, url, inf)
             except:
                 pass
 
@@ -1579,7 +1543,7 @@ class Videos2(Screen):
                 self.names.append(Utils.checkStr(name))
                 self.urls.append(Utils.checkStr(url))
                 self.pics.append(Utils.checkStr(pic))
-                self.infos.append(Utils.checkStr(info))
+                self.infos.append(html_conv.html_unescape(info))
                 i = i+1
             except:
                 break
@@ -1668,7 +1632,7 @@ class Videos6(Screen):
                 self.names.append(Utils.checkStr(name))
                 self.urls.append(Utils.checkStr(url))
                 self.pics.append(Utils.checkStr(pic))
-                self.infos.append(Utils.checkStr(info))
+                self.infos.append(html_conv.html_unescape(info))
                 i = i+1
             except:
                 break
@@ -1750,7 +1714,7 @@ class Videos1(Screen):
                 self.names.append(Utils.checkStr(name))
                 self.urls.append(Utils.checkStr(url))
                 self.pics.append(Utils.checkStr(pic))
-                self.infos.append(Utils.checkStr(info))
+                self.infos.append(html_conv.html_unescape(info))
                 i = i+1
             except:
                 break
@@ -1799,6 +1763,8 @@ class nextVideos1(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
+
+        # content = Utils.checkGZIP(self.url)
         referer = 'https://tivustream.website'
         url = self.url
         content = Utils.ReadUrl2(url, referer)
@@ -1833,7 +1799,7 @@ class nextVideos1(Screen):
                 self.names.append(Utils.checkStr(name))
                 self.urls.append(Utils.checkStr(url))
                 self.pics.append(Utils.checkStr(pic))
-                self.infos.append(Utils.checkStr(info))
+                self.infos.append(html_conv.html_unescape(info))
                 i = i+1
             except:
                 break
@@ -1883,6 +1849,7 @@ class Videos3(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
+
         referer = 'https://tivustream.website'
         url = self.url
         content = Utils.ReadUrl2(url, referer)
@@ -1917,7 +1884,7 @@ class Videos3(Screen):
                 self.names.append(Utils.checkStr(name))
                 self.urls.append(Utils.checkStr(url))
                 self.pics.append(Utils.checkStr(pic))
-                self.infos.append(Utils.checkStr(info))
+                self.infos.append(html_conv.html_unescape(info))
                 i = i+1
             except:
                 break
@@ -1967,6 +1934,7 @@ class Videos4(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
+
         referer = 'https://tivustream.website'
         url = self.url
         content = Utils.ReadUrl2(url, referer)
@@ -1999,7 +1967,7 @@ class Videos4(Screen):
                 self.names.append(Utils.checkStr(name))
                 self.urls.append(Utils.checkStr(url))
                 self.pics.append(Utils.checkStr(pic))
-                self.infos.append(Utils.checkStr(info))
+                self.infos.append(html_conv.html_unescape(info))
                 i = i+1
             except:
                 break
@@ -2049,12 +2017,14 @@ class nextVideos4(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
+
         referer = 'https://tivustream.website'
         url = self.url
         content = Utils.ReadUrl2(url, referer)
         if PY3:
             content = six.ensure_str(content)
         y = json.loads(content)
+
         i = 0
         while i < 100:
             try:
@@ -2084,7 +2054,7 @@ class nextVideos4(Screen):
                 self.names.append(Utils.checkStr(name))
                 self.urls.append(Utils.checkStr(url))
                 self.pics.append(Utils.checkStr(pic))
-                self.infos.append(Utils.checkStr(info))
+                self.infos.append(html_conv.html_unescape(info))
                 i = i+1
             except:
                 break
@@ -2134,6 +2104,7 @@ class Videos5(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
+
         referer = 'https://tivustream.website'
         url = self.url
         content = Utils.ReadUrl2(url, referer)
@@ -2167,7 +2138,7 @@ class Videos5(Screen):
                 self.names.append(Utils.checkStr(name))
                 self.urls.append(Utils.checkStr(url))
                 self.pics.append(Utils.checkStr(pic))
-                self.infos.append(Utils.checkStr(info))
+                self.infos.append(html_conv.html_unescape(info))
                 i = i+1
             except:
                 break
@@ -2256,12 +2227,12 @@ class Abouttvr(Screen):
 
 
 class Playstream1(Screen):
-    def __init__(self, session, name, url):
+    def __init__(self, session, name, url, inf):
         Screen.__init__(self, session)
         self.session = session
         global _session
         _session = session
-        skin = skin_path + 'Playstream1.xml'
+        skin = skin_path + 'Playstream2.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
         print('self.skin: ', skin)
@@ -2271,6 +2242,8 @@ class Playstream1(Screen):
         self['list'] = rvList([])
         self['info'] = Label()
         self['info'].setText(name)
+        self['desc'] = Label()        
+        self['desc'].setText(inf)
         self['key_red'] = Button(_('Exit'))
         self['key_green'] = Button(_('Select'))
         self['progress'] = ProgressBar()
@@ -2282,15 +2255,15 @@ class Playstream1(Screen):
                                      'ColorActions',
                                      'DirectionActions',
                                      'ButtonSetupActions',
-                                     'OkCancelActions',], {'red': self.cancel,
-                                                             'green': self.okClicked,
-                                                             'back': self.cancel,
-                                                             'cancel': self.cancel,
-                                                             'leavePlayer': self.cancel,
-                                                             'rec': self.runRec,
-                                                             'instantRecord': self.runRec,
-                                                             'ShortRecord': self.runRec,
-                                                             'ok': self.okClicked}, -2)
+                                     'OkCancelActions'], {'red': self.cancel,
+                                                          'green': self.okClicked,
+                                                          'back': self.cancel,
+                                                          'cancel': self.cancel,
+                                                          'leavePlayer': self.cancel,
+                                                          'rec': self.runRec,
+                                                          'instantRecord': self.runRec,
+                                                          'ShortRecord': self.runRec,
+                                                          'ok': self.okClicked}, -2)
         self.name1 = name
         self.url = url
         print('In Playstream1 self.url =', url)
@@ -2315,7 +2288,6 @@ class Playstream1(Screen):
         if result:
             if 'm3u8' not in self.urlm3u:
                 path = urlparse(self.urlm3u).path
-                ext = '.mp4'
                 ext = splitext(path)[1]
                 if ext != '.mp4' or ext != '.mkv' or ext != '.avi' or ext != '.flv':  # or ext != 'm3u8':
                     ext = '.mp4'
@@ -2390,13 +2362,13 @@ class Playstream1(Screen):
                 except:
                     pass
                 self.session.open(Playstream2, self.name, self.url, desc)
+
             if idx == 0:
                 self.name = self.names[idx]
                 self.url = self.urls[idx]
                 print('In playVideo url D=', self.url)
                 self.play()
-                
-                
+
             if idx == 1:
                 self.url = self.urls[idx]
                 print('In playVideo url D=', self.url)
