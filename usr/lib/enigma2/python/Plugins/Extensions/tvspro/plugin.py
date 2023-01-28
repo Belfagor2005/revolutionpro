@@ -388,6 +388,30 @@ def returnIMDB(text_clear):
         return True
     return
 
+from requests import get, exceptions
+from requests.exceptions import HTTPError
+from twisted.internet.reactor import callInThread
+
+def threadGetPage(url=None, file=None, key=None, success=None, fail=None, *args, **kwargs):
+    print('[FILMXY][threadGetPage] url, file, key, args, kwargs', url, "   ", file, "   ", key, "   ", args, "   ", kwargs)
+    try:
+        # from requests import get, exceptions
+        # from requests.exceptions import HTTPError
+        # from twisted.internet.reactor import callInThread
+        response = get(url)
+        response.raise_for_status()
+        if file is None:
+            success(response.content)
+        elif key is not None:
+            success(response.content, file, key)
+        else:
+            success(response.content, file)
+    except HTTPError as httperror:
+        print('[FILMXY][threadGetPage] Http error: ', httperror)
+        fail(error)  # E0602 undefined name 'error'
+    except exceptions.RequestException as error:
+        print(error)
+
 
 class ConfigEx(Screen, ConfigListScreen):
     def __init__(self, session):
@@ -618,11 +642,21 @@ def getpics(names, pics, tmpfold, picfold):
                         poster = Utils.checkRedirect(url)
                         if poster:
                             try:
-                                open(tpicf, 'wb').write(requests.get(poster, stream=True, allow_redirects=True).content)
-                                print('=============11111111=================\n')
-                            except:
-                                savePoster(tpicf, poster)
-                                print('===========2222222222=================\n')
+                                try:
+                                    if PY3:
+                                        poster = poster.encode()
+                                    callInThread(threadGetPage, url=poster, file=tpicf, success=downloadPic, fail=downloadError)
+                                    print('===========2222222222=================\n')
+                                except Exception as ex:
+                                    print("Error: Exception")
+                                    print(str(ex))
+                                    open(tpicf, 'wb').write(requests.get(poster, stream=True, allow_redirects=True).content)
+                                    print('=============11111111=================\n')
+                            except Exception as ex:
+                                print("Error: Exception 2")
+                                print(str(ex))
+                                # savePoster(tpicf, poster)
+
 
                         if Utils.isFHD():
                             nw = 220
@@ -662,7 +696,22 @@ def getpics(names, pics, tmpfold, picfold):
     cmd1 = "cp " + tmpfold + "/* " + picfold + " && rm " + tmpfold + "/* &"
     os.system(cmd1)
     return pix
-    
+
+
+def downloadPic(output, poster):
+    try:
+        if output is not None:
+            f = open(poster, 'wb')
+            f.write(output)
+            f.close()
+    except Exception as e:
+        print('error ', str(e))
+    return
+
+def downloadError(output):
+    print('output error ', output)
+    pass
+
 def savePoster(dwn_poster, url_poster):
     with open(dwn_poster, 'wb') as f:
         f.write(requests.get(url_poster, stream=True, allow_redirects=True).content)
@@ -852,6 +901,18 @@ class AnimMain(Screen):
                 dpointer = dblank
                 self["pointer"].instance.setPixmapFromFile(dpointer)
 
+        inf = self.index
+        if inf:
+            inf = self.infos[inf]
+            if inf:
+                try:
+                    self["info"].setText(inf)
+                    print('infos: ', inf)
+                except:
+                    self["info"].setText('')
+                    print('except info')
+
+
     def key_left(self):
         self.index -= 1
         if self.index < 1:
@@ -912,6 +973,9 @@ class AnimMain(Screen):
             url = self.urls[idx]
         except:
             url = " "
+        inf = self.index
+        if inf:
+            inf = self.infos[inf]
         if name == "Config":
             self.session.open(ConfigEx)
 
@@ -926,7 +990,7 @@ class AnimMain(Screen):
         elif '&page' in str(url) and self.nextmodule == 'Videos1':
             print("In AnimMain Going in Videos1")
             try:
-                vid2 = nextVideos1(self.session, name, url)
+                vid2 = nextVideos1(self.session, name, url, inf)
                 vid2.startSession()
             except:
                 pass
@@ -934,21 +998,18 @@ class AnimMain(Screen):
             print('video1 and play next sss  ', self.nextmodule)
             if 'tvseriesId' in str(url):
                 try:
-                    vid2 = Videos6(self.session, name, url)  # atv 6.5
+                    vid2 = Videos6(self.session, name, url, inf)  # atv 6.5
                     vid2.startSession()
                 except:
                     pass
             else:
                 print('video1 and play next xx : ', self.nextmodule)
-                inf = self.index
-                if inf:
-                    inf = self.infos[inf]
-                self.session.open(Playstream1, name, url, inf)
+                self.session.open(Playstream2, name, url, inf)
 
         elif '&page' in str(url) and self.nextmodule == 'Videos4':
             print("AnimMain Going in nextVideos4")
             try:
-                vid2 = nextVideos4(self.session, name, url)
+                vid2 = nextVideos4(self.session, name, url, inf)
                 vid2.startSession()
             except:
                 pass
@@ -956,7 +1017,7 @@ class AnimMain(Screen):
         elif 'listMovie' in str(url) and self.nextmodule == 'Videos4':
             print("AnimMain Going listmovie in Videos4")
             try:
-                vid2 = Videos4(self.session, name, url)
+                vid2 = Videos4(self.session, name, url, inf)
                 vid2.startSession()
             except:
                 pass
@@ -964,25 +1025,22 @@ class AnimMain(Screen):
         elif 'movieId' in str(url):  # and self.nextmodule == 'Videos4':
             print('AnimMain videos5 moveid')
             try:
-                vid2 = Videos5(self.session, name, url)
+                vid2 = Videos5(self.session, name, url, inf)
                 vid2.startSession()
             except:
                 pass
 
         elif self.nextmodule == "Play":
-            print("In AnimMain Going in Playstream1")
+            print("In AnimMain Going in Playstream2")
             try:
-                inf = self.index
-                if inf:
-                    inf = self.infos[inf]
-                self.session.open(Playstream1, name, url, inf)
+                self.session.open(Playstream2, name, url, inf)
             except:
                 pass
 
         elif self.nextmodule == "PlaySeries":
             print("In AnimMain Going in PlaySeries")
             try:
-                vid2 = Videos4(self.session, name, url)
+                vid2 = Videos4(self.session, name, url, inf)
                 vid2.startSession()
             except:
                 pass
@@ -992,7 +1050,7 @@ class AnimMain(Screen):
             print("In animeMain Going in Videos2 url =", url)
             print("In AnimMain Going in Nextmodule")
             try:
-                vid2 = Videos2(self.session, name, url)
+                vid2 = Videos2(self.session, name, url, inf)
                 vid2.startSession()
             except:
                 pass
@@ -1000,7 +1058,7 @@ class AnimMain(Screen):
         elif self.nextmodule == "Videos3":
             print("In AnimMain Going in Videos3")
             try:
-                vid2 = Videos3(self.session, name, url)
+                vid2 = Videos3(self.session, name, url, inf)
                 vid2.startSession()
             except:
                 pass
@@ -1008,7 +1066,7 @@ class AnimMain(Screen):
         elif self.nextmodule == "Videos4":
             print("in AnimMain Going in Videos4")
             try:
-                vid2 = Videos4(self.session, name, url)
+                vid2 = Videos4(self.session, name, url, inf)
                 vid2.startSession()
             except:
                 pass
@@ -1016,7 +1074,7 @@ class AnimMain(Screen):
         elif self.nextmodule == "Videos5":
             print("In AnimMain Going in Videos5")
             try:
-                vid2 = Videos5(self.session, name, url)
+                vid2 = Videos5(self.session, name, url, inf)
                 vid2.startSession()
             except:
                 pass
@@ -1154,10 +1212,13 @@ class GridMain(Screen):
             print("ifr =", ifr)
             ipos = self.pos[ifr]
             print("ipos =", ipos)
-            inf = self.index
+            itype = self.index
+            # url = self.urls[itype]
+            # name = self.names[itype]
+            inf = self.infos[itype] 
             if inf:
                 try:
-                    self["info"].setText(self.infos[inf])
+                    self["info"].setText(inf)
                     print('infos: ', inf)
                 except:
                     self["info"].setText('')
@@ -1276,6 +1337,7 @@ class GridMain(Screen):
         itype = self.index
         url = self.urls[itype]
         name = self.names[itype]
+        inf = self.infos[itype]        
         print("In GridMain name =", name)
         print("In GridMain self.nextmodule =", self.nextmodule)
 
@@ -1293,7 +1355,7 @@ class GridMain(Screen):
         elif '&page' in str(url) and self.nextmodule == 'Videos1':
             print("In GridMain Going in Videos1")
             try:
-                vid2 = nextVideos1(self.session, name, url)
+                vid2 = nextVideos1(self.session, name, url, inf)
                 vid2.startSession()
             except:
                 pass
@@ -1301,24 +1363,18 @@ class GridMain(Screen):
             print('In GridMain video1 and play next sss  ', self.nextmodule)
             if 'tvseriesId' in str(url):
                 try:
-                    vid2 = Videos6(self.session, name, url)  # atv 6.5
+                    vid2 = Videos6(self.session, name, url, inf)  # atv 6.5
                     vid2.startSession()
                 except:
                     pass
             else:
                 print('In GridMain video1 and play next xx : ', self.nextmodule)
-                
-                inf = self.index
-                if inf:
-                    inf = self.infos[inf]
-                
-                
-                self.session.open(Playstream1, name, url, inf)
+                self.session.open(Playstream2, name, url, inf)
 
         elif '&page' in str(url) and self.nextmodule == 'Videos4':
             print("In GridMain Going in nextVideos4")
             try:
-                vid2 = nextVideos4(self.session, name, url)
+                vid2 = nextVideos4(self.session, name, url, inf)
                 vid2.startSession()
             except:
                 pass
@@ -1326,7 +1382,7 @@ class GridMain(Screen):
         elif 'listMovie' in str(url) and self.nextmodule == 'Videos4':
             print("In GridMain Going listmovie in Videos4")
             try:
-                vid2 = Videos4(self.session, name, url)
+                vid2 = Videos4(self.session, name, url, inf)
                 vid2.startSession()
             except:
                 pass
@@ -1334,26 +1390,22 @@ class GridMain(Screen):
         elif 'movieId' in str(url):  # and self.nextmodule == 'Videos4':
             print('In GridMain videos5 moveid')
             try:
-                vid2 = Videos5(self.session, name, url)
+                vid2 = Videos5(self.session, name, url, inf)
                 vid2.startSession()
             except:
                 pass
 
         elif self.nextmodule == "Play":
-            print("In GridMain Going in Playstream1")
+            print("In GridMain Going in Playstream2")
             try:
-                inf = self.index
-                if inf:
-                    inf = self.infos[inf]
-            
-                self.session.open(Playstream1, name, url, inf)
+                self.session.open(Playstream2, name, url, inf)
             except:
                 pass
 
         elif self.nextmodule == "PlaySeries":
             print("In GridMain Going in PlaySeries")
             try:
-                vid2 = Videos4(self.session, name, url)
+                vid2 = Videos4(self.session, name, url, inf)
                 vid2.startSession()
             except:
                 pass
@@ -1363,7 +1415,7 @@ class GridMain(Screen):
             print("In GridMain Going in Videos2 url =", url)
             print("In GridMain Going in Nextmodule")
             try:
-                vid2 = Videos2(self.session, name, url)
+                vid2 = Videos2(self.session, name, url, inf)
                 vid2.startSession()
             except:
                 pass
@@ -1371,7 +1423,7 @@ class GridMain(Screen):
         elif self.nextmodule == "Videos3":
             print("In GridMain Going in Videos3")
             try:
-                vid2 = Videos3(self.session, name, url)
+                vid2 = Videos3(self.session, name, url, inf)
                 vid2.startSession()
             except:
                 pass
@@ -1379,7 +1431,7 @@ class GridMain(Screen):
         elif self.nextmodule == "Videos4":
             print("In GridMain Going in Videos4")
             try:
-                vid2 = Videos4(self.session, name, url)
+                vid2 = Videos4(self.session, name, url, inf)
                 vid2.startSession()
             except:
                 pass
@@ -1387,7 +1439,7 @@ class GridMain(Screen):
         elif self.nextmodule == "Videos5":
             print("In GridMain Going in Videos5")
             try:
-                vid2 = Videos5(self.session, name, url)
+                vid2 = Videos5(self.session, name, url, inf)
                 vid2.startSession()
             except:
                 pass
@@ -1479,7 +1531,7 @@ class tvspromain(Screen):
 
 
 class Videos2(Screen):
-    def __init__(self, session, name, url):
+    def __init__(self, session, name, url, inf):
         Screen.__init__(self, session)
         self.session = session
         global _session
@@ -1490,6 +1542,8 @@ class Videos2(Screen):
         self["title"] = Button(name)
         self["info"] = Label()
         self["info"].setText(title_plug)
+        self["desc"] = Label()
+        self["desc"].setText(inf)        
         self["pixmap"] = Pixmap()
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
@@ -1566,7 +1620,7 @@ class Videos2(Screen):
 
 
 class Videos6(Screen):
-    def __init__(self, session, name, url):
+    def __init__(self, session, name, url, inf):
         Screen.__init__(self, session)
         self.session = session
         global _session
@@ -1577,6 +1631,8 @@ class Videos6(Screen):
         self["title"] = Button(name)
         self["info"] = Label()
         self["info"].setText(title_plug)
+        self["desc"] = Label()
+        self["desc"].setText(inf) 
         self["pixmap"] = Pixmap()
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
@@ -1649,7 +1705,7 @@ class Videos6(Screen):
 
 
 class Videos1(Screen):
-    def __init__(self, session, name, url):
+    def __init__(self, session, name, url, inf):
         Screen.__init__(self, session)
         self.session = session
         global _session
@@ -1660,6 +1716,8 @@ class Videos1(Screen):
         self["title"] = Button(name)
         self["info"] = Label()
         self["info"].setText(title_plug)
+        self["desc"] = Label()
+        self["desc"].setText(inf) 
         self["pixmap"] = Pixmap()
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
@@ -1732,7 +1790,7 @@ class Videos1(Screen):
 
 
 class nextVideos1(Screen):
-    def __init__(self, session, name, url):
+    def __init__(self, session, name, url, inf):
         Screen.__init__(self, session)
         self.session = session
         global _session
@@ -1743,6 +1801,8 @@ class nextVideos1(Screen):
         self["title"] = Button(name)
         self["info"] = Label()
         self["info"].setText(title_plug)
+        self["desc"] = Label()
+        self["desc"].setText(inf) 
         self["pixmap"] = Pixmap()
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
@@ -1817,7 +1877,7 @@ class nextVideos1(Screen):
 
 
 class Videos3(Screen):
-    def __init__(self, session, name, url):
+    def __init__(self, session, name, url, inf):
         Screen.__init__(self, session)
         self.session = session
         global _session
@@ -1828,6 +1888,8 @@ class Videos3(Screen):
         self["title"] = Button(name)
         self["info"] = Label()
         self["info"].setText(title_plug)
+        self["desc"] = Label()
+        self["desc"].setText(inf) 
         self["pixmap"] = Pixmap()
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
@@ -1902,7 +1964,7 @@ class Videos3(Screen):
 
 
 class Videos4(Screen):
-    def __init__(self, session, name, url):
+    def __init__(self, session, name, url, inf):
         Screen.__init__(self, session)
         self.session = session
         global _session
@@ -1913,6 +1975,8 @@ class Videos4(Screen):
         self["title"] = Button(name)
         self["info"] = Label()
         self["info"].setText(title_plug)
+        self["desc"] = Label()
+        self["desc"].setText(inf) 
         self["pixmap"] = Pixmap()
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
@@ -1985,7 +2049,7 @@ class Videos4(Screen):
 
 
 class nextVideos4(Screen):
-    def __init__(self, session, name, url):
+    def __init__(self, session, name, url, inf):
         Screen.__init__(self, session)
         self.session = session
         global _session
@@ -1996,6 +2060,8 @@ class nextVideos4(Screen):
         self["title"] = Button(name)
         self["info"] = Label()
         self["info"].setText(title_plug)
+        self["desc"] = Label()
+        self["desc"].setText(inf) 
         self["pixmap"] = Pixmap()
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
@@ -2072,7 +2138,7 @@ class nextVideos4(Screen):
 
 
 class Videos5(Screen):
-    def __init__(self, session, name, url):
+    def __init__(self, session, name, url, inf):
         Screen.__init__(self, session)
         self.session = session
         global _session
@@ -2083,6 +2149,8 @@ class Videos5(Screen):
         self["title"] = Button(name)
         self["info"] = Label()
         self["info"].setText(title_plug)
+        self["desc"] = Label()
+        self["desc"].setText(inf) 
         self["pixmap"] = Pixmap()
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
@@ -2226,7 +2294,7 @@ class Abouttvr(Screen):
         Screen.close(self, False)
 
 
-class Playstream1(Screen):
+class Playstream2(Screen):
     def __init__(self, session, name, url, inf):
         Screen.__init__(self, session)
         self.session = session
@@ -2266,7 +2334,7 @@ class Playstream1(Screen):
                                                           'ok': self.okClicked}, -2)
         self.name1 = name
         self.url = url
-        print('In Playstream1 self.url =', url)
+        print('In Playstream2 self.url =', url)
         self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
         self.onLayoutFinish.append(self.openTest)
         return
@@ -2361,7 +2429,7 @@ class Playstream1(Screen):
                     self.url = result["url"]
                 except:
                     pass
-                self.session.open(Playstream2, self.name, self.url, desc)
+                self.session.open(Playerstream, self.name, self.url, desc)
 
             if idx == 0:
                 self.name = self.names[idx]
@@ -2423,7 +2491,7 @@ class Playstream1(Screen):
         desc = self.name
         url = self.url
         name = self.name1
-        self.session.open(Playstream2, name, url, desc)
+        self.session.open(Playerstream, name, url, desc)
         self.close()
 
     def play2(self):
@@ -2437,7 +2505,7 @@ class Playstream1(Screen):
             sref = eServiceReference(ref)
             print('SREF: ', sref)
             sref.setName(self.name1)
-            self.session.open(Playstream2, name, sref, desc)
+            self.session.open(Playerstream, name, sref, desc)
             self.close()
         else:
             self.session.open(MessageBox, _('Install Streamlink first'), MessageBox.TYPE_INFO, timeout=5)
@@ -2540,7 +2608,7 @@ class TvInfoBarShowHide():
         print(text + " %s\n" % obj)
 
 
-class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarAudioSelection, TvInfoBarShowHide, InfoBarSubtitleSupport):
+class Playerstream(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarAudioSelection, TvInfoBarShowHide, InfoBarSubtitleSupport):
     STATE_IDLE = 0
     STATE_PLAYING = 1
     STATE_PAUSED = 2
