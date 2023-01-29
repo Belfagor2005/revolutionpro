@@ -246,6 +246,7 @@ def getMointedDevice(pathname):
         pass
     return md
 
+
 def getFreeSpace(path):
     try:
         moin_point = getMountPoint(path)
