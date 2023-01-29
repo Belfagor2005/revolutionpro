@@ -1,5 +1,7 @@
 Tivustream Pro Revolution Best Version
 
+![](https://komarev.com/ghpvc/?username=Belfagor2005)
+
 <img src="https://github.com/Belfagor2005/revolutionpro/blob/main/usr/lib/enigma2/python/Plugins/Extensions/tvspro/icon.png">
 
 Enigma2 project
