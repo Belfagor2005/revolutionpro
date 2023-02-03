@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: exodus\n"
-"POT-Creation-Date: 2022-10-05 22:06+0200\n"
+"POT-Creation-Date: 2023-01-31 18:44+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -13,247 +13,232 @@ msgstr ""
 "X-Poedit-Basepath: ../../..\n"
 "X-Poedit-SearchPath-0: plugin.py\n"
 
-#: plugin.py:326
+#: plugin.py:266
 msgid "IPTV(4097)"
 msgstr ""
 
-#: plugin.py:327
+#: plugin.py:267
 msgid "Dvb(1)"
 msgstr ""
 
-#: plugin.py:328
+#: plugin.py:268
 msgid "eServiceUri(8193)"
 msgstr ""
 
-#: plugin.py:332
+#: plugin.py:272
 msgid "Gstreamer(5001)"
 msgstr ""
 
-#: plugin.py:334
+#: plugin.py:275
 msgid "Exteplayer3(5002)"
 msgstr ""
 
-#: plugin.py:337
+#: plugin.py:284
 msgid "yes"
 msgstr ""
 
-#: plugin.py:337
+#: plugin.py:284
 msgid "no"
 msgstr ""
 
-#: plugin.py:374
-msgid "SETUP PLUGIN"
-msgstr ""
-
-#: plugin.py:381
-msgid "Empty Cache"
-msgstr "Vuota Cache"
-
-#: plugin.py:416
-msgid "All cache fold empty!"
-msgstr "Tutta la cache è vuota!"
-
-#: plugin.py:421 plugin.py:431
-msgid "Services Player Reference type"
-msgstr ""
-
-#: plugin.py:421 plugin.py:432
-msgid "Configure Service Player Reference, Enigma restart required"
-msgstr "Configura Service Player Reference, richiesto il riavvio di Enigma"
-
-#: plugin.py:422 plugin.py:439
-msgid "Cache folder"
-msgstr "Cartella cache"
-
-#: plugin.py:422 plugin.py:440
-msgid "Folder Cache Path (eg.: /media/hdd), Enigma restart required"
-msgstr ""
-
-#: plugin.py:423
-msgid "Movie folder"
-msgstr ""
-
-#: plugin.py:423 plugin.py:436
-msgid "Folder Movie Path (eg.: /media/hdd/movie), Enigma restart required"
-msgstr ""
-
-#: plugin.py:424 plugin.py:447
-msgid "Show thumbpic ?"
-msgstr "Mostra thumbpic?"
-
-#: plugin.py:424 plugin.py:448
-msgid "Show Thumbpics ? Enigma restart required"
-msgstr "Mostra Thumbpics?  Sarà necessario riavviare Enigma"
-
-#: plugin.py:435
-msgid "Movie folder ?"
-msgstr ""
-
-#: plugin.py:443
-msgid "Skin resolution-(restart e2 after change)"
-msgstr "Risoluzione Skin (riavvia e2 dopo la modifica)"
-
-#: plugin.py:444
-msgid "Configure Skin Resolution Screen, Enigma restart required"
-msgstr "Configura risoluzione Skin, è necessario riavviare Enigma"
-
-#: plugin.py:489
-msgid "Choose Directory:"
-msgstr "Scegli cartella"
-
-#: plugin.py:490
-msgid "Choose Directory"
-msgstr "Scegli percorso"
-
-#: plugin.py:512
-msgid "Settings saved correctly!"
-msgstr "Settings salvati correttamente"
-
-#: plugin.py:519
-msgid "Really close without saving the settings?"
-msgstr "Uscire senza salvare le impostazioni?"
-
-#: plugin.py:1061 plugin.py:1439
-msgid "Filter this category..."
-msgstr ""
-
-#: plugin.py:1470 plugin.py:1529 plugin.py:1610 plugin.py:1682 plugin.py:1754
-#: plugin.py:1826 plugin.py:1900 plugin.py:1974 plugin.py:2051 plugin.py:2127
+#: plugin.py:579 plugin.py:773 plugin.py:1421 plugin.py:1519 plugin.py:1609
+#: plugin.py:1697 plugin.py:1786 plugin.py:1877 plugin.py:1968 plugin.py:2059
 msgid "Cancel"
 msgstr "Annulla"
 
-#: plugin.py:1471 plugin.py:1530 plugin.py:1611 plugin.py:1683 plugin.py:1755
-#: plugin.py:1827 plugin.py:1901 plugin.py:1975 plugin.py:2052 plugin.py:2128
-#: plugin.py:2199
+#: plugin.py:580 plugin.py:774 plugin.py:1422 plugin.py:1520 plugin.py:1610
+#: plugin.py:1698 plugin.py:1787 plugin.py:1878 plugin.py:1969 plugin.py:2060
+#: plugin.py:2248
 msgid "Select"
 msgstr "Seleziona"
 
-#: plugin.py:2143
-msgid ""
-"\n"
-"\n"
-"Error downloading Info!"
+#: plugin.py:596 plugin.py:720 plugin.py:1283
+msgid "About"
+msgstr "Informazioni"
+
+#: plugin.py:596
+msgid "Information Us"
+msgstr "Informazioni su"
+
+#: plugin.py:597 plugin.py:723 plugin.py:1280
+msgid "Config"
+msgstr "Impostazioni"
+
+#: plugin.py:597
+msgid "Setup Plugin"
+msgstr "Configura Plugin"
+
+#: plugin.py:598 plugin.py:726
+msgid "Live TV"
 msgstr ""
 
-#: plugin.py:2149
+#: plugin.py:598
+msgid "Live TV Stream"
+msgstr ""
+
+#: plugin.py:599 plugin.py:726 plugin.py:1488
+msgid "Film"
+msgstr ""
+
+#: plugin.py:599
+msgid "Film and Movie"
+msgstr ""
+
+#: plugin.py:600 plugin.py:726 plugin.py:1490
+msgid "Serie"
+msgstr ""
+
+#: plugin.py:600
+msgid "Series"
+msgstr ""
+
+#: plugin.py:601 plugin.py:733 plugin.py:1286
+msgid "Search"
+msgstr "Cerca"
+
+#: plugin.py:601
+msgid "Search your Movie"
+msgstr ""
+
+#: plugin.py:739 plugin.py:1388
+msgid "Filter this category..."
+msgstr ""
+
+#: plugin.py:791
 msgid "==  WELCOME to WWW.TIVUSTREAM.COM ==\n"
 msgstr ""
 
-#: plugin.py:2150
+#: plugin.py:792
 msgid "== SUPPORT ON: WWW.CORVOBOYS.COM http://t.me/tivustream ==\n"
 msgstr ""
 
-#: plugin.py:2151
-msgid "== thank's to @PCD and LINUXSAT-SUPPORT.COM\n"
+#: plugin.py:793
+msgid "== thank's to @PCD @KIDDAC @MMARK @LINUXSAT-SUPPORT.COM\n"
 msgstr ""
 
-#: plugin.py:2152 plugin.py:2159 plugin.py:2166
+#: plugin.py:794 plugin.py:801
 msgid "========================================\n"
 msgstr ""
 
-#: plugin.py:2153
-msgid "NOTA BENE:\n"
-msgstr ""
-
-#: plugin.py:2154
-msgid "Le liste create ad HOC contengono indirizzi liberamente e gratuitamente\n"
-msgstr ""
-
-#: plugin.py:2155
-msgid "trovati in rete e non protetti da sottoscrizione o abbonamento.\n"
-msgstr ""
-
-#: plugin.py:2156
-msgid "Il server di riferimento strutturale ai progetti rilasciati\n"
-msgstr ""
-
-#: plugin.py:2157
-msgid "non e' fonte di alcun stream/flusso.\n"
-msgstr ""
-
-#: plugin.py:2158
-msgid "Assolutamente VIETATO utilizzare queste liste senza autorizzazione.\n"
-msgstr ""
-
-#: plugin.py:2160
+#: plugin.py:795
 msgid "DISCLAIMER:\n"
-msgstr ""
+msgstr "NOTA BENE:\n"
 
-#: plugin.py:2161
+#: plugin.py:796
 msgid "The lists created at HOC contain addresses freely and freely found on\n"
-msgstr ""
+msgstr "Le liste create ad HOC contengono indirizzi liberamente e gratuitamente\n"
 
-#: plugin.py:2162
+#: plugin.py:797
 msgid "the net and not protected by subscription or subscription.\n"
-msgstr ""
+msgstr "trovati in rete e non protetti da sottoscrizione o abbonamento.\n"
 
-#: plugin.py:2163
+#: plugin.py:798
 msgid "The structural reference server for projects released\n"
-msgstr ""
+msgstr "Il server di riferimento strutturale ai progetti rilasciati\n"
 
-#: plugin.py:2164
+#: plugin.py:799
 msgid "is not a source of any stream/flow.\n"
-msgstr ""
+msgstr "non e' fonte di alcun stream/flusso.\n"
 
-#: plugin.py:2165
+#: plugin.py:800
 msgid "Absolutely PROHIBITED to use this lists without authorization\n"
-msgstr ""
+msgstr "ssolutamente VIETATO utilizzare queste liste senza autorizzazione.\n"
 
-#: plugin.py:2198
+#: plugin.py:827
+msgid "SETUP PLUGIN"
+msgstr "CONFIGURAZIONE PLUGIN"
+
+#: plugin.py:833 plugin.py:2247
 msgid "Exit"
 msgstr "Uscire"
 
-#: plugin.py:2226
+#: plugin.py:834
+msgid "Save"
+msgstr "Salva"
+
+#: plugin.py:835
+msgid "Empty Cache"
+msgstr "Vuota Cache"
+
+#: plugin.py:870
+msgid "All cache fold empty!"
+msgstr "Tutta la cache è vuota!"
+
+#: plugin.py:875 plugin.py:885
+msgid "Services Player Reference type"
+msgstr ""
+
+#: plugin.py:876 plugin.py:893
+msgid "Cache folder"
+msgstr "Cartella cache"
+
+#: plugin.py:877
+msgid "Movie folder"
+msgstr "Cartella Film"
+
+#: plugin.py:886
+msgid "Configure Service Player Reference, Enigma restart required"
+msgstr "Configura Service Player Reference, richiesto il riavvio di Enigma"
+
+#: plugin.py:889
+msgid "Movie folder ?"
+msgstr "Cartella Film?"
+
+#: plugin.py:890
+msgid "Folder Movie Path (eg.: /media/hdd/movie), Enigma restart required"
+msgstr ""
+
+#: plugin.py:894
+msgid "Folder Cache Path (eg.: /media/hdd), Enigma restart required"
+msgstr ""
+
+#: plugin.py:897
+msgid "Skin resolution-(restart e2 after change)"
+msgstr "Risoluzione Skin (riavvia e2 dopo la modifica)"
+
+#: plugin.py:898
+msgid "Configure Skin Resolution Screen, Enigma restart required"
+msgstr "Configura risoluzione Skin, è necessario riavviare Enigma"
+
+#: plugin.py:943
+msgid "Choose Directory:"
+msgstr "Scegli cartella"
+
+#: plugin.py:944
+msgid "Choose Directory"
+msgstr "Scegli percorso"
+
+#: plugin.py:967
+msgid "Settings saved correctly!"
+msgstr "Settings salvati correttamente"
+
+#: plugin.py:977
+msgid "Really close without saving settings?"
+msgstr ""
+
+#: plugin.py:1486
+msgid "Live"
+msgstr ""
+
+#: plugin.py:2276
 msgid "You are already downloading!!!"
 msgstr ""
 
-#: plugin.py:2230
+#: plugin.py:2280
 #, python-format
 msgid ""
 "DOWNLOAD VIDEO?\n"
 "%s"
 msgstr ""
 
-#: plugin.py:2233
+#: plugin.py:2283
 msgid "Only VOD Movie allowed or not .ext Filtered!!!"
 msgstr ""
 
-#: plugin.py:2255 plugin.py:2275
+#: plugin.py:2305 plugin.py:2325
 msgid "Download Failed!!!"
 msgstr ""
 
-#: plugin.py:2391
+#: plugin.py:2437
 msgid "Install Streamlink first"
-msgstr ""
-
-#: plugin.py:2559
-msgid "4:3 Letterbox"
-msgstr ""
-
-#: plugin.py:2560
-msgid "4:3 PanScan"
-msgstr ""
-
-#: plugin.py:2561
-msgid "16:9"
-msgstr ""
-
-#: plugin.py:2562
-msgid "16:9 always"
-msgstr ""
-
-#: plugin.py:2563
-msgid "16:10 Letterbox"
-msgstr ""
-
-#: plugin.py:2564
-msgid "16:10 PanScan"
-msgstr ""
-
-#: plugin.py:2565
-msgid "16:9 Letterbox"
-msgstr ""
-
-#: plugin.py:2720
-msgid "Sorry but No Internet :("
 msgstr ""

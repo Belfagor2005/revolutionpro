@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: exodus\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-04 23:18+0200\n"
+"POT-Creation-Date: 2023-01-31 18:45+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: ))^^(( <>\n"
 "Language-Team: *\n"
@@ -16,217 +16,232 @@ msgstr ""
 "X-Poedit-Basepath: ../../..\n"
 "X-Poedit-SearchPath-0: plugin.py\n"
 
-#: plugin.py:160
+#: plugin.py:266
 msgid "IPTV(4097)"
 msgstr ""
 
-#: plugin.py:161
+#: plugin.py:267
 msgid "Dvb(1)"
 msgstr ""
 
-#: plugin.py:162
+#: plugin.py:268
 msgid "eServiceUri(8193)"
 msgstr ""
 
-#: plugin.py:166
+#: plugin.py:272
 msgid "Gstreamer(5001)"
 msgstr ""
 
-#: plugin.py:168
+#: plugin.py:275
 msgid "Exteplayer3(5002)"
 msgstr ""
 
-#: plugin.py:173
+#: plugin.py:284
 msgid "yes"
 msgstr ""
 
-#: plugin.py:173
+#: plugin.py:284
 msgid "no"
 msgstr ""
 
-#: plugin.py:187
-msgid "SETUP PLUGIN"
-msgstr ""
-
-#: plugin.py:195
-msgid "Empty Cache"
-msgstr ""
-
-#: plugin.py:229
-msgid "All cache fold empty!"
-msgstr ""
-
-#: plugin.py:234 plugin.py:243
-msgid "Services Player Reference type"
-msgstr ""
-
-#: plugin.py:234 plugin.py:244
-msgid "Configure Service Player Reference, Enigma restart required"
-msgstr ""
-
-#: plugin.py:235 plugin.py:246
-msgid "Cache folder"
-msgstr ""
-
-#: plugin.py:235 plugin.py:247
-msgid "Configure Folder Cache Path (eg.: /media/hdd), Enigma restart required"
-msgstr ""
-
-#: plugin.py:236 plugin.py:252
-msgid "Show thumbpic ?"
-msgstr ""
-
-#: plugin.py:236 plugin.py:253
-msgid "Show Thumbpics ? Enigma restart required"
-msgstr ""
-
-#: plugin.py:249
-msgid "Skin resolution-(restart e2 after change)"
-msgstr ""
-
-#: plugin.py:250
-msgid "Configure Skin Resolution Screen, Enigma restart required"
-msgstr ""
-
-#: plugin.py:290
-msgid "Choose Directory:"
-msgstr ""
-
-#: plugin.py:291
-msgid "Choose Directory"
-msgstr ""
-
-#: plugin.py:311
-msgid "Settings saved correctly!"
-msgstr ""
-
-#: plugin.py:318
-msgid "Really close without saving the settings?"
-msgstr ""
-
-#: plugin.py:870 plugin.py:1270
-msgid "Filter this category..."
-msgstr ""
-
-#: plugin.py:1297 plugin.py:1351 plugin.py:1426 plugin.py:1509 plugin.py:1584
-#: plugin.py:1662 plugin.py:1744 plugin.py:1826 plugin.py:1907 plugin.py:1989
+#: plugin.py:579 plugin.py:773 plugin.py:1421 plugin.py:1519 plugin.py:1609
+#: plugin.py:1697 plugin.py:1786 plugin.py:1877 plugin.py:1968 plugin.py:2059
 msgid "Cancel"
 msgstr ""
 
-#: plugin.py:1298 plugin.py:1352 plugin.py:1427 plugin.py:1510 plugin.py:1585
-#: plugin.py:1663 plugin.py:1745 plugin.py:1827 plugin.py:1908 plugin.py:1990
-#: plugin.py:2058
+#: plugin.py:580 plugin.py:774 plugin.py:1422 plugin.py:1520 plugin.py:1610
+#: plugin.py:1698 plugin.py:1787 plugin.py:1878 plugin.py:1969 plugin.py:2060
+#: plugin.py:2248
 msgid "Select"
 msgstr "Wählen"
 
-#: plugin.py:1346 plugin.py:1421 plugin.py:1504 plugin.py:1579 plugin.py:1657
-#: plugin.py:1739 plugin.py:1821 plugin.py:1902
-msgid "TVS PRO"
+#: plugin.py:596 plugin.py:720 plugin.py:1283
+msgid "About"
 msgstr ""
 
-#: plugin.py:2005
-msgid ""
-"\n"
-"\n"
-"Error downloading Info!"
+#: plugin.py:596
+msgid "Information Us"
 msgstr ""
 
-#: plugin.py:2011
+#: plugin.py:597 plugin.py:723 plugin.py:1280
+msgid "Config"
+msgstr ""
+
+#: plugin.py:597
+msgid "Setup Plugin"
+msgstr ""
+
+#: plugin.py:598 plugin.py:726
+msgid "Live TV"
+msgstr ""
+
+#: plugin.py:598
+msgid "Live TV Stream"
+msgstr ""
+
+#: plugin.py:599 plugin.py:726 plugin.py:1488
+msgid "Film"
+msgstr ""
+
+#: plugin.py:599
+msgid "Film and Movie"
+msgstr ""
+
+#: plugin.py:600 plugin.py:726 plugin.py:1490
+msgid "Serie"
+msgstr ""
+
+#: plugin.py:600
+msgid "Series"
+msgstr ""
+
+#: plugin.py:601 plugin.py:733 plugin.py:1286
+msgid "Search"
+msgstr ""
+
+#: plugin.py:601
+msgid "Search your Movie"
+msgstr ""
+
+#: plugin.py:739 plugin.py:1388
+msgid "Filter this category..."
+msgstr ""
+
+#: plugin.py:791
 msgid "==  WELCOME to WWW.TIVUSTREAM.COM ==\n"
 msgstr ""
 
-#: plugin.py:2012
+#: plugin.py:792
 msgid "== SUPPORT ON: WWW.CORVOBOYS.COM http://t.me/tivustream ==\n"
 msgstr ""
 
-#: plugin.py:2013
-msgid "== thank's to @PCD and LINUXSAT-SUPPORT.COM \n"
+#: plugin.py:793
+msgid "== thank's to @PCD @KIDDAC @MMARK @LINUXSAT-SUPPORT.COM\n"
 msgstr ""
 
-#: plugin.py:2014 plugin.py:2021 plugin.py:2028
+#: plugin.py:794 plugin.py:801
 msgid "========================================\n"
 msgstr ""
 
-#: plugin.py:2015
-msgid "NOTA BENE:\n"
+#: plugin.py:795
+msgid "DISCLAIMER:\n"
 msgstr ""
 
-#: plugin.py:2016
-msgid "Le liste create ad HOC contengono indirizzi liberamente e gratuitamente\n"
-msgstr ""
-
-#: plugin.py:2017
-msgid "trovati in rete e non protetti da sottoscrizione o abbonamento.\n"
-msgstr ""
-
-#: plugin.py:2018
-msgid "Il server di riferimento strutturale ai progetti rilasciati\n"
-msgstr ""
-
-#: plugin.py:2019
-msgid "non e' fonte di alcun stream/flusso.\n"
-msgstr ""
-
-#: plugin.py:2020
-msgid "Assolutamente VIETATO utilizzare queste liste senza autorizzazione.\n"
-msgstr ""
-
-#: plugin.py:2022
-msgid "DISCLAIMER: \n"
-msgstr ""
-
-#: plugin.py:2023
+#: plugin.py:796
 msgid "The lists created at HOC contain addresses freely and freely found on\n"
 msgstr ""
 
-#: plugin.py:2024
+#: plugin.py:797
 msgid "the net and not protected by subscription or subscription.\n"
 msgstr ""
 
-#: plugin.py:2025
+#: plugin.py:798
 msgid "The structural reference server for projects released\n"
 msgstr ""
 
-#: plugin.py:2026
+#: plugin.py:799
 msgid "is not a source of any stream/flow.\n"
 msgstr ""
 
-#: plugin.py:2027
+#: plugin.py:800
 msgid "Absolutely PROHIBITED to use this lists without authorization\n"
 msgstr ""
 
-#: plugin.py:2057
+#: plugin.py:827
+msgid "SETUP PLUGIN"
+msgstr ""
+
+#: plugin.py:833 plugin.py:2247
 msgid "Exit"
 msgstr "Ausfahrt"
 
-#: plugin.py:2095 plugin.py:2439
-msgid "For Stream Youtube coming soon!"
+#: plugin.py:834
+msgid "Save"
 msgstr ""
 
-#: plugin.py:2339
-msgid "4:3 Letterbox"
+#: plugin.py:835
+msgid "Empty Cache"
 msgstr ""
 
-#: plugin.py:2340
-msgid "4:3 PanScan"
+#: plugin.py:870
+msgid "All cache fold empty!"
 msgstr ""
 
-#: plugin.py:2341
-msgid "16:9"
+#: plugin.py:875 plugin.py:885
+msgid "Services Player Reference type"
 msgstr ""
 
-#: plugin.py:2342
-msgid "16:9 always"
+#: plugin.py:876 plugin.py:893
+msgid "Cache folder"
 msgstr ""
 
-#: plugin.py:2343
-msgid "16:10 Letterbox"
+#: plugin.py:877
+msgid "Movie folder"
 msgstr ""
 
-#: plugin.py:2344
-msgid "16:10 PanScan"
+#: plugin.py:886
+msgid "Configure Service Player Reference, Enigma restart required"
 msgstr ""
 
-#: plugin.py:2345
-msgid "16:9 Letterbox"
+#: plugin.py:889
+msgid "Movie folder ?"
+msgstr ""
+
+#: plugin.py:890
+msgid "Folder Movie Path (eg.: /media/hdd/movie), Enigma restart required"
+msgstr ""
+
+#: plugin.py:894
+msgid "Folder Cache Path (eg.: /media/hdd), Enigma restart required"
+msgstr ""
+
+#: plugin.py:897
+msgid "Skin resolution-(restart e2 after change)"
+msgstr ""
+
+#: plugin.py:898
+msgid "Configure Skin Resolution Screen, Enigma restart required"
+msgstr ""
+
+#: plugin.py:943
+msgid "Choose Directory:"
+msgstr ""
+
+#: plugin.py:944
+msgid "Choose Directory"
+msgstr ""
+
+#: plugin.py:967
+msgid "Settings saved correctly!"
+msgstr ""
+
+#: plugin.py:977
+msgid "Really close without saving settings?"
+msgstr ""
+
+#: plugin.py:1486
+msgid "Live"
+msgstr ""
+
+#: plugin.py:2276
+msgid "You are already downloading!!!"
+msgstr ""
+
+#: plugin.py:2280
+#, python-format
+msgid ""
+"DOWNLOAD VIDEO?\n"
+"%s"
+msgstr ""
+
+#: plugin.py:2283
+msgid "Only VOD Movie allowed or not .ext Filtered!!!"
+msgstr ""
+
+#: plugin.py:2305 plugin.py:2325
+msgid "Download Failed!!!"
+msgstr ""
+
+#: plugin.py:2437
+msgid "Install Streamlink first"
 msgstr ""

@@ -64,7 +64,7 @@ if sys.version_info >= (2, 7, 9):
 def checkGZIP(url):
     from io import StringIO
     import gzip
-    hdr = {"User-Agent": "Enigma2 - XCForever Plugin"}
+    hdr = {"User-Agent": "Enigma2 - Plugin"}
     response = None
     request = Request(url, headers=hdr)
 
