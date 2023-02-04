@@ -239,7 +239,7 @@ class rvList(MenuList):
             textfont = int(30)
             self.l.setFont(0, gFont('Regular', textfont))
         else:
-            self.l.setItemHeight(30)
+            self.l.setItemHeight(50)
             textfont = int(24)
             self.l.setFont(0, gFont('Regular', textfont))
 
@@ -251,7 +251,7 @@ def rvoneListEntry(name):
         res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(40, 40), png=loadPNG(pngx)))
         res.append(MultiContentEntryText(pos=(70, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(3, 3), size=(30, 30), png=loadPNG(pngx)))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(3, 10), size=(40, 40), png=loadPNG(pngx)))
         res.append(MultiContentEntryText(pos=(50, 0), size=(500, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
@@ -398,7 +398,7 @@ def getpics(names, pics, tmpfold, picfold):
         if name is None or name == '':
             name = "Video"
         url = pics[j]
-        url = url.replace(" ", "%20").replace("ExQ", "=").replace("AxNxD", "&")
+        # url = url.replace(" ", "%20").replace("ExQ", "=").replace("AxNxD", "&")
         ext = str(os.path.splitext(url)[-1])
         picf = os.path.join(picfold, str(name + ext))
         tpicf = os.path.join(tmpfold, str(name + ext))
@@ -429,6 +429,7 @@ def getpics(names, pics, tmpfold, picfold):
             else:
                 # now download image
                 try:
+                    url = url.replace(" ", "%20").replace("ExQ", "=").replace("AxNxD", "&")
                     poster = Utils.checkRedirect(url)
                     if poster:
 
@@ -443,12 +444,14 @@ def getpics(names, pics, tmpfold, picfold):
                                 f1.write(p)
                         else:
                             try:
-                                """
-                                print("Going in urlopen url =", url)
-                                p = Utils.gettUrl(url)
-                                with open(tpicf, 'wb') as f1:
-                                    f1.write(p)
-                                """
+
+                                # print("Going in urlopen url =", url)
+                                # p = Utils.gettUrl(url)
+                                # with open(tpicf, 'wb') as f1:
+                                    # f1.write(p)
+
+                                
+
                                 try:
 
                                     with open(tpicf, 'wb') as f:
@@ -456,16 +459,18 @@ def getpics(names, pics, tmpfold, picfold):
                                     print('=============11111111=================\n')
 
                                 except Exception as e:
+
+                                
                                     print("Error: Exception")
                                     print('===========2222222222=================\n')
                                     if PY3:
                                         poster = poster.encode()
                                     callInThread(threadGetPage, url=poster, file=tpicf, success=downloadPic, fail=downloadError)
 
-                                    '''
-                                    print(str(e))
-                                    open(tpicf, 'wb').write(requests.get(poster, stream=True, allow_redirects=True).content)
-                                    '''
+                                '''
+                                print(str(e))
+                                open(tpicf, 'wb').write(requests.get(poster, stream=True, allow_redirects=True).content)
+                                '''
                             except Exception as e:
                                 print("Error: Exception 2")
                                 print(str(e))
@@ -974,7 +979,6 @@ class ConfigEx(ConfigListScreen, Screen):
             self.mbox = self.session.open(MessageBox, _('Settings saved correctly!'), MessageBox.TYPE_INFO, timeout=5)
             cfg.save()
             configfile.save()
-
         self.close()
 
     def extnok(self, answer=None):
@@ -1034,11 +1038,11 @@ class GridMain(Screen):
         tmpfold = os.path.join(str(cfg.cachefold.value), "tvspro/tmp")
         picfold = os.path.join(str(cfg.cachefold.value), "tvspro/pic")
 
-        pics = getpics(names, pics, tmpfold, picfold)
+        picx = getpics(names, pics, tmpfold, picfold)
         print("In Gridmain pics = ", pics)
 
         self.urls = urls
-        self.pics = pics
+        self.pics = picx
         self.names = names
         self.infos = infos
         self["info"] = Label()
