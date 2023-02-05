@@ -1855,8 +1855,8 @@ class Videos4(Screen):
                 if "thumbnail" in y["items"][i]:
                     pic = str(y["items"][i]["thumbnail"])
 
-                if _('serie') not in self.name.lower():
-                    pic = piconlocal(name)
+                # if _('serie') not in self.name.lower():
+                    # pic = piconlocal(name)
 
                 if "info" in y["items"][i]:
                     info = str(y["items"][i]["info"])
@@ -1940,8 +1940,8 @@ class nextVideos4(Screen):
                 if "thumbnail" in y["items"][i]:
                     pic = str(y["items"][i]["thumbnail"])
 
-                if _('serie') not in self.name.lower():
-                    pic = piconlocal(name)
+                # if _('serie') not in self.name.lower():
+                    # pic = piconlocal(name)
 
                 if "info" in y["items"][i]:
                     info = str(y["items"][i]["info"])
