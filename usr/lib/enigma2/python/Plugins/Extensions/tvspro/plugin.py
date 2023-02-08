@@ -7,7 +7,7 @@ Info http://t.me/tivustream
 *        coded by Lululla              *
 *        thank's Pcd  Kiddac           *
 *          skin by MMark               *
-*             01/02/2023               *
+*             08/02/2023               *
 ****************************************
 '''
 # from Components.Sources.Progress import Progress
@@ -308,8 +308,6 @@ print('Path Cache: ', Path_Cache)
 
 
 def cleanName(name):
-    # name = name.strip()
-    # filter out non-allowed characters
     non_allowed_characters = "/.\\:*?<>|\""
     name = name.replace('\xc2\x86', '').replace('\xc2\x87', '')
     name = name.replace(' ', '-').replace("'", '').replace('&', 'e')
@@ -444,23 +442,15 @@ def getpics(names, pics, tmpfold, picfold):
                                 f1.write(p)
                         else:
                             try:
-
                                 # print("Going in urlopen url =", url)
                                 # p = Utils.gettUrl(url)
                                 # with open(tpicf, 'wb') as f1:
                                     # f1.write(p)
-
-                                
-
                                 try:
-
                                     with open(tpicf, 'wb') as f:
                                         f.write(requests.get(url, stream=True, allow_redirects=True).content)
                                     print('=============11111111=================\n')
-
                                 except Exception as e:
-
-                                
                                     print("Error: Exception")
                                     print('===========2222222222=================\n')
                                     if PY3:
@@ -2183,10 +2173,8 @@ class Playstream1(Screen):
             'ok': self.okClicked
         }, -2)
 
-        # self.name1 = cleanName(name)
         self.name1 = name
         self.url = url
-        # print('In Playstream1 self.url =', url)
         self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
         self.onLayoutFinish.append(self.openTest)
         return
@@ -2267,22 +2255,22 @@ class Playstream1(Screen):
         if idx is not None or idx != -1:
             self.name = self.names[idx]
             self.url = self.urls[idx]
-            if "youtube" in str(self.url):
-                desc = self.name
-                try:
-                    from Plugins.Extensions.tvspro.youtube_dl import YoutubeDL
-                    '''
-                    ydl_opts = {'format': 'best'}
-                    ydl_opts = {'format': 'bestaudio/best'}
-                    '''
-                    ydl_opts = {'format': 'best'}
-                    ydl = YoutubeDL(ydl_opts)
-                    ydl.add_default_info_extractors()
-                    result = ydl.extract_info(self.url, download=False)
-                    self.url = result["url"]
-                except:
-                    pass
-                self.session.open(Playstream2, self.name, self.url, desc)
+            # if "youtube" in str(self.url):
+                # desc = self.name
+                # try:
+                    # from Plugins.Extensions.tvspro.youtube_dl import YoutubeDL
+                    # '''
+                    # ydl_opts = {'format': 'best'}
+                    # ydl_opts = {'format': 'bestaudio/best'}
+                    # '''
+                    # ydl_opts = {'format': 'best'}
+                    # ydl = YoutubeDL(ydl_opts)
+                    # ydl.add_default_info_extractors()
+                    # result = ydl.extract_info(self.url, download=False)
+                    # self.url = result["url"]
+                # except:
+                    # pass
+                # self.session.open(Playstream2, self.name, self.url, desc)
 
             if idx == 0:
                 print('In playVideo url D=', self.url)
@@ -2509,15 +2497,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.servicetype = str(next(nextStreamType))
         print('servicetype2: ', self.servicetype)
         self.openPlay(self.servicetype, url)
-
-    def keyNumberGlobal(self, number):
-        self['text'].number(number)
-
-    def keyLeft(self):
-        self['text'].left()
-
-    def keyRight(self):
-        self['text'].right()
 
     def showVideoInfo(self):
         if self.shown:
