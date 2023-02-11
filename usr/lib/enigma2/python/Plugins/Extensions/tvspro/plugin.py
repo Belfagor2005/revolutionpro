@@ -40,7 +40,7 @@ from Screens.LocationBox import LocationBox
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
 from Screens.VirtualKeyBoard import VirtualKeyBoard
-from Tools.Directories import fileExists, SCOPE_PLUGINS, resolveFilename
+from Tools.Directories import SCOPE_PLUGINS, resolveFilename
 from Tools.Downloader import downloadWithProgress
 
 import json
@@ -469,7 +469,7 @@ def getpics(names, pics, tmpfold, picfold):
                     cmd = "cp " + defpic + " " + tpicf
                     os.system(cmd)
 
-        if not fileExists(tpicf):
+        if not os.path.exists(tpicf):
             cmd = "cp " + defpic + " " + tpicf
             os.system(cmd)
 
