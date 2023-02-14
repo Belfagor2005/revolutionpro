@@ -1,7 +1,7 @@
 <screen name="ConfigFHD" position="0,0" size="1920,1080" title="Config">
 	<ePixmap position="0,0" zPosition="-2" size="1920,1080" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/fanartfhd.jpg" />
 	<!-- Menu List -->		 
-	<widget name="config" position="210,180" size="900,480" font="Regular;30" secondfont="Regular;30" itemHeight="48" scrollbarMode="showOnDemand" transparent="1" zPosition="1" foregroundColor="#fcc000"
+	<widget name="config" position="210,180" size="900,480" itemHeight="48" scrollbarMode="showOnDemand" transparent="1" zPosition="1" foregroundColor="#fcc000"
 	foregroundColorSelected="#ffffff" backgroundColor="#4a5b6d" backgroundColorSelected="#000000" />
 	
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/backg2.png" position="1200,180" size="321,441" alphatest="on" zPosition="1" />

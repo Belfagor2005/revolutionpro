@@ -1,17 +1,15 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-'''
-Info http://t.me/tivustream
-****************************************
-*        coded by Lululla              *
-*        thank's Pcd  Kiddac           *
-*          skin by MMark               *
-*             08/02/2023               *
-****************************************
-'''
-# from Components.Sources.Progress import Progress
-# from Screens.InfoBar import MoviePlayer
+# '''
+# Info http://t.me/tivustream
+# ****************************************
+# *        coded by Lululla              *
+# *        thank's Pcd  Kiddac           *
+# *          skin by MMark               *
+# *             14/02/2023               *
+# ****************************************
+# '''
 
 from __future__ import print_function
 from . import html_conv
@@ -34,7 +32,10 @@ from enigma import eListboxPythonMultiContent, eServiceReference, eTimer, gFont,
 from itertools import cycle, islice
 from os.path import splitext
 from Plugins.Plugin import PluginDescriptor
-from PIL import Image, ImageChops
+
+from PIL import Image, ImageChops, ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+
 from Screens.InfoBarGenerics import InfoBarMenu, InfoBarSubtitleSupport, InfoBarNotifications, InfoBarSeek, InfoBarAudioSelection
 from Screens.LocationBox import LocationBox
 from Screens.MessageBox import MessageBox
@@ -89,13 +90,13 @@ currversion = getversioninfo()
 folder_path = "/tmp/tvspro/"
 name_plug = 'TivuStream Pro Revolution'
 
-piccons = resolveFilename(SCOPE_PLUGINS, "Extensions/tvspro/res/img/")
-piconinter = piccons + 'inter.png'
-piconlive = piccons + 'tv.png'
-piconmovie = piccons + 'cinema.png'
-piconsearch = piccons + 'search.png'
-piconseries = piccons + 'series.png'
-# pixmaps = piccons + 'backg.png'
+piccons = os.path.join(THISPLUG, 'res/img/')
+piconinter = os.path.join(piccons, 'inter.png')
+piconlive = os.path.join(piccons, 'tv.png')
+piconmovie = os.path.join(piccons, 'cinema.png')
+piconsearch = os.path.join(piccons, 'search.png')
+piconseries = os.path.join(piccons, 'series.png')
+# pixmaps = os.path.join(piccons, 'backg.png')
 nextpng = 'next.png'
 prevpng = 'prev.png'
 
@@ -105,7 +106,7 @@ pngx = os.path.join(res_plugin_path, 'pics/setting2.png')
 skin_path = THISPLUG
 SREF = ""
 
-Version = currversion + ' - 05.01.2023'
+Version = currversion + ' - 12.02.2023'
 title_plug = '..:: TivuStream Pro Revolution V. %s ::..' % Version
 
 if not os.path.exists(folder_path):
@@ -307,22 +308,6 @@ print('Path Movies: ', Path_Movies)
 print('Path Cache: ', Path_Cache)
 
 
-def cleanName(name):
-    non_allowed_characters = "/.\\:*?<>|\""
-    name = name.replace('\xc2\x86', '').replace('\xc2\x87', '')
-    name = name.replace(' ', '-').replace("'", '').replace('&', 'e')
-    name = name.replace('(', '').replace(')', '')
-    name = name.strip()
-    name = ''.join(['_' if c in non_allowed_characters or ord(c) < 32 else c for c in name])
-    return name
-
-
-def cachedel():
-    fold = os.path.join(str(cfg.cachefold.value), "tvspro/pic")
-    cmd = "rm " + fold + "/*"
-    os.system(cmd)
-
-
 def returnIMDB(text_clear):
     TMDB = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('TMDB'))
     IMDb = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('IMDb'))
@@ -396,7 +381,6 @@ def getpics(names, pics, tmpfold, picfold):
         if name is None or name == '':
             name = "Video"
         url = pics[j]
-        # url = url.replace(" ", "%20").replace("ExQ", "=").replace("AxNxD", "&")
         ext = str(os.path.splitext(url)[-1])
         picf = os.path.join(picfold, str(name + ext))
         tpicf = os.path.join(tmpfold, str(name + ext))
@@ -417,7 +401,6 @@ def getpics(names, pics, tmpfold, picfold):
 
         if not os.path.exists(picf):
             if THISPLUG in url:
-            # if piccons in url:
                 try:
                     cmd = "cp " + url + " " + tpicf
                     print("In getpics not fileExists(picf) cmd =", cmd)
@@ -430,6 +413,8 @@ def getpics(names, pics, tmpfold, picfold):
                     url = url.replace(" ", "%20").replace("ExQ", "=").replace("AxNxD", "&")
                     poster = Utils.checkRedirect(url)
                     if poster:
+                        if PY3:
+                            poster = poster.encode()
 
                         if "|" in url:
                             n3 = url.find("|", 0)
@@ -453,14 +438,14 @@ def getpics(names, pics, tmpfold, picfold):
                                 except Exception as e:
                                     print("Error: Exception")
                                     print('===========2222222222=================\n')
-                                    if PY3:
-                                        poster = poster.encode()
+                                    # if PY3:
+                                        # poster = poster.encode()
                                     callInThread(threadGetPage, url=poster, file=tpicf, success=downloadPic, fail=downloadError)
 
-                                '''
-                                print(str(e))
-                                open(tpicf, 'wb').write(requests.get(poster, stream=True, allow_redirects=True).content)
-                                '''
+                                    '''
+                                    print(str(e))
+                                    open(tpicf, 'wb').write(requests.get(poster, stream=True, allow_redirects=True).content)
+                                    '''
                             except Exception as e:
                                 print("Error: Exception 2")
                                 print(str(e))
@@ -468,6 +453,7 @@ def getpics(names, pics, tmpfold, picfold):
                 except:
                     cmd = "cp " + defpic + " " + tpicf
                     os.system(cmd)
+                    print('cp defpic tpicf')
 
         if not os.path.exists(tpicf):
             cmd = "cp " + defpic + " " + tpicf
@@ -482,19 +468,16 @@ def getpics(names, pics, tmpfold, picfold):
                 file_name, file_extension = os.path.splitext(tpicf)
                 try:
                     im = Image.open(tpicf).convert("RGBA")
-
                     # shrink if larger
                     try:
                         im.thumbnail(size, Image.Resampling.LANCZOS)
                     except:
                         im.thumbnail(size, Image.ANTIALIAS)
                     imagew, imageh = im.size
-
                     # enlarge if smaller
                     try:
                         if imagew < size[0]:
                             ratio = size[0] / imagew
-
                             try:
                                 im = im.resize((int(imagew * ratio), int(imageh * ratio)), Image.Resampling.LANCZOS)
                             except:
@@ -503,35 +486,30 @@ def getpics(names, pics, tmpfold, picfold):
                             imagew, imageh = im.size
                     except Exception as e:
                         print(e)
-
-                    # crop and center image
-                    bg = Image.new("RGBA", size, (255, 255, 255, 0))
-
-                    im_alpha = im.convert("RGBA").split()[-1]
-                    bgwidth, bgheight = bg.size
-                    bg_alpha = bg.convert("RGBA").split()[-1]
-                    temp = Image.new("L", (bgwidth, bgheight), 0)
-                    temp.paste(im_alpha, (int((bgwidth - imagew) / 2), int((bgheight - imageh) / 2)), im_alpha)
-                    bg_alpha = ImageChops.screen(bg_alpha, temp)
-                    bg.paste(im, (int((bgwidth - imagew) / 2), int((bgheight - imageh) / 2)))
-                    im = bg
-
+                    # # no work on PY3
+                    # # crop and center image
+                    # bg = Image.new("RGBA", size, (255, 255, 255, 0))
+                    # im_alpha = im.convert("RGBA").split()[-1]
+                    # bgwidth, bgheight = bg.size
+                    # bg_alpha = bg.convert("RGBA").split()[-1]
+                    # temp = Image.new("L", (bgwidth, bgheight), 0)
+                    # temp.paste(im_alpha, (int((bgwidth - imagew) / 2), int((bgheight - imageh) / 2)), im_alpha)
+                    # bg_alpha = ImageChops.screen(bg_alpha, temp)
+                    # bg.paste(im, (int((bgwidth - imagew) / 2), int((bgheight - imageh) / 2)))
+                    # im = bg
                     im.save(file_name + ".png", "PNG")
-
                 except Exception as e:
                     print(e)
                     im = Image.open(tpicf)
-
                     try:
                         im.thumbnail(size, Image.Resampling.LANCZOS)
                     except:
                         im.thumbnail(size, Image.ANTIALIAS)
-
                     im.save(tpicf)
-
             except Exception as e:
                 print("******* picon resize failed *******")
                 print(e)
+                tpicf = defpic
         else:
             print("******* make picon failed *******")
             tpicf = defpic
@@ -613,7 +591,6 @@ class tvspromain(Screen):
 
     def cancel(self):
         self.session.nav.playService(self.srefInit)
-        # cachedel()  # remove cache on exit
         self.close()
 
 
@@ -623,17 +600,12 @@ class AnimMain(Screen):
         self.session = session
         global _session
         _session = session
-
         skin = os.path.join(skin_path, 'AnimMain.xml')
         with open(skin, 'r') as f:
             self.skin = f.read()
-
         self.menu = menu
         self.nextmodule = nextmodule
-
         self.pos = []
-        self.index = 0
-
         self["title"] = Button(menuTitle)
         self["pointer"] = Pixmap()
         self["info"] = Label()
@@ -764,12 +736,10 @@ class AnimMain(Screen):
 class Abouttvr(Screen):
     def __init__(self, session):
         Screen.__init__(self, session)
-        self.session = session  # edit
+        self.session = session
         skin = os.path.join(skin_path, 'Abouttvr.xml')
-
         with open(skin, 'r') as f:
             self.skin = f.read()
-
         title = _(name_plug)
         self["title"] = Button(title)
         self["info"] = Label()
@@ -821,26 +791,19 @@ class ConfigEx(ConfigListScreen, Screen):
     def __init__(self, session):
         Screen.__init__(self, session)
         self.session = session
-
         skin = os.path.join(skin_path, 'Config.xml')
         if os.path.exists('/var/lib/dpkg/status'):
             skin = os.path.join(skin_path, 'ConfigOs.xml')
-
         with open(skin, 'r') as f:
             self.skin = f.read()
-
         self.setup_title = _("SETUP PLUGIN")
         self.onChangedEntry = []
-
         self.list = []
         ConfigListScreen.__init__(self, self.list, session=self.session, on_change=self.changedEntry)
-
         self['key_red'] = Label(_('Exit'))
         self['key_green'] = Label(_('Save'))
         self['key_yellow'] = Button(_('Empty Cache'))
-
         self["description"] = Label('')
-
         self['actions'] = ActionMap(["SetupActions", "ColorActions", "VirtualKeyboardActions"], {
             'cancel': self.extnok,
             'yellow': self.cachedel,
@@ -870,8 +833,9 @@ class ConfigEx(ConfigListScreen, Screen):
 
     def cachedel(self):
         fold = os.path.join(str(cfg.cachefold.value), "tvspro/pic")
-        cmd = "rm " + fold + "/*"
-        os.system(cmd)
+        Utils.cachedel(fold)
+        # cmd = "rm " + fold + "/*"
+        # os.system(cmd)
         self.mbox = self.session.open(MessageBox, _('All cache fold empty!'), MessageBox.TYPE_INFO, timeout=5)
 
     def createSetup(self):
@@ -992,11 +956,9 @@ class GridMain(Screen):
         self.session = session
         global _session
         _session = session
-
         skin = os.path.join(skin_path, 'GridMain.xml')
         with open(skin, 'r') as f:
             self.skin = f.read()
-
         title = menuTitle
         self.name = menuTitle
         self.nextmodule = nextmodule
@@ -1107,9 +1069,7 @@ class GridMain(Screen):
             # print("ipos =", ipos)
             self["frame"].moveTo(ipos[0], ipos[1], 1)
             self["frame"].startMoving()
-
             self.info()
-
         except Exception as e:
             print('error  in paintframe: ', str(e))
 
@@ -1152,19 +1112,15 @@ class GridMain(Screen):
             else:
                 print("pic path not exists")
             picd = defpic
-
             file_name, file_extension = os.path.splitext(pic)
-
             if file_extension != ".png":
                 pic = str(file_name) + ".png"
-
             if self["pixmap" + str(i + 1)].instance:
                 try:
                     self["pixmap" + str(i + 1)].instance.setPixmapFromFile(pic)  # ok
                 except Exception as e:
                     print(e)
                     self["pixmap" + str(i + 1)].instance.setPixmapFromFile(picd)
-
             i += 1
 
         self.index = self.minentry
@@ -1411,7 +1367,7 @@ class Videos2(Screen):
                 if "title" in response["items"][i]:
                     name = str(response["items"][i]["title"])
                     name = re.sub('\[.*?\]', "", name)
-                    name = cleanName(name)
+                    name = Utils.cleanName(name)
 
                 if "externallink" in response["items"][i]:
                     url = str(response["items"][i]["externallink"])
@@ -1425,7 +1381,7 @@ class Videos2(Screen):
                 if "info" in response["items"][i]:
                     info = str(response["items"][i]["info"])
                     info = re.sub(r'\r\n', '', info)
-                # name = cleanName(name)
+                # name = Utils.cleanName(name)
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -1504,7 +1460,7 @@ class Videos6(Screen):
                 if "title" in y["items"][i]:
                     name = str(y["items"][i]["title"])
                     name = re.sub('\[.*?\]', "", name)
-                    name = cleanName(name)
+                    name = Utils.cleanName(name)
 
                 if "link" in y["items"][i]:
                     url = (y["items"][i]["link"])
@@ -1586,7 +1542,7 @@ class Videos1(Screen):
                 if "title" in y["items"][i]:
                     name = str(y["items"][i]["title"])
                     name = re.sub('\[.*?\]', "", name)
-                    name = cleanName(name)
+                    name = Utils.cleanName(name)
 
                 if "link" in y["items"][i]:
                     url = (y["items"][i]["link"])
@@ -1669,7 +1625,7 @@ class nextVideos1(Screen):
                 if "title" in y["items"][i]:
                     name = str(y["items"][i]["title"])
                     name = re.sub('\[.*?\]', "", name)
-                    name = cleanName(name)
+                    name = Utils.cleanName(name)
 
                 if "link" in y["items"][i]:
                     url = (y["items"][i]["link"])
@@ -1753,7 +1709,7 @@ class Videos3(Screen):
                 if "title" in y["items"][i]:
                     name = str(y["items"][i]["title"])
                     name = re.sub('\[.*?\]', "", name)
-                    name = cleanName(name)
+                    name = Utils.cleanName(name)
 
                 if "link" in y["items"][i]:
                     url = (y["items"][i]["link"])
@@ -1837,7 +1793,7 @@ class Videos4(Screen):
                 if "title" in y["items"][i]:
                     name = str(y["items"][i]["title"])
                     name = re.sub('\[.*?\]', "", name)
-                    name = cleanName(name)
+                    name = Utils.cleanName(name)
 
                 if "externallink" in y["items"][i]:
                     url = str(y["items"][i]["externallink"])
@@ -1922,7 +1878,7 @@ class nextVideos4(Screen):
                 if "title" in y["items"][i]:
                     name = str(y["items"][i]["title"])
                     name = re.sub('\[.*?\]', "", name)
-                    name = cleanName(name)
+                    name = Utils.cleanName(name)
 
                 if "externallink" in y["items"][i]:
                     url = str(y["items"][i]["externallink"])
@@ -2007,7 +1963,7 @@ class Videos5(Screen):
                 if "title" in y["items"][i]:
                     name = str(y["items"][i]["title"])
                     name = re.sub('\[.*?\]', "", name)
-                    name = cleanName(name)
+                    name = Utils.cleanName(name)
 
                 if "link" in y["items"][i]:
                     url = (y["items"][i]["link"])
@@ -2145,11 +2101,9 @@ class Playstream1(Screen):
         self.session = session
         global _session
         _session = session
-
         skin = os.path.join(skin_path, 'Playstream1.xml')
         with open(skin, 'r') as f:
             self.skin = f.read()
-
         self.setup_title = ('Select Player Stream')
         self.list = []
         self['list'] = rvList([])
