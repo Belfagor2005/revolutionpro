@@ -311,7 +311,7 @@ print('Path Cache: ', Path_Cache)
 def returnIMDB(text_clear):
     TMDB = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('TMDB'))
     IMDb = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('IMDb'))
-    if TMDB:
+    if os.path.exists(TMDB):
         try:
             from Plugins.Extensions.TMBD.plugin import TMBD
             text = html_conv.html_unescape(text_clear)
@@ -319,7 +319,7 @@ def returnIMDB(text_clear):
         except Exception as e:
             print("[XCF] Tmdb: ", str(e))
         return True
-    elif IMDb:
+    elif os.path.exists(IMDb):
         try:
             from Plugins.Extensions.IMDb.plugin import main as imdb
             text = html_conv.html_unescape(text_clear)
@@ -331,7 +331,6 @@ def returnIMDB(text_clear):
         text_clear = html_conv.html_unescape(text_clear)
         _session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
         return True
-    return
 
 
 from requests import get, exceptions
