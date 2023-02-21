@@ -2147,25 +2147,25 @@ class Playstream1(Screen):
 
     def download_m3u(self, result):
         if result:
-            if 'm3u8' not in self.urlm3u:
-                path = urlparse(self.urlm3u).path
-                ext = splitext(path)[1]
-                if ext != '.mp4' or ext != '.mkv' or ext != '.avi' or ext != '.flv':  # or ext != 'm3u8':
-                    ext = '.mp4'
-                fileTitle = re.sub(r'[\<\>\:\"\/\\\|\?\*\[\]]', '_', self.namem3u)
-                fileTitle = re.sub(r' ', '_', fileTitle)
-                fileTitle = re.sub(r'_+', '_', fileTitle)
-                fileTitle = fileTitle.replace("(", "_").replace(")", "_").replace("#", "").replace("+", "_").replace("\'", "_").replace("'", "_")
-                fileTitle = fileTitle.replace(" ", "_").replace(":", "").replace("[", "").replace("]", "").replace("!", "_").replace("&", "_")
-                fileTitle = fileTitle.lower() + ext
-                self.in_tmp = os.path.join(Path_Movies, fileTitle)
-                self.downloading = True
-                self.download = downloadWithProgress(self.urlm3u, self.in_tmp)
-                self.download.addProgress(self.downloadProgress)
-                self.download.start().addCallback(self.check).addErrback(self.showError)
-            else:
-                self.downloading = False
-                self.session.open(MessageBox, _('Download Failed!!!'), MessageBox.TYPE_INFO, timeout=5)
+            # if 'm3u8' not in self.urlm3u:
+            path = urlparse(self.urlm3u).path
+            ext = splitext(path)[1]
+            if ext != '.mp4' or ext != '.mkv' or ext != '.avi' or ext != '.flv':  # or ext != 'm3u8':
+                ext = '.mp4'
+            fileTitle = re.sub(r'[\<\>\:\"\/\\\|\?\*\[\]]', '_', self.namem3u)
+            fileTitle = re.sub(r' ', '_', fileTitle)
+            fileTitle = re.sub(r'_+', '_', fileTitle)
+            fileTitle = fileTitle.replace("(", "_").replace(")", "_").replace("#", "").replace("+", "_").replace("\'", "_").replace("'", "_")
+            fileTitle = fileTitle.replace(" ", "_").replace(":", "").replace("[", "").replace("]", "").replace("!", "_").replace("&", "_")
+            fileTitle = fileTitle.lower() + ext
+            self.in_tmp = os.path.join(Path_Movies, fileTitle)
+            self.downloading = True
+            self.download = downloadWithProgress(self.urlm3u, self.in_tmp)
+            self.download.addProgress(self.downloadProgress)
+            self.download.start().addCallback(self.check).addErrback(self.showError)
+            # else:
+                # self.downloading = False
+                # self.session.open(MessageBox, _('Download Failed!!!'), MessageBox.TYPE_INFO, timeout=5)
         else:
             self.downloading = False
 
@@ -2419,7 +2419,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
     def cicleStreamType(self):
         global streaml
         # streaml = False
-        from itertools import cycle, islice
         self.servicetype = str(cfg.services.value)
         print('servicetype1: ', self.servicetype)
         url = str(self.url)
