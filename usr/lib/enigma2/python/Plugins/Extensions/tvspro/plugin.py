@@ -412,8 +412,8 @@ def getpics(names, pics, tmpfold, picfold):
                     url = url.replace(" ", "%20").replace("ExQ", "=").replace("AxNxD", "&")
                     poster = Utils.checkRedirect(url)
                     if poster:
-                        if PY3:
-                            poster = poster.encode()
+                        # if PY3:
+                            # poster = poster.encode()
 
                         if "|" in url:
                             n3 = url.find("|", 0)
@@ -439,7 +439,7 @@ def getpics(names, pics, tmpfold, picfold):
                                     print('===========2222222222=================\n')
                                     # if PY3:
                                         # poster = poster.encode()
-                                    callInThread(threadGetPage, url=poster, file=tpicf, success=downloadPic, fail=downloadError)
+                                    # callInThread(threadGetPage, url=poster, file=tpicf, success=downloadPic, fail=downloadError)
 
                                     '''
                                     print(str(e))
@@ -625,8 +625,6 @@ class AnimMain(Screen):
 
         self.nop = len(self.menu)
         self.index = 0
-        # self.ipage = 1
-        # self.onShown.append(self.info)
         self.onShown.append(self.openTest)
 
     def key_menu(self):
@@ -641,10 +639,8 @@ class AnimMain(Screen):
         if self.inf:
             try:
                 self["info"].setText(self.inf)
-                # print('infos: ', self.inf)
             except:
                 self["info"].setText('')
-                # print('except info')
         print("In AnimMain infos nextlink[1] =", self.inf)
 
     def cancel(self):
@@ -833,41 +829,31 @@ class ConfigEx(ConfigListScreen, Screen):
     def cachedel(self):
         fold = os.path.join(str(cfg.cachefold.value), "tvspro/pic")
         Utils.cachedel(fold)
-        # cmd = "rm " + fold + "/*"
-        # os.system(cmd)
         self.mbox = self.session.open(MessageBox, _('All cache fold empty!'), MessageBox.TYPE_INFO, timeout=5)
 
     def createSetup(self):
         self.editListEntry = None
         self.list = []
-        self.list.append(getConfigListEntry(_('Services Player Reference type'), cfg.services))
-        self.list.append(getConfigListEntry(_("Cache folder"), cfg.cachefold))
-        self.list.append(getConfigListEntry(_("Movie folder"), cfg.movie))
-        # self.list.append(getConfigListEntry(_("Show thumbpic ?"), cfg.thumb))
+        self.list.append(getConfigListEntry(_('Services Player Reference type'), cfg.services, _("Configure Service Player Reference, Enigma restart required")))
+        self.list.append(getConfigListEntry(_("Cache folder"), cfg.cachefold, _("Folder Cache Path (eg.: /media/hdd), Enigma restart required")))
+        self.list.append(getConfigListEntry(_("Movie folder"), cfg.movie, _("Folder Movie Path (eg.: /media/hdd/movie), Enigma restart required")))
+        # self.list.append(getConfigListEntry(_("Show thumbpic ?"), cfg.thumb, _("Show Thumbpics ? Enigma restart required")))
         self['config'].list = self.list
         self["config"].l.setList(self.list)
         self.setInfo()
 
     def setInfo(self):
-        entry = str(self.getCurrentEntry())
-        if entry == _('Services Player Reference type'):
-            self['description'].setText(_("Configure Service Player Reference, Enigma restart required"))
-
-        if entry == _('Movie folder ?'):
-            self['description'].setText(_("Folder Movie Path (eg.: /media/hdd/movie), Enigma restart required"))
-
-        if entry == _('Cache folder'):
-            self['description'].setText(_("Folder Cache Path (eg.: /media/hdd), Enigma restart required"))
-
-        if entry == _('Skin resolution-(restart e2 after change)'):
-            self['description'].setText(_("Configure Skin Resolution Screen, Enigma restart required"))
-        return
-
-        """
-        if entry == _('Show thumbpic ?'):
-            self['description'].setText(_("Show Thumbpics ? Enigma restart required"))
+        try:
+            sel = self['config'].getCurrent()[2]
+            if sel:
+                # print('sel =: ', sel)
+                self['description'].setText(str(sel))
+            else:
+                self['description'].setText(_('SELECT YOUR CHOICE'))
             return
-            """
+        except Exception as e:
+            print("Error ", e)
+
 
     def changedEntry(self):
         for x in self.onChangedEntry:
