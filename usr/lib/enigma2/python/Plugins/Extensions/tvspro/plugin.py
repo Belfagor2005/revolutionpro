@@ -7,16 +7,16 @@
 # *        coded by Lululla              *
 # *        thank's Pcd  Kiddac           *
 # *          skin by MMark               *
-# *             14/02/2023               *
+# *             29/04/2023               *
 # ****************************************
 # '''
 
 from __future__ import print_function
-from . import html_conv
 from . import Utils
 from . import _
-from Components.ActionMap import ActionMap
+from . import html_conv
 from Components.AVSwitch import AVSwitch
+from Components.ActionMap import ActionMap
 from Components.Button import Button
 from Components.config import config, configfile, ConfigDirectory, ConfigYesNo, ConfigEnableDisable, getConfigListEntry, ConfigSelection, ConfigSubsection
 from Components.ConfigList import ConfigListScreen
@@ -32,10 +32,7 @@ from enigma import eListboxPythonMultiContent, eServiceReference, eTimer, gFont,
 from itertools import cycle, islice
 from os.path import splitext
 from Plugins.Plugin import PluginDescriptor
-
 from PIL import Image, ImageChops, ImageFile
-ImageFile.LOAD_TRUNCATED_IMAGES = True
-
 from Screens.InfoBarGenerics import InfoBarMenu, InfoBarSubtitleSupport, InfoBarNotifications, InfoBarSeek, InfoBarAudioSelection
 from Screens.LocationBox import LocationBox
 from Screens.MessageBox import MessageBox
@@ -43,7 +40,9 @@ from Screens.Screen import Screen
 from Screens.VirtualKeyBoard import VirtualKeyBoard
 from Tools.Directories import SCOPE_PLUGINS, resolveFilename
 from Tools.Downloader import downloadWithProgress
-
+from requests import get, exceptions
+from requests.exceptions import HTTPError
+from twisted.internet.reactor import callInThread
 import json
 import os
 import re
@@ -51,6 +50,7 @@ import requests
 import six
 import sys
 
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 _session = None
 THISPLUG = '/usr/lib/enigma2/python/Plugins/Extensions/tvspro/'
 PY3 = sys.version_info.major >= 3
@@ -69,7 +69,7 @@ HTTPConnection.debuglevel = 1
 
 
 def getversioninfo():
-    currversion = '1.6'
+    currversion = '1.8'
     version_file = os.path.join(THISPLUG, 'version')
     if os.path.exists(version_file):
         try:
@@ -150,15 +150,19 @@ def piconlocal(name):
         ["comedy", "commedia"],
         ["thriller", "thriller"],
         ["family", "family"],
+        ["famiglia", "family"],
         ["azione", "azione"],
         ["dramma", "dramma"],
         ["drama", "dramma"],
         ["western", "western"],
         ["biografico", "biografico"],
+        ["storia", "biografico"],
+        ["documentario", "biografico"],
         ["romantico", "romantico"],
         ["romance", "romantico"],
         ["horror", "horror"],
         ["musica", "musical"],
+        ["show", "musical"],
         ["guerra", "guerra"],
         ["bambini", "bambini"],
         ["bianco", "bianconero"],
@@ -168,13 +172,20 @@ def piconlocal(name):
         ["documentary", "documentary"],
         ["crime", "crime"],
         ["mystery", "mistery"],
+        ["mistero", "mistery"],
+        ["giallo", "mistery"],
         ["fiction", "fiction"],
         ["adventure", "mistery"],
         ["action", "azione"],
         ["007", "007"],
         ["sport", "sport"],
         ["teatr", "teatro"],
+        ["variet", "teatro"],
+        ["giallo", "teatro"],
         ["extra", "extra"],
+        ["sexy", "fantasy"],
+        ["erotic", "fantasy"],
+        ["animazione", "bambini"],
         ["search", "search"],
 
         ["abruzzo", "regioni/abruzzo"],
@@ -206,6 +217,7 @@ def piconlocal(name):
         ["webcam", "relaxweb"],
         ["relax", "relaxweb"],
         ["vecchi", "vecchi"],
+        ["muto", "vecchi"],
         ["'italiani", "movie"],
 
         ["fantascienza", "fantascienza"],
@@ -317,7 +329,7 @@ def returnIMDB(text_clear):
             text = html_conv.html_unescape(text_clear)
             _session.open(TMBD.tmdbScreen, text, 0)
         except Exception as e:
-            print("[XCF] Tmdb: ", str(e))
+            print("[XCF] Tmdb: ", e)
         return True
     elif os.path.exists(IMDb):
         try:
@@ -325,17 +337,12 @@ def returnIMDB(text_clear):
             text = html_conv.html_unescape(text_clear)
             imdb(_session, text)
         except Exception as e:
-            print("[XCF] imdb: ", str(e))
+            print("[XCF] imdb: ", e)
         return True
     else:
         text_clear = html_conv.html_unescape(text_clear)
         _session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
         return True
-
-
-from requests import get, exceptions
-from requests.exceptions import HTTPError
-from twisted.internet.reactor import callInThread
 
 
 def threadGetPage(url=None, file=None, key=None, success=None, fail=None, *args, **kwargs):
@@ -442,12 +449,12 @@ def getpics(names, pics, tmpfold, picfold):
                                     # callInThread(threadGetPage, url=poster, file=tpicf, success=downloadPic, fail=downloadError)
 
                                     '''
-                                    print(str(e))
+                                    print(e)
                                     open(tpicf, 'wb').write(requests.get(poster, stream=True, allow_redirects=True).content)
                                     '''
                             except Exception as e:
                                 print("Error: Exception 2")
-                                print(str(e))
+                                print(e)
 
                 except:
                     cmd = "cp " + defpic + " " + tpicf
@@ -532,7 +539,7 @@ def downloadPic(output, poster):
             f.write(output)
             f.close()
     except Exception as e:
-        print('error ', str(e))
+        print('error ', e)
     return
 
 
@@ -854,7 +861,6 @@ class ConfigEx(ConfigListScreen, Screen):
         except Exception as e:
             print("Error ", e)
 
-
     def changedEntry(self):
         for x in self.onChangedEntry:
             x()
@@ -901,7 +907,7 @@ class ConfigEx(ConfigListScreen, Screen):
                 minFree=15
             )
         except Exception as e:
-            print(e)
+            print('openDirectoryBrowser get failed: ', e)
 
     def openDirectoryBrowserCB(self, path):
         if path is not None:
@@ -1056,7 +1062,7 @@ class GridMain(Screen):
             self["frame"].startMoving()
             self.info()
         except Exception as e:
-            print('error  in paintframe: ', str(e))
+            print('error  in paintframe: ', e)
 
     def openTest(self):
         # print("self.index, openTest self.ipage, self.npage =", self.index, self.ipage, self.npage)
@@ -1349,23 +1355,24 @@ class Videos2(Screen):
             pic = ""
             try:
 
-                if "title" in response["items"][i]:
-                    name = str(response["items"][i]["title"])
-                    name = re.sub('\[.*?\]', "", name)
-                    name = Utils.cleanName(name)
+                # if "title" in response["items"][i]:
+                name = str(response["items"][i]["title"])
+                name = re.sub('\[.*?\]', "", name)
+                name = Utils.cleanName(name)
 
-                if "externallink" in response["items"][i]:
-                    url = str(response["items"][i]["externallink"])
+                # if "externallink" in response["items"][i]:
+                url = str(response["items"][i]["externallink"])
 
-                if "thumbnail" in response["items"][i]:
-                    pic = str(response["items"][i]["thumbnail"])
+                # if "thumbnail" in response["items"][i]:
+                pic = str(response["items"][i]["thumbnail"])
 
                 if _('serie') not in self.name.lower():
                     pic = piconlocal(name)
 
-                if "info" in response["items"][i]:
-                    info = str(response["items"][i]["info"])
-                    info = re.sub(r'\r\n', '', info)
+                # if "info" in response["items"][i]:
+                info = str(response["items"][i]["info"])
+                info = re.sub(r'\r\n', '', info)
+                info = info.replace('---', ' ')
                 # name = Utils.cleanName(name)
                 self.names.append(name)
                 self.urls.append(url)
@@ -1442,22 +1449,22 @@ class Videos6(Screen):
             url = ""
             pic = ""
             try:
-                if "title" in y["items"][i]:
-                    name = str(y["items"][i]["title"])
-                    name = re.sub('\[.*?\]', "", name)
-                    name = Utils.cleanName(name)
+                # if "title" in y["items"][i]:
+                name = str(y["items"][i]["title"])
+                name = re.sub('\[.*?\]', "", name)
+                name = Utils.cleanName(name)
 
-                if "link" in y["items"][i]:
-                    url = (y["items"][i]["link"])
-                elif "yatse" in y["items"][i]:
-                    url = (y["items"][i]["yatse"])
+                # if "link" in y["items"][i]:
+                url = (y["items"][i]["link"])
+                # elif "yatse" in y["items"][i]:
+                    # url = (y["items"][i]["yatse"])
 
-                if "thumbnail" in y["items"][i]:
-                    pic = (y["items"][i]["thumbnail"])
+                # if "thumbnail" in y["items"][i]:
+                pic = (y["items"][i]["thumbnail"])
 
-                if "info" in y["items"][i]:
-                    info = str(y["items"][i]["info"])
-                    info = re.sub(r'\r\n', '', info)
+                # if "info" in y["items"][i]:
+                info = str(y["items"][i]["info"])
+                info = re.sub(r'\r\n', '', info)
 
                 self.names.append(name)
                 self.urls.append(url)
@@ -1524,22 +1531,22 @@ class Videos1(Screen):
             url = ""
             pic = ""
             try:
-                if "title" in y["items"][i]:
-                    name = str(y["items"][i]["title"])
-                    name = re.sub('\[.*?\]', "", name)
-                    name = Utils.cleanName(name)
+                # if "title" in y["items"][i]:
+                name = str(y["items"][i]["title"])
+                name = re.sub('\[.*?\]', "", name)
+                name = Utils.cleanName(name)
 
-                if "link" in y["items"][i]:
-                    url = (y["items"][i]["link"])
-                elif "yatse" in y["items"][i]:
-                    url = (y["items"][i]["yatse"])
+                # if "link" in y["items"][i]:
+                url = (y["items"][i]["link"])
+                # elif "yatse" in y["items"][i]:
+                    # url = (y["items"][i]["yatse"])
 
-                if "thumbnail" in y["items"][i]:
-                    pic = (y["items"][i]["thumbnail"])
+                # if "thumbnail" in y["items"][i]:
+                pic = (y["items"][i]["thumbnail"])
 
-                if "info" in y["items"][i]:
-                    info = str(y["items"][i]["info"])
-                    info = re.sub(r'\r\n', '', info)
+                # if "info" in y["items"][i]:
+                info = str(y["items"][i]["info"])
+                info = re.sub(r'\r\n', '', info)
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -1607,21 +1614,24 @@ class nextVideos1(Screen):
             url = ""
             pic = ""
             try:
-                if "title" in y["items"][i]:
-                    name = str(y["items"][i]["title"])
-                    name = re.sub('\[.*?\]', "", name)
-                    name = Utils.cleanName(name)
+                # if "title" in y["items"][i]:
+                name = str(y["items"][i]["title"])
+                name = re.sub('\[.*?\]', "", name)
+                name = Utils.cleanName(name)
+                # if "link" in y["items"][i]:
+                url = (y["items"][i]["link"])
+                # elif "yatse" in y["items"][i]:
+                    # url = (y["items"][i]["yatse"])
 
-                if "link" in y["items"][i]:
-                    url = (y["items"][i]["link"])
-                elif "yatse" in y["items"][i]:
-                    url = (y["items"][i]["yatse"])
+                # if "thumbnail" in y["items"][i]:
+                pic = (y["items"][i]["thumbnail"])
 
-                if "thumbnail" in y["items"][i]:
-                    pic = (y["items"][i]["thumbnail"])
-                if "info" in y["items"][i]:
-                    info = str(y["items"][i]["info"])
-                    info = re.sub(r'\r\n', '', info)
+                if _('serie') not in self.name.lower():
+                    pic = piconlocal(name)
+
+                # if "info" in y["items"][i]:
+                info = str(y["items"][i]["info"])
+                info = re.sub(r'\r\n', '', info)
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -1691,22 +1701,23 @@ class Videos3(Screen):
             url = ""
             pic = ""
             try:
-                if "title" in y["items"][i]:
-                    name = str(y["items"][i]["title"])
-                    name = re.sub('\[.*?\]', "", name)
-                    name = Utils.cleanName(name)
+                # if "title" in y["items"][i]:
+                name = str(y["items"][i]["title"])
+                name = re.sub('\[.*?\]', "", name)
+                name = Utils.cleanName(name)
 
-                if "link" in y["items"][i]:
-                    url = (y["items"][i]["link"])
-                elif "yatse" in y["items"][i]:
-                    url = (y["items"][i]["yatse"])
+                # if "link" in y["items"][i]:
+                url = (y["items"][i]["link"])
+                # elif "yatse" in y["items"][i]:
+                    # url = (y["items"][i]["yatse"])
 
-                if "thumbnail" in y["items"][i]:
-                    pic = (y["items"][i]["thumbnail"])
+                # if "thumbnail" in y["items"][i]:
+                pic = (y["items"][i]["thumbnail"])
 
-                if "info" in y["items"][i]:
-                    info = str(y["items"][i]["info"])
-                    info = re.sub(r'\r\n', '', info)
+                # if "info" in y["items"][i]:
+                info = str(y["items"][i]["info"])
+                info = re.sub(r'\r\n', '', info)
+
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -1775,23 +1786,23 @@ class Videos4(Screen):
             url = ""
             pic = ""
             try:
-                if "title" in y["items"][i]:
-                    name = str(y["items"][i]["title"])
-                    name = re.sub('\[.*?\]', "", name)
-                    name = Utils.cleanName(name)
+                # if "title" in y["items"][i]:
+                name = str(y["items"][i]["title"])
+                name = re.sub('\[.*?\]', "", name)
+                name = Utils.cleanName(name)
 
-                if "externallink" in y["items"][i]:
-                    url = str(y["items"][i]["externallink"])
+                # if "externallink" in y["items"][i]:
+                url = str(y["items"][i]["externallink"])
 
-                if "thumbnail" in y["items"][i]:
-                    pic = str(y["items"][i]["thumbnail"])
+                # if "thumbnail" in y["items"][i]:
+                pic = str(y["items"][i]["thumbnail"])
 
-                # if _('serie') not in self.name.lower():
-                    # pic = piconlocal(name)
+                # # if _('serie') not in self.name.lower():
+                    # # pic = piconlocal(name)
 
-                if "info" in y["items"][i]:
-                    info = str(y["items"][i]["info"])
-                    info = re.sub(r'\r\n', '', info)
+                # if "info" in y["items"][i]:
+                info = str(y["items"][i]["info"])
+                info = re.sub(r'\r\n', '', info)
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -1860,23 +1871,23 @@ class nextVideos4(Screen):
             url = ""
             pic = ""
             try:
-                if "title" in y["items"][i]:
-                    name = str(y["items"][i]["title"])
-                    name = re.sub('\[.*?\]', "", name)
-                    name = Utils.cleanName(name)
+                # if "title" in y["items"][i]:
+                name = str(y["items"][i]["title"])
+                name = re.sub('\[.*?\]', "", name)
+                name = Utils.cleanName(name)
 
-                if "externallink" in y["items"][i]:
-                    url = str(y["items"][i]["externallink"])
+                # if "externallink" in y["items"][i]:
+                url = str(y["items"][i]["externallink"])
 
-                if "thumbnail" in y["items"][i]:
-                    pic = str(y["items"][i]["thumbnail"])
+                # if "thumbnail" in y["items"][i]:
+                pic = str(y["items"][i]["thumbnail"])
 
-                # if _('serie') not in self.name.lower():
-                    # pic = piconlocal(name)
+                # # if _('serie') not in self.name.lower():
+                    # # pic = piconlocal(name)
 
-                if "info" in y["items"][i]:
-                    info = str(y["items"][i]["info"])
-                    info = re.sub(r'\r\n', '', info)
+                # if "info" in y["items"][i]:
+                info = str(y["items"][i]["info"])
+                info = re.sub(r'\r\n', '', info)
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -1945,22 +1956,22 @@ class Videos5(Screen):
             url = ""
             pic = ""
             try:
-                if "title" in y["items"][i]:
-                    name = str(y["items"][i]["title"])
-                    name = re.sub('\[.*?\]', "", name)
-                    name = Utils.cleanName(name)
+                # if "title" in y["items"][i]:
+                name = str(y["items"][i]["title"])
+                name = re.sub('\[.*?\]', "", name)
+                name = Utils.cleanName(name)
 
-                if "link" in y["items"][i]:
-                    url = (y["items"][i]["link"])
-                elif "yatse" in y["items"][i]:
-                    url = (y["items"][i]["yatse"])
+                # if "link" in y["items"][i]:
+                url = (y["items"][i]["link"])
+                # elif "yatse" in y["items"][i]:
+                    # url = (y["items"][i]["yatse"])
 
-                if "thumbnail" in y["items"][i]:
-                    pic = (y["items"][i]["thumbnail"])
+                # if "thumbnail" in y["items"][i]:
+                pic = (y["items"][i]["thumbnail"])
 
-                if "info" in y["items"][i]:
-                    info = str(y["items"][i]["info"])
-                    info = re.sub(r'\r\n', '', info)
+                # if "info" in y["items"][i]:
+                info = str(y["items"][i]["info"])
+                info = re.sub(r'\r\n', '', info)
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -2141,7 +2152,7 @@ class Playstream1(Screen):
             fileTitle = re.sub(r'[\<\>\:\"\/\\\|\?\*\[\]]', '_', self.namem3u)
             fileTitle = re.sub(r' ', '_', fileTitle)
             fileTitle = re.sub(r'_+', '_', fileTitle)
-            fileTitle = fileTitle.replace("(", "_").replace(")", "_").replace("#", "").replace("+", "_").replace("\'", "_").replace("'", "_")
+            fileTitle = fileTitle.replace("(", "_").replace(")", "_").replace("#", "").replace("+", "_").replace("\'", "_").replace("'", "_").replace("!", "_").replace("&", "_")
             fileTitle = fileTitle.replace(" ", "_").replace(":", "").replace("[", "").replace("]", "").replace("!", "_").replace("&", "_")
             fileTitle = fileTitle.lower() + ext
             self.in_tmp = os.path.join(Path_Movies, fileTitle)
@@ -2215,7 +2226,7 @@ class Playstream1(Screen):
                 print('In playVideo url D=', self.url)
                 self.play()
 
-            if idx == 1:
+            elif idx == 1:
                 print('In playVideo url D=', self.url)
                 self.runRec()
 
@@ -2292,24 +2303,30 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
     screen_timeout = 4000
 
     def __init__(self, session, name, url, desc):
-        global streaml
+        global streaml, _session
+        _session = session
+        streaml = False
         Screen.__init__(self, session)
         self.session = session
-        global _session
-        _session = session
         self.skinName = 'MoviePlayer'
-        streaml = False
         InfoBarMenu.__init__(self)
         InfoBarNotifications.__init__(self)
         InfoBarBase.__init__(self, steal_current_service=True)
         TvInfoBarShowHide.__init__(self)
-        InfoBarAudioSelection.__init__(self)
         InfoBarSubtitleSupport.__init__(self)
+        InfoBarAudioSelection.__init__(self)
         try:
             self.init_aspect = int(self.getAspect())
         except:
             self.init_aspect = 0
         self.new_aspect = self.init_aspect
+        self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
+        self.service = None
+        self.allowPiP = False
+        self.desc = desc
+        self.url = url
+        self.name = name
+        self.state = self.STATE_PLAYING
         self['actions'] = ActionMap(['WizardActions', 'MoviePlayerActions', 'MovieSelectionActions', 'MediaPlayerActions', 'EPGSelectActions', 'MediaPlayerSeekActions', 'ColorActions',
                                      'ButtonSetupActions', 'InfobarShowHideActions', 'InfobarActions', 'InfobarSeekActions'], {
             'leavePlayer': self.cancel,
@@ -2321,15 +2338,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
             'cancel': self.cancel,
             'back': self.cancel
         }, -1)
-
-        self.allowPiP = False
-        self.service = None
         InfoBarSeek.__init__(self, actionmap='InfobarSeekActions')
-        self.desc = desc
-        self.url = url
-        self.name = name
-        self.state = self.STATE_PLAYING
-        self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
         # self.onLayoutFinish.append(self.cicleStreamType)
         # self.onClose.append(self.cancel)
         # self.onClose.append(self.__onClose)
@@ -2386,6 +2395,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         ref = str(self.url)
         ref = ref.replace(':', '%3a').replace(' ', '%20')
         print('final reference 1:   ', ref)
+        ref = "{0}:{1}".format(ref, self.name)
         sref = eServiceReference(ref)
         sref.setName(self.name)
         self.session.nav.stopService()
@@ -2393,9 +2403,9 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
 
     def openPlay(self, servicetype, url):
         url = url.replace(':', '%3a').replace(' ', '%20')
-        ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:' + str(url)
+        ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:' + str(url)  # + ':' + self.name
         if streaml is True:
-            ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + str(url)
+            ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + str(url) + ':' + self.name
         print('final reference 2:   ', ref)
         sref = eServiceReference(ref)
         sref.setName(self.name)
@@ -2405,6 +2415,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
     def cicleStreamType(self):
         global streaml
         # streaml = False
+        from itertools import cycle, islice
         self.servicetype = str(cfg.services.value)
         print('servicetype1: ', self.servicetype)
         url = str(self.url)
@@ -2448,11 +2459,10 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
             self.doShow()
 
     def cancel(self):
-        SREF = self.srefInit
         if os.path.exists('/tmp/hls.avi'):
             os.remove('/tmp/hls.avi')
         self.session.nav.stopService()
-        self.session.nav.playService(SREF)
+        self.session.nav.playService(self.srefInit)
         if not self.new_aspect == self.init_aspect:
             try:
                 self.setAspect(self.init_aspect)
@@ -2479,7 +2489,7 @@ class AutoStartTimertvspro:
             Update.upd_done()
             _firstStarttvspro = False
         except Exception as e:
-            print('error _firstStarttvspro', str(e))
+            print('error _firstStarttvspro', e)
 
 
 def autostart(reason, session=None, **kwargs):
