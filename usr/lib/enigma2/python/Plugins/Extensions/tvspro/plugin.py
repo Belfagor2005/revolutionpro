@@ -5,24 +5,27 @@
 # Info http://t.me/tivustream
 # ****************************************
 # *        coded by Lululla              *
-# *        thank's Pcd  Kiddac           *
 # *          skin by MMark               *
-# *             29/04/2023               *
+# *             02/07/2023               *
 # ****************************************
 # '''
 
 from __future__ import print_function
-from . import Utils
 from . import _
+from . import Utils
 from . import html_conv
 from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap
 from Components.Button import Button
-from Components.config import config, configfile, ConfigDirectory, ConfigYesNo, ConfigEnableDisable, getConfigListEntry, ConfigSelection, ConfigSubsection
+from Components.config import config, ConfigSubsection
+from Components.config import ConfigSelection, getConfigListEntry
+from Components.config import ConfigDirectory, ConfigYesNo
+from Components.config import configfile, ConfigEnableDisable
 from Components.ConfigList import ConfigListScreen
 from Components.Label import Label
 from Components.MenuList import MenuList
-from Components.MultiContent import MultiContentEntryPixmapAlphaTest, MultiContentEntryText
+from Components.MultiContent import MultiContentEntryText
+from Components.MultiContent import MultiContentEntryPixmapAlphaTest
 from Components.Pixmap import Pixmap, MovingPixmap
 from Components.ProgressBar import ProgressBar
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
@@ -40,6 +43,7 @@ from Screens.Screen import Screen
 from Screens.VirtualKeyBoard import VirtualKeyBoard
 from Tools.Directories import SCOPE_PLUGINS, resolveFilename
 from Tools.Downloader import downloadWithProgress
+from enigma import getDesktop
 from requests import get, exceptions
 from requests.exceptions import HTTPError
 from twisted.internet.reactor import callInThread
@@ -112,15 +116,29 @@ title_plug = '..:: TivuStream Pro Revolution V. %s ::..' % Version
 if not os.path.exists(folder_path):
     os.makedirs(folder_path)
 
+screenwidth = getDesktop(0).size()
+if screenwidth.width() == 2560:
+    skin_path = THISPLUG + '/res/skins/uhd/'
+    defpic = THISPLUG + '/res/pics/defaultL.png'
+    dblank = THISPLUG + '/res/pics/blankL.png'
 
-if Utils.isFHD():
-    skin_path = os.path.join(res_plugin_path, "skins/fhd/")
-    defpic = os.path.join(res_plugin_path, "pics/defaultL.png")
-    dblank = os.path.join(res_plugin_path, "pics/blankL.png")
+elif screenwidth.width() == 1920:
+    skin_path = THISPLUG + '/res/skins/fhd/'
+    defpic = THISPLUG + '/res/pics/defaultL.png'
+    dblank = THISPLUG + '/res/pics/blankL.png'
 else:
-    skin_path = os.path.join(res_plugin_path, "skins/hd/")
-    defpic = os.path.join(res_plugin_path, "pics/default.png")
-    dblank = os.path.join(res_plugin_path, "pics/blank.png")
+    skin_path = THISPLUG + '/res/skins/hd/'
+    defpic = THISPLUG + '/res/pics/default.png'
+    dblank = THISPLUG + '/res/pics/blank.png'
+
+# if Utils.isFHD() or Utils.isUHD():
+    # skin_path = os.path.join(res_plugin_path, "skins/fhd/")
+    # defpic = os.path.join(res_plugin_path, "pics/defaultL.png")
+    # dblank = os.path.join(res_plugin_path, "pics/blankL.png")
+# else:
+    # skin_path = os.path.join(res_plugin_path, "skins/hd/")
+    # defpic = os.path.join(res_plugin_path, "pics/default.png")
+    # dblank = os.path.join(res_plugin_path, "pics/blank.png")
 
 # https twisted client hack #
 try:
@@ -246,8 +264,12 @@ def piconlocal(name):
 
 class rvList(MenuList):
     def __init__(self, list):
-        MenuList.__init__(self, list, True, eListboxPythonMultiContent)
-        if Utils.isFHD():
+        MenuList.__init__(self, list, False, eListboxPythonMultiContent)
+        if screenwidth.width() == 2560:
+            self.l.setItemHeight(60)
+            textfont = int(42)
+            self.l.setFont(0, gFont('Regular', textfont))
+        elif screenwidth.width() == 1920:
             self.l.setItemHeight(50)
             textfont = int(30)
             self.l.setFont(0, gFont('Regular', textfont))
@@ -260,7 +282,10 @@ class rvList(MenuList):
 def rvoneListEntry(name):
     res = [name]
     pngx = os.path.join(res_plugin_path, 'pics/setting2.png')
-    if Utils.isFHD():
+    if screenwidth.width() == 2560:
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(50, 50), png=loadPNG(pngx)))
+        res.append(MultiContentEntryText(pos=(90, 0), size=(1200, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+    elif screenwidth.width() == 1920:
         res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(40, 40), png=loadPNG(pngx)))
         res.append(MultiContentEntryText(pos=(70, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
@@ -348,6 +373,9 @@ def returnIMDB(text_clear):
 def threadGetPage(url=None, file=None, key=None, success=None, fail=None, *args, **kwargs):
     print('[tivustream][threadGetPage] url, file, key, args, kwargs', url, "   ", file, "   ", key, "   ", args, "   ", kwargs)
     try:
+        url = url.rstrip('\r\n')
+        url = url.rstrip()
+        url = url.replace("%0A", "")
         response = get(url, verify=False)
         response.raise_for_status()
         if file is None:
@@ -358,12 +386,13 @@ def threadGetPage(url=None, file=None, key=None, success=None, fail=None, *args,
             success(response.content, file)
     except HTTPError as httperror:
         print('[tivustream][threadGetPage] Http error: ', httperror)
-        fail(error)  # E0602 undefined name 'error'
+        # fail(error)  # E0602 undefined name 'error'
     except exceptions.RequestException as error:
         print(error)
 
 
 def getpics(names, pics, tmpfold, picfold):
+    # from PIL import Image
     global defpic
     defpic = defpic
     pix = []
@@ -406,6 +435,7 @@ def getpics(names, pics, tmpfold, picfold):
             # os.system(cmd)
 
         if not os.path.exists(picf):
+            # if plugin_path in url:
             if THISPLUG in url:
                 try:
                     cmd = "cp " + url + " " + tpicf
@@ -416,7 +446,8 @@ def getpics(names, pics, tmpfold, picfold):
             else:
                 # now download image
                 try:
-                    url = url.replace(" ", "%20").replace("ExQ", "=").replace("AxNxD", "&")
+                    url = url.replace(" ", "%20").replace("ExQ", "=")
+                    url = url.replace("AxNxD", "&").replace("%0A", "")
                     poster = Utils.checkRedirect(url)
                     if poster:
                         # if PY3:
@@ -446,7 +477,7 @@ def getpics(names, pics, tmpfold, picfold):
                                     print('===========2222222222=================\n')
                                     # if PY3:
                                         # poster = poster.encode()
-                                    # callInThread(threadGetPage, url=poster, file=tpicf, success=downloadPic, fail=downloadError)
+                                    callInThread(threadGetPage, url=poster, file=tpicf, success=downloadPic, fail=downloadError)
 
                                     '''
                                     print(e)
@@ -468,7 +499,9 @@ def getpics(names, pics, tmpfold, picfold):
         if os.path.exists(tpicf):
             try:
                 size = [150, 220]
-                if Utils.isFHD():
+                if screenwidth.width() == 2560:
+                    size = [294, 440]
+                elif screenwidth.width() == 1920:
                     size = [220, 330]
 
                 file_name, file_extension = os.path.splitext(tpicf)
@@ -539,7 +572,7 @@ def downloadPic(output, poster):
             f.write(output)
             f.close()
     except Exception as e:
-        print('error ', e)
+        print('downloadPic error ', e)
     return
 
 
@@ -655,13 +688,11 @@ class AnimMain(Screen):
 
     def openTest(self):
         nextname = islice(cycle(self.menu), self.index, None)
-
         menu1 = next(nextname)
         menu2 = next(nextname)
         menu3 = next(nextname)
         menu4 = next(nextname)
         menu5 = next(nextname)
-
         self["label1"].setText(menu1[0])
         self["label2"].setText(menu2[0])
         self["label3"].setText(menu3[0])
@@ -669,8 +700,10 @@ class AnimMain(Screen):
         self["label5"].setText(menu5[0])
 
         self.nextlink = menu3
-
-        if Utils.isFHD():
+        if screenwidth.width() == 2560:
+            dpointer = os.path.join(res_plugin_path, "pics/pointerFHD.png")
+            self["pointer"].instance.setPixmapFromFile(dpointer)
+        elif screenwidth.width() == 1920:
             dpointer = os.path.join(res_plugin_path, "pics/pointerFHD.png")
             self["pointer"].instance.setPixmapFromFile(dpointer)
         else:
@@ -955,7 +988,20 @@ class GridMain(Screen):
         self.nextmodule = nextmodule
         self["title"] = Button(title)
         self.pos = []
-        if Utils.isFHD():
+
+        if screenwidth.width() == 2560:
+            self.pos.append([180, 80])
+            self.pos.append([658, 80])
+            self.pos.append([1134, 80])
+            self.pos.append([1610, 80])
+            self.pos.append([2084, 80])
+            self.pos.append([180, 720])
+            self.pos.append([658, 720])
+            self.pos.append([1134, 720])
+            self.pos.append([1610, 720])
+            self.pos.append([2084, 720])
+
+        elif screenwidth.width() == 1920:
             self.pos.append([122, 42])
             self.pos.append([478, 42])
             self.pos.append([834, 42])
@@ -1007,7 +1053,7 @@ class GridMain(Screen):
         ln = len(self.names)
         self.npage = int(float(ln / 10)) + 1
         print("self.npage =", self.npage)
-        self["actions"] = ActionMap(["OkCancelActions", "EPGSelectActions", "MenuActions", 'ButtonSetupActions', "DirectionActions", "NumberActions"], {
+        self["actions"] = ActionMap(["OkCancelActions", "EPGSelectActions", "MenuActions", "DirectionActions", "NumberActions"], {
             "ok": self.okClicked,
             "epg": self.showIMDB,
             "info": self.showIMDB,
@@ -1036,7 +1082,7 @@ class GridMain(Screen):
     def info(self):
         itype = self.index
         self.inf = self.infos[itype]
-        self.inf = ''
+        # self.inf = ''
         try:
             self.inf = self.infos[itype]
         except:
@@ -1065,24 +1111,24 @@ class GridMain(Screen):
             print('error  in paintframe: ', e)
 
     def openTest(self):
-        # print("self.index, openTest self.ipage, self.npage =", self.index, self.ipage, self.npage)
+        print("self.index, openTest self.ipage, self.npage =", self.index, self.ipage, self.npage)
         if self.ipage < self.npage:
             self.maxentry = (10 * self.ipage) - 1
             self.minentry = (self.ipage - 1) * 10
-            # print("self.ipage , self.minentry, self.maxentry =", self.ipage, self.minentry, self.maxentry)
+            print("self.ipage , self.minentry, self.maxentry =", self.ipage, self.minentry, self.maxentry)
 
         elif self.ipage == self.npage:
-            # print("self.ipage , len(self.pics) =", self.ipage, len(self.pics))
+            print("self.ipage , len(self.pics) =", self.ipage, len(self.pics))
             self.maxentry = len(self.pics) - 1
             self.minentry = (self.ipage - 1) * 10
-            # print("self.ipage , self.minentry, self.maxentry B=", self.ipage, self.minentry, self.maxentry)
+            print("self.ipage , self.minentry, self.maxentry B=", self.ipage, self.minentry, self.maxentry)
             i1 = 0
             blpic = dblank
             while i1 < 12:
                 self["label" + str(i1 + 1)].setText(" ")
                 self["pixmap" + str(i1 + 1)].instance.setPixmapFromFile(blpic)
                 i1 += 1
-        # print("len(self.pics), self.minentry, self.maxentry =", len(self.pics), self.minentry, self.maxentry)
+        print("len(self.pics), self.minentry, self.maxentry =", len(self.pics), self.minentry, self.maxentry)
         self.npics = len(self.pics)
         i = 0
         i1 = 0
