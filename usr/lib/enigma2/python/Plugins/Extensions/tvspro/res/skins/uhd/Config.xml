@@ -1,4 +1,4 @@
-<screen name="ConfigFHD" position="0,0" size="2560,1440" title="Config">
+<screen name="ConfigFHD" position="0,0" size="2560,1440" title="Config" backgroundColor="#ff000000" flags="wfNoBorder">
     <ePixmap position="0,0" zPosition="-2" size="2560,1440" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/fanartfhd.jpg"/>
     <!-- Menu List -->
     <widget name="config" textoffset="20,0" position="280,240" size="1200,640" font="Regular;40" secondfont="Regular;54" itemHeight="64" scrollbarMode="showOnDemand" transparent="1" zPosition="1" foregroundColor="#fcc000" foregroundColorSelected="#ffffff" backgroundColor="#4a5b6d" backgroundColorSelected="#000000"/>

@@ -1,4 +1,4 @@
-<screen name="FullHD1" position="center,center" size="1200,640" title="Player Choice" backgroundColor="#000000">
+<screen name="FullHD1" position="center,center" size="1200,640" title="Player Choice" backgroundColor="#ff000000" flags="wfNoBorder">
     <widget name="info" position="0,0" zPosition="4" size="1200,64" font="Regular;48" foregroundColor="#ffffff" backgroundColor="#000000" halign="center" valign="center"/>
     <widget name="list" position="80,80" size="1040,360" foregroundColor="#ffffff" backgroundColor="#000000" zPosition="4" scrollbarMode="showOnDemand" itemHeight="72" backgroundColorSelected="#c10801"/>
     <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/key_red.png" position="80,560" size="40,40" alphatest="blend" zPosition="1"/>
