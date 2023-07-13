@@ -131,14 +131,6 @@ else:
     defpic = THISPLUG + '/res/pics/default.png'
     dblank = THISPLUG + '/res/pics/blank.png'
 
-# if Utils.isFHD() or Utils.isUHD():
-    # skin_path = os.path.join(res_plugin_path, "skins/fhd/")
-    # defpic = os.path.join(res_plugin_path, "pics/defaultL.png")
-    # dblank = os.path.join(res_plugin_path, "pics/blankL.png")
-# else:
-    # skin_path = os.path.join(res_plugin_path, "skins/hd/")
-    # defpic = os.path.join(res_plugin_path, "pics/default.png")
-    # dblank = os.path.join(res_plugin_path, "pics/blank.png")
 
 # https twisted client hack #
 try:
@@ -368,6 +360,7 @@ def returnIMDB(text_clear):
         text_clear = html_conv.html_unescape(text_clear)
         _session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
         return True
+    return False
 
 
 def threadGetPage(url=None, file=None, key=None, success=None, fail=None, *args, **kwargs):
