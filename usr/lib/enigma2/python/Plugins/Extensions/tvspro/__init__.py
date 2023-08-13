@@ -8,10 +8,24 @@ import os
 
 PluginLanguageDomain = 'tvspro'
 PluginLanguagePath = 'Extensions/tvspro/locale'
-
+THISPLUG = '/usr/lib/enigma2/python/Plugins/Extensions/tvspro/'
 isDreamOS = False
 if os.path.exists("/var/lib/dpkg/status"):
     isDreamOS = True
+
+
+def getversioninfo():
+    currversion = '1.8'
+    version_file = os.path.join(THISPLUG, 'version')
+    if os.path.exists(version_file):
+        try:
+            fp = open(version_file, 'r').readlines()
+            for line in fp:
+                if 'version' in line:
+                    currversion = line.split('=')[1].strip()
+        except:
+            pass
+    return (currversion)
 
 
 def localeInit():

@@ -11,7 +11,7 @@
 # '''
 
 from __future__ import print_function
-from . import _
+from . import _, getversioninfo
 from . import Utils
 from . import html_conv
 try:
@@ -75,18 +75,18 @@ else:
 HTTPConnection.debuglevel = 1
 
 
-def getversioninfo():
-    currversion = '1.8'
-    version_file = os.path.join(THISPLUG, 'version')
-    if os.path.exists(version_file):
-        try:
-            fp = open(version_file, 'r').readlines()
-            for line in fp:
-                if 'version' in line:
-                    currversion = line.split('=')[1].strip()
-        except:
-            pass
-    return (currversion)
+# def getversioninfo():
+    # currversion = '1.8'
+    # version_file = os.path.join(THISPLUG, 'version')
+    # if os.path.exists(version_file):
+        # try:
+            # fp = open(version_file, 'r').readlines()
+            # for line in fp:
+                # if 'version' in line:
+                    # currversion = line.split('=')[1].strip()
+        # except:
+            # pass
+    # return (currversion)
 
 
 global defpic, dblank
@@ -2391,7 +2391,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         return
 
     def getAspect(self):
-        return AVSwitch().getAspectRatioSetting()
+        return eAVSwitch().getAspectRatioSetting()
 
     def getAspectString(self, aspectnum):
         return {
@@ -2416,7 +2416,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         }
         config.av.aspectratio.setValue(map[aspect])
         try:
-            AVSwitch().setAspectRatio(aspect)
+            eAVSwitch().setAspectRatio(aspect)
         except:
             pass
 
