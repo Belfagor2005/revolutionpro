@@ -14,10 +14,12 @@ from __future__ import print_function
 from . import _, getversioninfo
 from . import Utils
 from . import html_conv
+import codecs
+from Components.AVSwitch import AVSwitch
 try:
-    from Components.AVSwitch import eAVSwitch
-except Exception:
-    from Components.AVSwitch import iAVSwitch as eAVSwitch
+    from Components.AVSwitch import iAVSwitch
+except:
+    from enigma import eAVSwitch
 from Components.ActionMap import ActionMap
 from Components.Button import Button
 from Components.config import config, ConfigSubsection
@@ -636,7 +638,7 @@ class AnimMain(Screen):
         global _session
         _session = session
         skin = os.path.join(skin_path, 'AnimMain.xml')
-        with open(skin, 'r') as f:
+        with codecs.open(skin, "r", encoding="utf-8") as f:
             self.skin = f.read()
         self.menu = menu
         self.nextmodule = nextmodule
@@ -769,7 +771,7 @@ class Abouttvr(Screen):
         Screen.__init__(self, session)
         self.session = session
         skin = os.path.join(skin_path, 'Abouttvr.xml')
-        with open(skin, 'r') as f:
+        with codecs.open(skin, "r", encoding="utf-8") as f:
             self.skin = f.read()
         title = _(name_plug)
         self["title"] = Button(title)
@@ -825,7 +827,7 @@ class ConfigEx(ConfigListScreen, Screen):
         skin = os.path.join(skin_path, 'Config.xml')
         if os.path.exists('/var/lib/dpkg/status'):
             skin = os.path.join(skin_path, 'ConfigOs.xml')
-        with open(skin, 'r') as f:
+        with codecs.open(skin, "r", encoding="utf-8") as f:
             self.skin = f.read()
         self.setup_title = _("SETUP PLUGIN")
         self.onChangedEntry = []
@@ -977,7 +979,7 @@ class GridMain(Screen):
         global _session
         _session = session
         skin = os.path.join(skin_path, 'GridMain.xml')
-        with open(skin, 'r') as f:
+        with codecs.open(skin, "r", encoding="utf-8") as f:
             self.skin = f.read()
         title = menuTitle
         self.name = menuTitle
@@ -2140,7 +2142,7 @@ class Playstream1(Screen):
         global _session
         _session = session
         skin = os.path.join(skin_path, 'Playstream1.xml')
-        with open(skin, 'r') as f:
+        with codecs.open(skin, "r", encoding="utf-8") as f:
             self.skin = f.read()
         self.setup_title = ('Select Player Stream')
         self.list = []
@@ -2391,7 +2393,11 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         return
 
     def getAspect(self):
-        return eAVSwitch().getAspectRatioSetting()
+        try:
+            aspect = iAVSwitch.getAspectRatioSetting()
+        except:
+            aspect = eAVSwitch.getAspectRatioSetting()
+        return aspect
 
     def getAspectString(self, aspectnum):
         return {
@@ -2405,20 +2411,18 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         }[aspectnum]
 
     def setAspect(self, aspect):
-        map = {
-            0: '4_3_letterbox',
-            1: '4_3_panscan',
-            2: '16_9',
-            3: '16_9_always',
-            4: '16_10_letterbox',
-            5: '16_10_panscan',
-            6: '16_9_letterbox'
-        }
+        map = {0: '4_3_letterbox',
+               1: '4_3_panscan',
+               2: '16_9',
+               3: '16_9_always',
+               4: '16_10_letterbox',
+               5: '16_10_panscan',
+               6: '16_9_letterbox'}
         config.av.aspectratio.setValue(map[aspect])
         try:
-            eAVSwitch().setAspectRatio(aspect)
+            iAVSwitch.setAspectRatio(aspect)
         except:
-            pass
+            eAVSwitch.setAspectRatio(aspect)
 
     def av(self):
         temp = int(self.getAspect())
