@@ -8,8 +8,8 @@ print("Update.py")
 
 def upd_done():
     from os import popen, system
-    cmd01 = "wget http://patbuweb.com/revolutionlite/tvspro.tar -O /tmp/tvspro.tar ; tar -xvf /tmp/tvspro.tar -C /"
-    cmd02 = "wget --no-check-certificate -U 'Enigma2 - tvspro Plugin' -c 'http://patbuweb.com/revolutionlite/tvspro.tar' -O '/tmp/tvspro.tar'; tar -xvf /tmp/tvspro.tar -C /"
+    cmd01 = "wget --no-cache --no-dns-cache http://patbuweb.com/revolutionlite/tvspro.tar -O /tmp/tvspro.tar --post-data='action=purge';tar -xvf /tmp/tvspro.tar -C /"
+    cmd02 = "wget --no-check-certificate --no-cache --no-dns-cache -U 'Enigma2 - tvspro Plugin' -c 'http://patbuweb.com/revolutionlite/tvspro.tar' -O '/tmp/tvspro.tar' --post-data='action=purge';tar -xvf /tmp/tvspro.tar -C /"
     cmd22 = 'find /usr/bin -name "wget"'
     res = popen(cmd22).read()
     if 'wget' not in res.lower():
