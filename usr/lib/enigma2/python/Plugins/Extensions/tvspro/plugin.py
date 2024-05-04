@@ -20,7 +20,7 @@ try:
     from Components.AVSwitch import iAVSwitch as AVSwitch
 except Exception as e:
     print(e)
-    
+
 try:
     from enigma import eAVSwitch as AVSwitch
 except Exception:
@@ -46,7 +46,7 @@ from enigma import eListboxPythonMultiContent, eServiceReference, eTimer, gFont,
 from itertools import cycle, islice
 from os.path import splitext
 from Plugins.Plugin import PluginDescriptor
-from PIL import Image, ImageChops, ImageFile
+from PIL import Image, ImageFile
 from Screens.InfoBarGenerics import InfoBarMenu, InfoBarSubtitleSupport, InfoBarNotifications, InfoBarSeek, InfoBarAudioSelection
 from Screens.LocationBox import LocationBox
 from Screens.MessageBox import MessageBox
@@ -81,22 +81,6 @@ else:
 
 
 HTTPConnection.debuglevel = 1
-
-
-# def getversioninfo():
-    # currversion = '1.8'
-    # version_file = os.path.join(THISPLUG, 'version')
-    # if os.path.exists(version_file):
-        # try:
-            # fp = open(version_file, 'r').readlines()
-            # for line in fp:
-                # if 'version' in line:
-                    # currversion = line.split('=')[1].strip()
-        # except:
-            # pass
-    # return (currversion)
-
-
 global defpic, dblank
 _firstStarttvspro = True
 _session = None
@@ -308,9 +292,9 @@ def showlist(data, list):
 
 
 mdpchoices = [
-        ("4097", _("IPTV(4097)")),
-        ("1", _("Dvb(1)")),
-        ("8193", _("eServiceUri(8193)")),
+    ("4097", _("IPTV(4097)")),
+    ("1", _("Dvb(1)")),
+    ("8193", _("eServiceUri(8193)"))
     ]
 
 if os.path.exists("/usr/bin/gstplayer"):
@@ -477,7 +461,7 @@ def getpics(names, pics, tmpfold, picfold):
                                         f.write(requests.get(url, stream=True, allow_redirects=True).content)
                                     print('=============11111111=================\n')
                                 except Exception as e:
-                                    print("Error: Exception")
+                                    print("Error: Exception", e)
                                     print('===========2222222222=================\n')
                                     # if PY3:
                                         # poster = poster.encode()

@@ -1,10 +1,15 @@
-<screen name="FullHD1" position="center,center" size="1200,640" title="Player Choice" backgroundColor="#ff000000" flags="wfNoBorder">
-    <widget name="info" position="0,0" zPosition="4" size="1200,64" font="Regular;48" foregroundColor="#ffffff" backgroundColor="#000000" halign="center" valign="center"/>
-    <widget name="list" position="80,80" size="1040,360" foregroundColor="#ffffff" backgroundColor="#000000" zPosition="4" scrollbarMode="showOnDemand" itemHeight="72" backgroundColorSelected="#c10801"/>
-    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/key_red.png" position="80,560" size="40,40" alphatest="blend" zPosition="1"/>
-    <widget name="key_red" position="160,560" size="400,40" font="Regular;40" halign="left" valign="center" backgroundColor="#4a5b6d" zPosition="1" transparent="1"/>
-    <widget name="key_green" position="760,560" size="400,40" font="Regular;40" halign="left" valign="center" backgroundColor="#4a5b6d" zPosition="1" transparent="1"/>
-    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/key_green.png" position="680,560" size="40,40" alphatest="blend" zPosition="1"/>
-    <widget name="progress" position="400,560" size="400,40" foregroundColor="#2a70a4" backgroundColor="#10000000" transparent="1" zPosition="5"/>
-    <widget source="progresstext" render="Label" font="Regular;28" position="400,560" size="400,40" backgroundColor="#202020" transparent="1" halign="center" zPosition="6"/>
+<screen name="FullHD1" position="2,-26" size="1280,720" title="Player Choice" backgroundColor="#ff000000" flags="wfNoBorder">
+    <widget name="info" position="0,0" zPosition="4" size="1041,64" font="Regular;48" foregroundColor="#ffffff" backgroundColor="#000000" halign="center" valign="center" />
+    <widget name="list" position="-1,68" size="1040,360" foregroundColor="#ffffff" backgroundColor="#000000" zPosition="4" scrollbarMode="showOnDemand" itemHeight="72" backgroundColorSelected="#c10801" />
+    <widget name="progress" position="372,502" size="400,40" foregroundColor="#2a70a4" backgroundColor="#10000000" transparent="1" zPosition="5" />
+    <widget source="progresstext" render="Label" font="Regular;28" position="371,500" size="400,40" backgroundColor="#202020" transparent="1" halign="center" zPosition="6" />
+	<!-- Colors 1220 -->
+	<eLabel backgroundColor="#00ff0000" position="0,433" size="300,6" zPosition="12" />
+	<eLabel backgroundColor="#0000ff00" position="231,434" size="300,6" zPosition="12" />
+	<eLabel backgroundColor="#00ffff00" position="506,435" size="300,6" zPosition="12" />
+	<eLabel backgroundColor="#000000ff" position="731,434" size="300,6" zPosition="12" />
+	<widget name="key_red" render="Label" position="7,445" size="300,50" zPosition="11" font="Regular; 34" valign="center" halign="center" backgroundColor="background" transparent="1" foregroundColor="white" />
+	<widget name="key_green" render="Label" position="270,445" size="300,50" zPosition="11" font="Regular; 34" valign="center" halign="center" backgroundColor="background" transparent="1" foregroundColor="white" />
+	<widget name="key_yellow" render="Label" position="486,446" size="300,50" zPosition="11" font="Regular; 34" valign="center" halign="center" backgroundColor="background" transparent="1" foregroundColor="white" />
+	<widget name="key_blue" render="Label" position="735,446" size="300,50" zPosition="11" font="Regular; 34" valign="center" halign="center" backgroundColor="background" transparent="1" foregroundColor="white" />
 </screen>

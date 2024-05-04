@@ -1,14 +1,16 @@
 <screen name="ConfigFHD" position="0,0" size="1920,1080" title="Config">
-    <ePixmap position="0,0" zPosition="-2" size="1920,1080" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/fanartfhd.jpg"/>
+    <ePixmap position="0,0" zPosition="-2" size="1920,1080" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/fanartfhd.jpg" />
     <!-- Menu List -->
-    <widget name="config" textoffset="15,0" position="210,180" size="900,480" font="Regular;30" secondfont="Regular;30" itemHeight="48" scrollbarMode="showOnDemand" transparent="1" zPosition="1" foregroundColor="#fcc000" foregroundColorSelected="#ffffff" backgroundColor="#4a5b6d" backgroundColorSelected="#000000"/>
-    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/backg2.png" position="1200,180" size="321,441" alphatest="on" zPosition="10"/>
-    <widget name="description" position="210,660" zPosition="1" size="1500,60" font="Regular;30" foregroundColor="#fcc000" backgroundColor="#4a5b6d" transparent="1" halign="left" valign="center"/>
+    <widget name="config" textoffset="15,0" position="210,180" size="900,480" font="Regular;30" secondfont="Regular;30" itemHeight="48" scrollbarMode="showOnDemand" transparent="1" zPosition="1" foregroundColor="#fcc000" foregroundColorSelected="#ffffff" backgroundColor="#4a5b6d" backgroundColorSelected="#000000" />
+    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/backg2.png" position="1200,180" size="321,441" alphatest="on" zPosition="10" />
+    <widget name="description" position="210,660" zPosition="1" size="899,204" font="Regular;30" foregroundColor="#fcc000" backgroundColor="#4a5b6d" transparent="1" halign="left" valign="center" />
     <!-- MButton -->
-    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/key_red.png" position="210,780" size="30,30" alphatest="blend" zPosition="1"/>
-    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/key_green.png" position="510,780" size="30,30" alphatest="blend" zPosition="1"/>
-    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/key_yellow.png" position="810,780" size="30,30" alphatest="blend" zPosition="1"/>
-    <widget name="key_red" position="270,780" size="300,30" font="Regular;30" halign="left" valign="center" backgroundColor="#4a5b6d" zPosition="1" transparent="1"/>
-    <widget name="key_green" position="570,780" size="300,30" font="Regular;30" halign="left" valign="center" backgroundColor="#4a5b6d" zPosition="1" transparent="1"/>
-    <widget name="key_yellow" position="870,780" size="300,30" font="Regular;30" halign="left" valign="center" backgroundColor="#4a5b6d" zPosition="1" transparent="1"/>
+	<eLabel backgroundColor="#00ff0000" position="219,954" size="300,6" zPosition="12" />
+	<eLabel backgroundColor="#0000ff00" position="217,1014" size="300,6" zPosition="12" />
+	<eLabel backgroundColor="#00ffff00" position="802,1014" size="300,6" zPosition="12" />
+	<eLabel backgroundColor="#000000ff" position="802,954" size="300,6" zPosition="12" />
+	<widget name="key_red" render="Label" position="219,961" size="300,45" zPosition="11" font="Regular; 30" valign="center" halign="center" backgroundColor="background" transparent="1" foregroundColor="white" />
+	<widget name="key_green" render="Label" position="217,1021" size="300,45" zPosition="11" font="Regular; 30" valign="center" halign="center" backgroundColor="background" transparent="1" foregroundColor="white" />
+	<widget name="key_yellow" render="Label" position="802,1021" size="300,45" zPosition="11" font="Regular; 30" valign="center" halign="center" backgroundColor="background" transparent="1" foregroundColor="white" />
+	<widget name="key_blue" render="Label" position="802,961" size="300,45" zPosition="11" font="Regular; 30" valign="center" halign="center" backgroundColor="background" transparent="1" foregroundColor="white" />
 </screen>
