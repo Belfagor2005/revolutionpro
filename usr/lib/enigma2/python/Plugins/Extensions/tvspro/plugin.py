@@ -145,23 +145,24 @@ if sys.version_info >= (2, 7, 9):
         sslContext = None
 
 # https twisted client hack #
-# try:
-    # from twisted.internet import ssl
-    # from twisted.internet._sslverify import ClientTLSOptions
-    # sslverify = True
-# except:
-    # sslverify = False
+sslverify = False
+try:
+    from twisted.internet import ssl
+    from twisted.internet._sslverify import ClientTLSOptions
+    sslverify = True
+except ImportError:
+    pass
 
-# if sslverify:
-    # class SNIFactory(ssl.ClientContextFactory):
-        # def __init__(self, hostname=None):
-            # self.hostname = hostname
+if sslverify:
+    class SNIFactory(ssl.ClientContextFactory):
+        def __init__(self, hostname=None):
+            self.hostname = hostname
 
-        # def getContext(self):
-            # ctx = self._contextFactory(self.method)
-            # if self.hostname:
-                # ClientTLSOptions(self.hostname, ctx)
-            # return ctx
+        def getContext(self):
+            ctx = self._contextFactory(self.method)
+            if self.hostname:
+                ClientTLSOptions(self.hostname, ctx)
+            return ctx
 
 
 def piconlocal(name):
