@@ -1,16 +1,17 @@
-<screen name="ConfigFHD" position="0,0" size="2560,1440" title="Config" backgroundColor="#ff000000" flags="wfNoBorder">
-    <ePixmap position="0,0" zPosition="-2" size="2560,1440" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/fanartfhd.jpg" />
-    <!-- Menu List -->
-    <widget name="config" position="280,240" size="1200,640" itemHeight="64" scrollbarMode="showOnDemand" transparent="1" zPosition="1" foregroundColor="#fcc000" foregroundColorSelected="#ffffff" backgroundColor="#4a5b6d" backgroundColorSelected="#000000" />
-    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/backg2.png" position="1600,240" size="428,588" alphatest="on" zPosition="1" />
-    <widget name="description" position="280,880" zPosition="1" size="1200,178" font="Regular;40" foregroundColor="#fcc000" backgroundColor="#4a5b6d" transparent="1" halign="left" valign="center" />
-    <!-- MButton -->
-	<eLabel backgroundColor="#00ff0000" position="275,1334" size="300,6" zPosition="12" />
-	<eLabel backgroundColor="#0000ff00" position="575,1334" size="300,6" zPosition="12" />
-	<eLabel backgroundColor="#00ffff00" position="874,1334" size="300,6" zPosition="12" />
-	<eLabel backgroundColor="#000000ff" position="1175,1334" size="300,6" zPosition="12" />
-	<widget name="key_red" render="Label" position="275,1345" size="300,50" zPosition="11" font="Regular; 34" valign="center" halign="center" backgroundColor="background" transparent="1" foregroundColor="white" />
-	<widget name="key_green" render="Label" position="575,1345" size="300,50" zPosition="11" font="Regular; 34" valign="center" halign="center" backgroundColor="background" transparent="1" foregroundColor="white" />
-	<widget name="key_yellow" render="Label" position="874,1345" size="300,50" zPosition="11" font="Regular; 34" valign="center" halign="center" backgroundColor="background" transparent="1" foregroundColor="white" />
-	<widget name="key_blue" render="Label" position="1175,1345" size="300,50" zPosition="11" font="Regular; 34" valign="center" halign="center" backgroundColor="background" transparent="1" foregroundColor="white" />
+<screen name="ConfigFHD" position="0,0" size="2560,1440"  backgroundColor="#ff000000" flags="wfNoBorder">
+	<widget name="title" position="200,31" size="2160,130" zPosition="3" halign="center" valign="center" foregroundColor="#ffffff" backgroundColor="#4a5b6d" font="Regular;52" transparent="1" />
+	<ePixmap position="0,0" zPosition="2" size="2560,1440" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/back.png" scale="stretch" />
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/backg2.png" position="1600,240" size="428,588" alphatest="on" zPosition="10" />
+	<!-- Menu List -->
+	<widget name="config" textoffset="20,0" position="280,240" size="1200,774" itemHeight="67" scrollbarMode="showOnDemand" transparent="1" zPosition="5" foregroundColor="#fcc000" foregroundColorSelected="#ffffff" backgroundColor="#4a5b6d" backgroundColorSelected="#000000" />
+	<widget name="description" position="280,880" zPosition="1" size="1199,272" font="Regular;40" foregroundColor="#fcc000" backgroundColor="#4a5b6d" transparent="1" halign="left" valign="center" />
+	<!-- MButton -->
+	<eLabel backgroundColor="#00ff0000" position="306,1119" size="280,8" zPosition="12" />
+	<eLabel backgroundColor="#0000ff00" position="303,1352" size="280,8" zPosition="12" />
+	<eLabel backgroundColor="#00ffff00" position="1136,1126" size="280,8" zPosition="12" />
+	<eLabel backgroundColor="#000000ff" position="1143,1359" size="280,8" zPosition="12" />
+	<widget name="key_red" position="304,1134" size="284,84" font="Regular;40" halign="center" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" />
+	<widget name="key_green" position="300,1280" size="280,80" font="Regular;40" halign="center" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" />
+	<widget name="key_yellow" position="1140,1140" size="280,80" font="Regular;40" halign="center" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" />
+	<widget name="key_blue" position="1147,1280" size="280,80" font="Regular;40" halign="center" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" />
 </screen>

@@ -12,47 +12,64 @@
 
 from __future__ import print_function
 from . import _, getversioninfo
-from . import Utils
-from . import html_conv
-import codecs
-from Components.AVSwitch import AVSwitch
-try:
-    from enigma import eAVSwitch as AVSwitch
-except Exception:
-    from enigma import eAVControl as AVSwitch
+from .lib import Utils
+from .lib import html_conv
+from .lib.Console import Console as xConsole
 
+from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap
 from Components.Button import Button
-from Components.config import config, ConfigSubsection
-from Components.config import ConfigSelection, getConfigListEntry
-from Components.config import ConfigDirectory, ConfigYesNo
-from Components.config import configfile, ConfigEnableDisable
+from Components.config import (
+    ConfigEnableDisable,
+    ConfigDirectory,
+    ConfigSelection,
+    getConfigListEntry,
+    configfile,
+    config,
+    ConfigYesNo,
+    ConfigSubsection,
+)
 from Components.ConfigList import ConfigListScreen
 from Components.Label import Label
 from Components.MenuList import MenuList
-from Components.MultiContent import MultiContentEntryText
-from Components.MultiContent import MultiContentEntryPixmapAlphaTest
-from Components.Pixmap import Pixmap, MovingPixmap
+from Components.MultiContent import (MultiContentEntryPixmapAlphaTest, MultiContentEntryText)
+from Components.Pixmap import (Pixmap, MovingPixmap)
 from Components.ProgressBar import ProgressBar
-from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
+from Components.ServiceEventTracker import (ServiceEventTracker, InfoBarBase)
 from Components.Sources.List import List
 from Components.Sources.StaticText import StaticText
-from enigma import eListboxPythonMultiContent, eServiceReference, eTimer, gFont, iPlayableService, loadPNG, RT_HALIGN_LEFT, RT_VALIGN_CENTER
 from itertools import cycle, islice
 from os.path import splitext
 from Plugins.Plugin import PluginDescriptor
 from PIL import Image, ImageFile
-from Screens.InfoBarGenerics import InfoBarMenu, InfoBarSubtitleSupport, InfoBarNotifications, InfoBarSeek, InfoBarAudioSelection
+from Screens.InfoBarGenerics import (
+    InfoBarSubtitleSupport,
+    InfoBarMenu,
+    InfoBarSeek,
+    InfoBarAudioSelection,
+    InfoBarNotifications,
+)
 from Screens.LocationBox import LocationBox
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
 from Screens.VirtualKeyBoard import VirtualKeyBoard
 from Tools.Directories import SCOPE_PLUGINS, resolveFilename
 from Tools.Downloader import downloadWithProgress
-from enigma import getDesktop
+from enigma import (
+    eListboxPythonMultiContent,
+    eServiceReference,
+    eTimer,
+    gFont,
+    iPlayableService,
+    loadPNG,
+    RT_HALIGN_LEFT,
+    RT_VALIGN_CENTER,
+    getDesktop,
+)
 from requests import get, exceptions
 from requests.exceptions import HTTPError
 from twisted.internet.reactor import callInThread
+import codecs
 import json
 import os
 import re
@@ -74,16 +91,20 @@ else:
     from httplib import HTTPConnection
     from urlparse import urlparse
 
-
 HTTPConnection.debuglevel = 1
+
 global defpic, dblank
-_firstStarttvspro = True
 _session = None
-
+name_plug = 'TVS Pro Revolution'
 currversion = getversioninfo()
-folder_path = "/tmp/tvspro/"
-name_plug = 'TivuStream Pro Revolution'
-
+Version = currversion + ' - 18.07.2024'
+title_plug = '..:: TVS Pro Revolution V. %s ::..' % Version
+installer_url = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0JlbGZhZ29yMjAwNS9yZXZvbHV0aW9ucHJvL21haW4vaW5zdGFsbGVyLnNo'
+developer_url = 'aHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS9yZXBvcy9CZWxmYWdvcjIwMDUvcmV2b2x1dGlvbnBybw=='
+skin_path = THISPLUG
+res_plugin_path = os.path.join(THISPLUG, 'res/')
+pngx = os.path.join(res_plugin_path, 'pics/setting2.png')
+SREF = ""
 piccons = os.path.join(THISPLUG, 'res/img/')
 piconinter = os.path.join(piccons, 'inter.png')
 piconlive = os.path.join(piccons, 'tv.png')
@@ -93,15 +114,8 @@ piconseries = os.path.join(piccons, 'series.png')
 # pixmaps = os.path.join(piccons, 'backg.png')
 nextpng = 'next.png'
 prevpng = 'prev.png'
+folder_path = "/tmp/tvspro/"
 
-res_plugin_path = os.path.join(THISPLUG, 'res/')
-pngx = os.path.join(res_plugin_path, 'pics/setting2.png')
-
-skin_path = THISPLUG
-SREF = ""
-
-Version = currversion + ' - 12.02.2023'
-title_plug = '..:: TivuStream Pro Revolution V. %s ::..' % Version
 
 if not os.path.exists(folder_path):
     os.makedirs(folder_path)
@@ -289,7 +303,6 @@ def showlist(data, list):
 mdpchoices = [
     ("4097", _("IPTV(4097)")),
     ("1", _("Dvb(1)")),
-    ("8193", _("eServiceUri(8193)"))
     ]
 
 if os.path.exists("/usr/bin/gstplayer"):
@@ -583,15 +596,101 @@ class tvspromain(Screen):
         self["pixmap"] = Pixmap()
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
+        # self["key_yellow"] = Button(_("Update"))
+        self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()        
         self["actions"] = ActionMap(["MenuActions", "DirectionActions", "ColorActions", "OkCancelActions"], {
             "ok": self.okClicked,
             "cancel": self.close,
             "red": self.close,
             "green": self.okClicked
         }, -1)
-
-        self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
         self.onLayoutFinish.append(self.startSession)
+        # self.Update = False
+        # self['actions'] = ActionMap(['OkCancelActions',
+                                     # 'ColorActions',
+                                     # 'HotkeyActions',
+                                     # 'InfobarEPGActions',
+                                     # 'MenuActions',
+                                     # 'ChannelSelectBaseActions',
+                                     # 'DirectionActions'], {'ok': self.okClicked,
+                                                           # # 'up': self.up,
+                                                           # # 'down': self.down,
+                                                           # # 'left': self.left,
+                                                           # # 'right': self.right,
+                                                           # 'yellow': self.update_me,  # update_me,
+                                                           # 'yellow_long': self.update_dev,
+                                                           # 'info_long': self.update_dev,
+                                                           # 'infolong': self.update_dev,
+                                                           # 'showEventInfoPlugin': self.update_dev,
+                                                           # # 'menu': self.goConfig,
+                                                           # 'green': self.okClicked,
+                                                           # 'cancel': self.closerm,
+                                                           # 'red': self.closerm}, -1)
+        # self.timer = eTimer()
+        # if os.path.exists('/var/lib/dpkg/status'):
+            # self.timer_conn = self.timer.timeout.connect(self.check_vers)
+        # else:
+            # self.timer.callback.append(self.check_vers)
+        # self.timer.start(500, 1)
+        # # self.onLayoutFinish.append(self.updateMenuList)
+        # self.onLayoutFinish.append(self.startSession)
+
+    # def check_vers(self):
+        # remote_version = '0.0'
+        # remote_changelog = ''
+        # req = Utils.Request(Utils.b64decoder(installer_url), headers={'User-Agent': 'Mozilla/5.0'})
+        # page = Utils.urlopen(req).read()
+        # if PY3:
+            # data = page.decode("utf-8")
+        # else:
+            # data = page.encode("utf-8")
+        # if data:
+            # lines = data.split("\n")
+            # for line in lines:
+                # if line.startswith("version"):
+                    # remote_version = line.split("=")
+                    # remote_version = line.split("'")[1]
+                # if line.startswith("changelog"):
+                    # remote_changelog = line.split("=")
+                    # remote_changelog = line.split("'")[1]
+                    # break
+        # self.new_version = remote_version
+        # self.new_changelog = remote_changelog
+        # if currversion < remote_version:
+            # self.Update = True
+            # self['key_yellow'].show()
+            # # self['key_green'].show()
+            # self.session.open(MessageBox, _('New version %s is available\n\nChangelog: %s\n\nPress info_long or yellow_long button to start force updating.') % (self.new_version, self.new_changelog), MessageBox.TYPE_INFO, timeout=5)
+        # # self.update_me()
+
+    # def update_me(self):
+        # if self.Update is True:
+            # self.session.openWithCallback(self.install_update, MessageBox, _("New version %s is available.\n\nChangelog: %s \n\nDo you want to install it now?") % (self.new_version, self.new_changelog), MessageBox.TYPE_YESNO)
+        # else:
+            # self.session.open(MessageBox, _("Congrats! You already have the latest version..."),  MessageBox.TYPE_INFO, timeout=4)
+
+    # def update_dev(self):
+        # try:
+            # req = Utils.Request(Utils.b64decoder(developer_url), headers={'User-Agent': 'Mozilla/5.0'})
+            # page = Utils.urlopen(req).read()
+            # data = json.loads(page)
+            # remote_date = data['pushed_at']
+            # strp_remote_date = datetime.strptime(remote_date, '%Y-%m-%dT%H:%M:%SZ')
+            # remote_date = strp_remote_date.strftime('%Y-%m-%d')
+            # self.session.openWithCallback(self.install_update, MessageBox, _("Do you want to install update ( %s ) now?") % (remote_date), MessageBox.TYPE_YESNO)
+        # except Exception as e:
+            # print('error xcons:', e)
+
+    # def install_update(self, answer=False):
+        # if answer:
+            # cmd1 = 'wget -q "--no-check-certificate" ' + Utils.b64decoder(installer_url) + ' -O - | /bin/sh'
+            # self.session.open(xConsole, 'Upgrading...', cmdlist=[cmd1], finishedCallback=self.myCallback, closeOnSuccess=False)
+        # else:
+            # self.session.open(MessageBox, _("Update Aborted!"),  MessageBox.TYPE_INFO, timeout=3)
+
+    # def myCallback(self, result=None):
+        # print('result:', result)
+        # return
 
     def startSession(self):
         self.names = []
@@ -636,19 +735,109 @@ class AnimMain(Screen):
         self["label3"] = StaticText()
         self["label4"] = StaticText()
         self["label5"] = StaticText()
-        self["actions"] = ActionMap(["MenuActions", "DirectionActions", "ColorActions", "OkCancelActions"], {
-            "ok": self.okbuttonClick,
-            "cancel": self.cancel,
-            "left": self.key_left,
-            "right": self.key_right,
-            "red": self.cancel,
-            "green": self.okbuttonClick,
-            "menu": self.closeRecursive,
-        }, -1)
+        self["key_red"] = Button(_("Cancel"))
+        self["key_yellow"] = Button(_("Update"))
+        # self["actions"] = ActionMap(["MenuActions", "DirectionActions", "ColorActions", "OkCancelActions"], {
+            # "ok": self.okbuttonClick,
+            # "cancel": self.cancel,
+            # "left": self.key_left,
+            # "right": self.key_right,
+            # "red": self.cancel,
+            # "green": self.okbuttonClick,
+            # "menu": self.closeRecursive,
+        # }, -1)
 
         self.nop = len(self.menu)
         self.index = 0
+        # self.onShown.append(self.openTest)
+
+        self.Update = False
+        self['actions'] = ActionMap(['OkCancelActions',
+                                     'ColorActions',
+                                     'HotkeyActions',
+                                     'InfobarEPGActions',
+                                     'MenuActions',
+                                     'ChannelSelectBaseActions',
+                                     'DirectionActions'], {'ok': self.okbuttonClick,
+                                                           # 'up': self.up,
+                                                           # 'down': self.down,
+                                                           'left': self.key_left,
+                                                           'right': self.key_right,
+                                                           'yellow': self.update_me,  # update_me,
+                                                           'yellow_long': self.update_dev,
+                                                           'info_long': self.update_dev,
+                                                           'infolong': self.update_dev,
+                                                           'showEventInfoPlugin': self.update_dev,
+                                                           'menu': self.closeRecursive,
+                                                           'green': self.okbuttonClick,
+                                                           'cancel': self.closerm,
+                                                           'red': self.closerm}, -1)
+        self.timer = eTimer()
+        if os.path.exists('/var/lib/dpkg/status'):
+            self.timer_conn = self.timer.timeout.connect(self.check_vers)
+        else:
+            self.timer.callback.append(self.check_vers)
+        self.timer.start(500, 1)
+        # self.onLayoutFinish.append(self.updateMenuList)
+        # self.onLayoutFinish.append(self.openTest)
         self.onShown.append(self.openTest)
+
+    def check_vers(self):
+        remote_version = '0.0'
+        remote_changelog = ''
+        req = Utils.Request(Utils.b64decoder(installer_url), headers={'User-Agent': 'Mozilla/5.0'})
+        page = Utils.urlopen(req).read()
+        if PY3:
+            data = page.decode("utf-8")
+        else:
+            data = page.encode("utf-8")
+        if data:
+            lines = data.split("\n")
+            for line in lines:
+                if line.startswith("version"):
+                    remote_version = line.split("=")
+                    remote_version = line.split("'")[1]
+                if line.startswith("changelog"):
+                    remote_changelog = line.split("=")
+                    remote_changelog = line.split("'")[1]
+                    break
+        self.new_version = remote_version
+        self.new_changelog = remote_changelog
+        if currversion < remote_version:
+            self.Update = True
+            self['key_yellow'].show()
+            # self['key_green'].show()
+            self.session.open(MessageBox, _('New version %s is available\n\nChangelog: %s\n\nPress info_long or yellow_long button to start force updating.') % (self.new_version, self.new_changelog), MessageBox.TYPE_INFO, timeout=5)
+        # self.update_me()
+
+    def update_me(self):
+        if self.Update is True:
+            self.session.openWithCallback(self.install_update, MessageBox, _("New version %s is available.\n\nChangelog: %s \n\nDo you want to install it now?") % (self.new_version, self.new_changelog), MessageBox.TYPE_YESNO)
+        else:
+            self.session.open(MessageBox, _("Congrats! You already have the latest version..."),  MessageBox.TYPE_INFO, timeout=4)
+
+    def update_dev(self):
+        try:
+            req = Utils.Request(Utils.b64decoder(developer_url), headers={'User-Agent': 'Mozilla/5.0'})
+            page = Utils.urlopen(req).read()
+            data = json.loads(page)
+            remote_date = data['pushed_at']
+            strp_remote_date = datetime.strptime(remote_date, '%Y-%m-%dT%H:%M:%SZ')
+            remote_date = strp_remote_date.strftime('%Y-%m-%d')
+            self.session.openWithCallback(self.install_update, MessageBox, _("Do you want to install update ( %s ) now?") % (remote_date), MessageBox.TYPE_YESNO)
+        except Exception as e:
+            print('error xcons:', e)
+
+    def install_update(self, answer=False):
+        if answer:
+            cmd1 = 'wget -q "--no-check-certificate" ' + Utils.b64decoder(installer_url) + ' -O - | /bin/sh'
+            self.session.open(xConsole, 'Upgrading...', cmdlist=[cmd1], finishedCallback=self.myCallback, closeOnSuccess=False)
+        else:
+            self.session.open(MessageBox, _("Update Aborted!"),  MessageBox.TYPE_INFO, timeout=3)
+
+    def myCallback(self, result=None):
+        print('result:', result)
+        return
 
     def key_menu(self):
         return
@@ -666,7 +855,7 @@ class AnimMain(Screen):
                 self["info"].setText('')
         print("In AnimMain infos nextlink[1] =", self.inf)
 
-    def cancel(self):
+    def closerm(self):
         self.close()
 
     def openTest(self):
@@ -717,6 +906,7 @@ class AnimMain(Screen):
 
         elif self.nextlink[0] == _("Config"):
             self.session.open(ConfigEx)
+
 
         elif self.nextlink[0] == _("Live TV") or self.nextlink[0] == _("Film") or self.nextlink[0] == _("Serie"):
             try:
@@ -782,7 +972,7 @@ class Abouttvr(Screen):
 
     def getinfo(self):
         continfo = _("==  WELCOME to WWW.TIVUSTREAM.COM ==\n")
-        continfo += _("== SUPPORT ON: WWW.CORVOBOYS.COM http://t.me/tivustream ==\n")
+        continfo += _("== SUPPORT ON: WWW.CORVOBOYS.ORG http://t.me/tivustream ==\n")
         continfo += _("== thank's to @PCD @KIDDAC @MMARK @LINUXSAT-SUPPORT.COM\n")
         continfo += _("========================================\n")
         continfo += _("DISCLAIMER:\n")
@@ -821,6 +1011,7 @@ class ConfigEx(ConfigListScreen, Screen):
         self['key_red'] = Label(_('Exit'))
         self['key_green'] = Label(_('Save'))
         self['key_yellow'] = Button(_('Empty Cache'))
+        self['title'] = Label(_('"SETUP PLUGIN"'))
         self["description"] = Label('')
         self['actions'] = ActionMap(["SetupActions", "ColorActions", "VirtualKeyboardActions"], {
             'cancel': self.extnok,
@@ -897,7 +1088,7 @@ class ConfigEx(ConfigListScreen, Screen):
         return SetupSummary
 
     def Ok_edit(self):
-        ConfigListScreen.keyOK(self)
+        # ConfigListScreen.keyOK(self)
         sel = self['config'].getCurrent()[1]
         if sel and sel == cfg.cachefold:
             self.setting = 'cachefold'
@@ -2505,34 +2696,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.close()
 
 
-class AutoStartTimertvspro:
-
-    def __init__(self, session):
-        self.session = session
-        global _firstStarttvspro
-        if _firstStarttvspro:
-            self.runUpdate()
-
-    def runUpdate(self):
-        print("*** running update ***")
-        try:
-            from . import Update
-            Update.upd_done()
-            _firstStarttvspro = False
-        except Exception as e:
-            print('error _firstStarttvspro', e)
-
-
-def autostart(reason, session=None, **kwargs):
-    global autoStartTimertvspro
-    global _firstStarttvspro
-    if reason == 0:
-        if session is not None:
-            _firstStarttvspro = True
-            autoStartTimertvspro = AutoStartTimertvspro(session)
-    return
-
-
 def main(session, **kwargs):
     try:
         _session = session
@@ -2568,7 +2731,6 @@ def main(session, **kwargs):
 def Plugins(**kwargs):
     icona = 'icon.png'
     extDescriptor = PluginDescriptor(name=name_plug, description=_(title_plug), where=PluginDescriptor.WHERE_EXTENSIONSMENU, icon=icona, fnc=main)
-    result = [PluginDescriptor(name=name_plug, description=title_plug, where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=autostart),
-              PluginDescriptor(name=name_plug, description=title_plug, where=PluginDescriptor.WHERE_PLUGINMENU, icon=icona, fnc=main)]
+    result = [PluginDescriptor(name=name_plug, description=title_plug, where=PluginDescriptor.WHERE_PLUGINMENU, icon=icona, fnc=main)]
     result.append(extDescriptor)
     return result

@@ -15,7 +15,7 @@ if os.path.exists("/var/lib/dpkg/status"):
 
 
 def getversioninfo():
-    currversion = '1.8'
+    currversion = '1.9'
     version_file = os.path.join(THISPLUG, 'version')
     if os.path.exists(version_file):
         try:
