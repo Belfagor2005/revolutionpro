@@ -69,6 +69,7 @@ from enigma import (
 from requests import get, exceptions
 from requests.exceptions import HTTPError
 from twisted.internet.reactor import callInThread
+from datetime import datetime
 import codecs
 import json
 import os
@@ -136,24 +137,31 @@ else:
     dblank = THISPLUG + '/res/pics/blank.png'
 
 
+if sys.version_info >= (2, 7, 9):
+    try:
+        import ssl
+        sslContext = ssl._create_unverified_context()
+    except:
+        sslContext = None
+
 # https twisted client hack #
-try:
-    from twisted.internet import ssl
-    from twisted.internet._sslverify import ClientTLSOptions
-    sslverify = True
-except:
-    sslverify = False
+# try:
+    # from twisted.internet import ssl
+    # from twisted.internet._sslverify import ClientTLSOptions
+    # sslverify = True
+# except:
+    # sslverify = False
 
-if sslverify:
-    class SNIFactory(ssl.ClientContextFactory):
-        def __init__(self, hostname=None):
-            self.hostname = hostname
+# if sslverify:
+    # class SNIFactory(ssl.ClientContextFactory):
+        # def __init__(self, hostname=None):
+            # self.hostname = hostname
 
-        def getContext(self):
-            ctx = self._contextFactory(self.method)
-            if self.hostname:
-                ClientTLSOptions(self.hostname, ctx)
-            return ctx
+        # def getContext(self):
+            # ctx = self._contextFactory(self.method)
+            # if self.hostname:
+                # ClientTLSOptions(self.hostname, ctx)
+            # return ctx
 
 
 def piconlocal(name):
@@ -300,10 +308,8 @@ def showlist(data, list):
         list.setList(plist)
 
 
-mdpchoices = [
-    ("4097", _("IPTV(4097)")),
-    ("1", _("Dvb(1)")),
-    ]
+mdpchoices = [("4097", _("IPTV(4097)")),
+              ("1", _("Dvb(1)"))]
 
 if os.path.exists("/usr/bin/gstplayer"):
     mdpchoices.append(("5001", _("Gstreamer(5001)")))
@@ -597,7 +603,7 @@ class tvspromain(Screen):
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
         # self["key_yellow"] = Button(_("Update"))
-        self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()        
+        self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
         self["actions"] = ActionMap(["MenuActions", "DirectionActions", "ColorActions", "OkCancelActions"], {
             "ok": self.okClicked,
             "cancel": self.close,
@@ -906,7 +912,6 @@ class AnimMain(Screen):
 
         elif self.nextlink[0] == _("Config"):
             self.session.open(ConfigEx)
-
 
         elif self.nextlink[0] == _("Live TV") or self.nextlink[0] == _("Film") or self.nextlink[0] == _("Serie"):
             try:
@@ -2572,7 +2577,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         try:
             aspect = AVSwitch().getAspectRatioSetting()
         except:
-            aspect = eAVSwitch().getAspectRatioSetting()
+            pass
         return aspect
 
     def getAspectString(self, aspectnum):
@@ -2598,7 +2603,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         try:
             AVSwitch.setAspectRatio(aspect)
         except:
-            eAVSwitch.setAspectRatio(aspect)
+            pass
 
     def av(self):
         temp = int(self.getAspect())
