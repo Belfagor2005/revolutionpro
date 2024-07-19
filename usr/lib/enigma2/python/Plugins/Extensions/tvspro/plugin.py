@@ -374,7 +374,7 @@ def returnIMDB(text_clear):
 
 
 def threadGetPage(url=None, file=None, key=None, success=None, fail=None, *args, **kwargs):
-    print('[tivustream][threadGetPage] url, file, key, args, kwargs', url, "   ", file, "   ", key, "   ", args, "   ", kwargs)
+    print('[threadGetPage] url, file, key, args, kwargs', url, "   ", file, "   ", key, "   ", args, "   ", kwargs)
     try:
         url = url.rstrip('\r\n')
         url = url.rstrip()
@@ -388,7 +388,7 @@ def threadGetPage(url=None, file=None, key=None, success=None, fail=None, *args,
         else:
             success(response.content, file)
     except HTTPError as httperror:
-        print('[tivustream][threadGetPage] Http error: ', httperror)
+        print('[threadGetPage] Http error: ', httperror)
         # fail(error)  # E0602 undefined name 'error'
     except exceptions.RequestException as error:
         print(error)
@@ -603,7 +603,6 @@ class tvspromain(Screen):
         self["pixmap"] = Pixmap()
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
-        # self["key_yellow"] = Button(_("Update"))
         self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
         self["actions"] = ActionMap(["MenuActions", "DirectionActions", "ColorActions", "OkCancelActions"], {
             "ok": self.okClicked,
@@ -963,7 +962,6 @@ class ConfigEx(ConfigListScreen, Screen):
         try:
             sel = self['config'].getCurrent()[2]
             if sel:
-                # print('sel =: ', sel)
                 self['description'].setText(str(sel))
             else:
                 self['description'].setText(_('SELECT YOUR CHOICE'))
@@ -1178,9 +1176,7 @@ class GridMain(Screen):
         # print("In paintFrame self.ipage = ", self.ipage)
         try:
             ifr = self.index - (10 * (self.ipage - 1))
-            # print("ifr =", ifr)
             ipos = self.pos[ifr]
-            # print("ipos =", ipos)
             self["frame"].moveTo(ipos[0], ipos[1], 1)
             self["frame"].startMoving()
             self.info()
@@ -1215,12 +1211,6 @@ class GridMain(Screen):
             idx = self.minentry + i
             self["label" + str(i + 1)].setText(self.names[idx])
             pic = self.pics[idx]
-            '''
-            print("i, idx =", i, idx)
-            print("self.names[idx] B=", self.names[idx])
-            print("idx, self.pics[idx]", idx, self.pics[idx])
-            print("pic =", pic)
-            '''
             if os.path.exists(pic):
                 print("pic path exists")
             else:
@@ -1263,10 +1253,7 @@ class GridMain(Screen):
             self.paintFrame()
 
     def key_up(self):
-        # print("keyup self.index, self.minentry = ", self.index, self.minentry)
         self.index = self.index - 5
-        # print("keyup self.index, self.minentry 2 = ", self.index, self.minentry)
-        # print("keyup self.ipage = ", self.ipage)
         if self.index < (self.minentry):
             if self.ipage > 1:
                 self.ipage = self.ipage - 1
@@ -1280,10 +1267,7 @@ class GridMain(Screen):
             self.paintFrame()
 
     def key_down(self):
-        # print("keydown self.index, self.maxentry = ", self.index, self.maxentry)
         self.index = self.index + 5
-        # print("keydown self.index, self.maxentry 2= ", self.index, self.maxentry)
-        # print("keydown self.ipage = ", self.ipage)
         if self.index > (self.maxentry):
             if self.ipage < self.npage:
                 self.ipage = self.ipage + 1
@@ -1293,7 +1277,6 @@ class GridMain(Screen):
                 self.ipage = 1
                 self.openTest()
             else:
-                # print("keydown self.index, self.maxentry 3= ", self.index, self.maxentry)
                 self.index = 0
             self.paintFrame()
         else:
@@ -1303,9 +1286,6 @@ class GridMain(Screen):
         itype = self.index
         url = self.urls[itype]
         name = self.names[itype]
-        # inf = self.infos[itype]
-        # print("In GridMain name =", name)
-        # print("In GridMain self.nextmodule =", self.nextmodule)
 
         if name == _("Config"):
             self.session.open(ConfigEx)
@@ -1483,20 +1463,16 @@ class Videos2(Screen):
                 name = re.sub('\[.*?\]', "", name)
                 name = Utils.cleanName(name)
 
-                # if "externallink" in response["items"][i]:
                 url = str(response["items"][i]["externallink"])
 
-                # if "thumbnail" in response["items"][i]:
                 pic = str(response["items"][i]["thumbnail"])
 
                 if _('serie') not in self.name.lower():
                     pic = piconlocal(name)
 
-                # if "info" in response["items"][i]:
                 info = str(response["items"][i]["info"])
                 info = re.sub(r'\r\n', '', info)
                 info = info.replace('---', ' ')
-                # name = Utils.cleanName(name)
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -1516,13 +1492,7 @@ class Videos2(Screen):
             nextmodule = "Videos1"
 
         if cfg.thumb.value == "True":
-            # print("In Videos2 Going in GridMain")
-            # menuTitle, nextmodule, names, urls, infos, pics=[]
             self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics=self.pics)
-        """
-        else:
-            self.session.open(AnimMain, title, nextmodule, self.menu)
-            """
 
     def okClicked(self):
         pass
@@ -1577,15 +1547,8 @@ class Videos6(Screen):
                 name = re.sub('\[.*?\]', "", name)
                 name = Utils.cleanName(name)
 
-                # if "link" in y["items"][i]:
                 url = (y["items"][i]["link"])
-                # elif "yatse" in y["items"][i]:
-                    # url = (y["items"][i]["yatse"])
-
-                # if "thumbnail" in y["items"][i]:
                 pic = (y["items"][i]["thumbnail"])
-
-                # if "info" in y["items"][i]:
                 info = str(y["items"][i]["info"])
                 info = re.sub(r'\r\n', '', info)
 
@@ -1659,17 +1622,11 @@ class Videos1(Screen):
                 name = re.sub('\[.*?\]', "", name)
                 name = Utils.cleanName(name)
 
-                # if "link" in y["items"][i]:
                 url = (y["items"][i]["link"])
-                # elif "yatse" in y["items"][i]:
-                    # url = (y["items"][i]["yatse"])
-
-                # if "thumbnail" in y["items"][i]:
                 pic = (y["items"][i]["thumbnail"])
-
-                # if "info" in y["items"][i]:
                 info = str(y["items"][i]["info"])
                 info = re.sub(r'\r\n', '', info)
+
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -1737,24 +1694,18 @@ class nextVideos1(Screen):
             url = ""
             pic = ""
             try:
-                # if "title" in y["items"][i]:
                 name = str(y["items"][i]["title"])
                 name = re.sub('\[.*?\]', "", name)
                 name = Utils.cleanName(name)
-                # if "link" in y["items"][i]:
                 url = (y["items"][i]["link"])
-                # elif "yatse" in y["items"][i]:
-                    # url = (y["items"][i]["yatse"])
-
-                # if "thumbnail" in y["items"][i]:
                 pic = (y["items"][i]["thumbnail"])
 
                 if _('serie') not in self.name.lower():
                     pic = piconlocal(name)
 
-                # if "info" in y["items"][i]:
                 info = str(y["items"][i]["info"])
                 info = re.sub(r'\r\n', '', info)
+
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -1824,20 +1775,12 @@ class Videos3(Screen):
             url = ""
             pic = ""
             try:
-                # if "title" in y["items"][i]:
                 name = str(y["items"][i]["title"])
                 name = re.sub('\[.*?\]', "", name)
                 name = Utils.cleanName(name)
 
-                # if "link" in y["items"][i]:
                 url = (y["items"][i]["link"])
-                # elif "yatse" in y["items"][i]:
-                    # url = (y["items"][i]["yatse"])
-
-                # if "thumbnail" in y["items"][i]:
                 pic = (y["items"][i]["thumbnail"])
-
-                # if "info" in y["items"][i]:
                 info = str(y["items"][i]["info"])
                 info = re.sub(r'\r\n', '', info)
 
@@ -1909,23 +1852,15 @@ class Videos4(Screen):
             url = ""
             pic = ""
             try:
-                # if "title" in y["items"][i]:
                 name = str(y["items"][i]["title"])
                 name = re.sub('\[.*?\]', "", name)
                 name = Utils.cleanName(name)
 
-                # if "externallink" in y["items"][i]:
                 url = str(y["items"][i]["externallink"])
-
-                # if "thumbnail" in y["items"][i]:
                 pic = str(y["items"][i]["thumbnail"])
-
-                # # if _('serie') not in self.name.lower():
-                    # # pic = piconlocal(name)
-
-                # if "info" in y["items"][i]:
                 info = str(y["items"][i]["info"])
                 info = re.sub(r'\r\n', '', info)
+
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -1994,23 +1929,14 @@ class nextVideos4(Screen):
             url = ""
             pic = ""
             try:
-                # if "title" in y["items"][i]:
                 name = str(y["items"][i]["title"])
                 name = re.sub('\[.*?\]', "", name)
                 name = Utils.cleanName(name)
-
-                # if "externallink" in y["items"][i]:
                 url = str(y["items"][i]["externallink"])
-
-                # if "thumbnail" in y["items"][i]:
                 pic = str(y["items"][i]["thumbnail"])
-
-                # # if _('serie') not in self.name.lower():
-                    # # pic = piconlocal(name)
-
-                # if "info" in y["items"][i]:
                 info = str(y["items"][i]["info"])
                 info = re.sub(r'\r\n', '', info)
+
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
@@ -2079,22 +2005,15 @@ class Videos5(Screen):
             url = ""
             pic = ""
             try:
-                # if "title" in y["items"][i]:
                 name = str(y["items"][i]["title"])
                 name = re.sub('\[.*?\]', "", name)
                 name = Utils.cleanName(name)
 
-                # if "link" in y["items"][i]:
                 url = (y["items"][i]["link"])
-                # elif "yatse" in y["items"][i]:
-                    # url = (y["items"][i]["yatse"])
-
-                # if "thumbnail" in y["items"][i]:
                 pic = (y["items"][i]["thumbnail"])
-
-                # if "info" in y["items"][i]:
                 info = str(y["items"][i]["info"])
                 info = re.sub(r'\r\n', '', info)
+
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
