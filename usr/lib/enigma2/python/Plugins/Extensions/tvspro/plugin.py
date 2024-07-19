@@ -1316,7 +1316,7 @@ class GridMain(Screen):
                     pass
             else:
                 # print('In GridMain video1 and play next xx : ', self.nextmodule)
-                self.session.open(Playstream1, name, url)
+                self.session.open(Playstream1x, name, url)
 
         elif '&page' in str(url) and self.nextmodule == 'Videos4':
             # print("In GridMain Going in nextVideos4")
@@ -1343,9 +1343,9 @@ class GridMain(Screen):
                 pass
 
         elif self.nextmodule == "Play":
-            # print("In GridMain Going in Playstream1")
+            # print("In GridMain Going in Playstream1x")
             try:
-                self.session.open(Playstream1, name, url)
+                self.session.open(Playstream1x, name, url)
             except:
                 pass
 
@@ -2133,13 +2133,13 @@ class TvInfoBarShowHide():
         print(text + " %s\n" % obj)
 
 
-class Playstream1(Screen):
+class Playstream1x(Screen):
     def __init__(self, session, name, url):
         Screen.__init__(self, session)
         self.session = session
         global _session
         _session = session
-        skin = os.path.join(skin_path, 'Playstream1.xml')
+        skin = os.path.join(skin_path, 'Playstream1x.xml')
         with codecs.open(skin, "r", encoding="utf-8") as f:
             self.skin = f.read()
         self.setup_title = ('Select Player Stream')
