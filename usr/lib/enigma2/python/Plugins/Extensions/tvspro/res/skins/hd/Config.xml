@@ -1,4 +1,4 @@
-<screen name="ConfigFHD" position="0,0" size="1280,720"  backgroundColor="#ff000000" flags="wfNoBorder">
+<screen name="ConfigFHD" position="center,center" size="1280,720"  backgroundColor="#ff000000" flags="wfNoBorder">
 	<widget name="title" position="100,15" size="1080,64" zPosition="3" halign="center" valign="center" foregroundColor="#ffffff" backgroundColor="#4a5b6d" font="Regular;26" transparent="1" />
 	<ePixmap position="0,0" zPosition="2" size="1280,720" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/back.png" scale="stretch" />
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/backg2.png" position="800,120" size="214,294" alphatest="on" zPosition="10" />
@@ -9,9 +9,9 @@
 	<eLabel backgroundColor="#00ff0000" position="152,559" size="140,4" zPosition="12" />
 	<eLabel backgroundColor="#0000ff00" position="151,676" size="140,4" zPosition="12" />
 	<eLabel backgroundColor="#00ffff00" position="568,562" size="140,4" zPosition="12" />
-	<eLabel backgroundColor="#000000ff" position="571,679" size="140,4" zPosition="12" />
+	<!-- <eLabel backgroundColor="#000000ff" position="571,679" size="140,4" zPosition="12" /> -->
 	<widget name="key_red" position="152,566" size="142,42" font="Regular;20" halign="center" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" />
 	<widget name="key_green" position="150,640" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" />
 	<widget name="key_yellow" position="570,570" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" />
-	<widget name="key_blue" position="573,640" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" />
+	<!-- <widget name="key_blue" position="573,640" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" /> -->
 </screen>

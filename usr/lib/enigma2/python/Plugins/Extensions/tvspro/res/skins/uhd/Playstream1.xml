@@ -1,8 +1,10 @@
-<screen name="FullHD1" position="680,400" size="1200,640" title="Player Choice" backgroundColor="#ff000000" flags="wfNoBorder">
+<screen name="FullHD1" position="center,center" size="1200,640" title="Player Choice" backgroundColor="#ff000000" flags="wfNoBorder">
     <widget name="info" position="0,0" zPosition="4" size="1200,64" font="Regular;48" foregroundColor="#ffffff" backgroundColor="#000000" halign="center" valign="center" />
     <widget name="list" position="80,80" size="1040,360" foregroundColor="#ffffff" backgroundColor="#000000" zPosition="4" scrollbarMode="showOnDemand" itemHeight="72" backgroundColorSelected="#c10801" />
     <widget name="progress" position="400,560" size="400,40" foregroundColor="#2a70a4" backgroundColor="#10000000" transparent="1" zPosition="5" />
     <widget source="progresstext" render="Label" font="Regular;28" position="400,560" size="400,40" backgroundColor="#202020" transparent="1" halign="center" zPosition="6" />
+	<eLabel backgroundColor="#10000000" position="1,-1" size="1200,640" zPosition="0" foregroundColor="#000000" />
+
     <!-- MButton -->
 	<eLabel backgroundColor="#00ff0000" position="799,535" size="400,8" zPosition="12" />
 	<eLabel backgroundColor="#0000ff00" position="6,535" size="400,8" zPosition="12" />

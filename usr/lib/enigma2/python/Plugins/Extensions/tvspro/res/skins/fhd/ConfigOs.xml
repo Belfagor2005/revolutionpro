@@ -1,4 +1,4 @@
-<screen name="ConfigFHD" position="0,0" size="1920,1080"  backgroundColor="#ff000000" flags="wfNoBorder">
+<screen name="ConfigFHD" position="center,center" size="1920,1080"  backgroundColor="#ff000000" flags="wfNoBorder">
 	<widget name="title" position="150,23" size="1620,97" zPosition="3" halign="center" valign="center" foregroundColor="#ffffff" backgroundColor="#4a5b6d" font="Regular;39" transparent="1" />
 	<ePixmap position="0,0" zPosition="2" size="1920,1080" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/back.png" scale="stretch" />
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/backg2.png" position="1200,180" size="321,441" alphatest="on" zPosition="10" />
@@ -9,9 +9,9 @@
 	<eLabel backgroundColor="#00ff0000" position="229,839" size="210,6" zPosition="12" />
 	<eLabel backgroundColor="#0000ff00" position="227,1014" size="210,6" zPosition="12" />
 	<eLabel backgroundColor="#00ffff00" position="852,844" size="210,6" zPosition="12" />
-	<eLabel backgroundColor="#000000ff" position="857,1019" size="210,6" zPosition="12" />
+	<!-- <eLabel backgroundColor="#000000ff" position="857,1019" size="210,6" zPosition="12" /> -->
 	<widget name="key_red" position="228,850" size="213,63" font="Regular;30" halign="center" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" />
 	<widget name="key_green" position="225,960" size="210,60" font="Regular;30" halign="center" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" />
 	<widget name="key_yellow" position="855,855" size="210,60" font="Regular;30" halign="center" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" />
-	<widget name="key_blue" position="860,960" size="210,60" font="Regular;30" halign="center" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" />
+	<!-- <widget name="key_blue" position="860,960" size="210,60" font="Regular;30" halign="center" valign="center" backgroundColor="#20000000" zPosition="5" transparent="1" /> -->
 </screen>

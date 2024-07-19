@@ -612,92 +612,6 @@ class tvspromain(Screen):
             "green": self.okClicked
         }, -1)
         self.onLayoutFinish.append(self.startSession)
-        # self.Update = False
-        # self['actions'] = ActionMap(['OkCancelActions',
-                                     # 'ColorActions',
-                                     # 'HotkeyActions',
-                                     # 'InfobarEPGActions',
-                                     # 'MenuActions',
-                                     # 'ChannelSelectBaseActions',
-                                     # 'DirectionActions'], {'ok': self.okClicked,
-                                                           # # 'up': self.up,
-                                                           # # 'down': self.down,
-                                                           # # 'left': self.left,
-                                                           # # 'right': self.right,
-                                                           # 'yellow': self.update_me,  # update_me,
-                                                           # 'yellow_long': self.update_dev,
-                                                           # 'info_long': self.update_dev,
-                                                           # 'infolong': self.update_dev,
-                                                           # 'showEventInfoPlugin': self.update_dev,
-                                                           # # 'menu': self.goConfig,
-                                                           # 'green': self.okClicked,
-                                                           # 'cancel': self.closerm,
-                                                           # 'red': self.closerm}, -1)
-        # self.timer = eTimer()
-        # if os.path.exists('/var/lib/dpkg/status'):
-            # self.timer_conn = self.timer.timeout.connect(self.check_vers)
-        # else:
-            # self.timer.callback.append(self.check_vers)
-        # self.timer.start(500, 1)
-        # # self.onLayoutFinish.append(self.updateMenuList)
-        # self.onLayoutFinish.append(self.startSession)
-
-    # def check_vers(self):
-        # remote_version = '0.0'
-        # remote_changelog = ''
-        # req = Utils.Request(Utils.b64decoder(installer_url), headers={'User-Agent': 'Mozilla/5.0'})
-        # page = Utils.urlopen(req).read()
-        # if PY3:
-            # data = page.decode("utf-8")
-        # else:
-            # data = page.encode("utf-8")
-        # if data:
-            # lines = data.split("\n")
-            # for line in lines:
-                # if line.startswith("version"):
-                    # remote_version = line.split("=")
-                    # remote_version = line.split("'")[1]
-                # if line.startswith("changelog"):
-                    # remote_changelog = line.split("=")
-                    # remote_changelog = line.split("'")[1]
-                    # break
-        # self.new_version = remote_version
-        # self.new_changelog = remote_changelog
-        # if currversion < remote_version:
-            # self.Update = True
-            # self['key_yellow'].show()
-            # # self['key_green'].show()
-            # self.session.open(MessageBox, _('New version %s is available\n\nChangelog: %s\n\nPress info_long or yellow_long button to start force updating.') % (self.new_version, self.new_changelog), MessageBox.TYPE_INFO, timeout=5)
-        # # self.update_me()
-
-    # def update_me(self):
-        # if self.Update is True:
-            # self.session.openWithCallback(self.install_update, MessageBox, _("New version %s is available.\n\nChangelog: %s \n\nDo you want to install it now?") % (self.new_version, self.new_changelog), MessageBox.TYPE_YESNO)
-        # else:
-            # self.session.open(MessageBox, _("Congrats! You already have the latest version..."),  MessageBox.TYPE_INFO, timeout=4)
-
-    # def update_dev(self):
-        # try:
-            # req = Utils.Request(Utils.b64decoder(developer_url), headers={'User-Agent': 'Mozilla/5.0'})
-            # page = Utils.urlopen(req).read()
-            # data = json.loads(page)
-            # remote_date = data['pushed_at']
-            # strp_remote_date = datetime.strptime(remote_date, '%Y-%m-%dT%H:%M:%SZ')
-            # remote_date = strp_remote_date.strftime('%Y-%m-%d')
-            # self.session.openWithCallback(self.install_update, MessageBox, _("Do you want to install update ( %s ) now?") % (remote_date), MessageBox.TYPE_YESNO)
-        # except Exception as e:
-            # print('error xcons:', e)
-
-    # def install_update(self, answer=False):
-        # if answer:
-            # cmd1 = 'wget -q "--no-check-certificate" ' + Utils.b64decoder(installer_url) + ' -O - | /bin/sh'
-            # self.session.open(xConsole, 'Upgrading...', cmdlist=[cmd1], finishedCallback=self.myCallback, closeOnSuccess=False)
-        # else:
-            # self.session.open(MessageBox, _("Update Aborted!"),  MessageBox.TYPE_INFO, timeout=3)
-
-    # def myCallback(self, result=None):
-        # print('result:', result)
-        # return
 
     def startSession(self):
         self.names = []
@@ -744,20 +658,8 @@ class AnimMain(Screen):
         self["label5"] = StaticText()
         self["key_red"] = Button(_("Cancel"))
         self["key_yellow"] = Button(_("Update"))
-        # self["actions"] = ActionMap(["MenuActions", "DirectionActions", "ColorActions", "OkCancelActions"], {
-            # "ok": self.okbuttonClick,
-            # "cancel": self.cancel,
-            # "left": self.key_left,
-            # "right": self.key_right,
-            # "red": self.cancel,
-            # "green": self.okbuttonClick,
-            # "menu": self.closeRecursive,
-        # }, -1)
-
         self.nop = len(self.menu)
         self.index = 0
-        # self.onShown.append(self.openTest)
-
         self.Update = False
         self['actions'] = ActionMap(['OkCancelActions',
                                      'ColorActions',
@@ -785,8 +687,6 @@ class AnimMain(Screen):
         else:
             self.timer.callback.append(self.check_vers)
         self.timer.start(500, 1)
-        # self.onLayoutFinish.append(self.updateMenuList)
-        # self.onLayoutFinish.append(self.openTest)
         self.onShown.append(self.openTest)
 
     def check_vers(self):
@@ -958,9 +858,6 @@ class Abouttvr(Screen):
         self["title"] = Button(title)
         self["info"] = Label()
         self["info"].setText(title_plug)
-        self["pixmap"] = Pixmap()
-        self["key_red"] = Button(_("Cancel"))
-        self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", 'ButtonSetupActions', "DirectionActions"], {
             "ok": self.okClicked,
             "back": self.close,
