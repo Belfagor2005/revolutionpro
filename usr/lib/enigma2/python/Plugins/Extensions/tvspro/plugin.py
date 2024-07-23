@@ -1232,12 +1232,11 @@ class GridMain(Screen):
         self.paintFrame()
 
     def key_left(self):
-        self.index -= 1
-        if self.index < 0:
-            self.index = self.maxentry
-            self.key_up()
-        else:
+        if not self.index <= 0:
+            self.index -= 1
             self.paintFrame()
+        # else:
+            # self.paintFrame()
 
     def key_right(self):
         i = self.npics - 1
@@ -1247,7 +1246,7 @@ class GridMain(Screen):
             self.openTest()
         self.index += 1
         if self.index > self.maxentry:
-            self.index = 0
+            # self.index = 0
             self.key_down()
         else:
             self.paintFrame()
@@ -1457,7 +1456,6 @@ class Videos2(Screen):
             url = ""
             pic = ""
             try:
-
                 # if "title" in response["items"][i]:
                 name = str(response["items"][i]["title"])
                 name = re.sub('\[.*?\]', "", name)
