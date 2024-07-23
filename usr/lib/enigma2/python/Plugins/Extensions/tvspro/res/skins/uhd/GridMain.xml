@@ -1,8 +1,8 @@
 <screen name="GridMain" position="0,0" size="2560,1440" title="GridMain" backgroundColor="#ff000000" flags="wfNoBorder">
     <widget name="title" position="115,1454" size="2355,107" zPosition="5" halign="center" valign="top" foregroundColor="#7bd7f7" backgroundColor="#000000" font="Regular;80" transparent="1" />
-    <widget name="info" position="0,1334" zPosition="6" size="2560,107" font="Regular; 35" foregroundColor="#7bd7f7" backgroundColor="#000000" transparent="1" halign="center" valign="top" />
+    <widget name="info" position="0,1314" zPosition="6" size="2560,127" font="Regular; 35" foregroundColor="#7bd7f7" backgroundColor="#000000" transparent="1" halign="center" valign="top" />
     <ePixmap position="0,0" zPosition="2" size="2560,1440" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/back.png" scale="stretch" />
-    <widget name="frame" position="163,56" size="334,494" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/pic_frame2L.png" zPosition="5" scale="1" />
+    <widget name="frame" position="160,55" size="334,494" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/tvspro/res/pics/pic_frame2L.png" zPosition="5" scale="1" />
     <widget name="pixmap1" position="183,80" size="294,440" zPosition="6" transparent="1" alphatest="blend" />
     <widget source="label1" render="Label" position="183,548" size="294,120" font="Regular;38" halign="center" zPosition="6" transparent="1" foregroundColor="#ffffff" backgroundColor="#000000" valign="top" />
     <widget name="pixmap2" position="658,80" size="294,440" zPosition="6" transparent="1" alphatest="blend" />
