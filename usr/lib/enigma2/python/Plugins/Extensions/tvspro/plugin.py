@@ -279,7 +279,7 @@ class rvList(MenuList):
             textfont = int(30)
             self.l.setFont(0, gFont('Regular', textfont))
         else:
-            self.l.setItemHeight(50)
+            self.l.setItemHeight(40)
             textfont = int(24)
             self.l.setFont(0, gFont('Regular', textfont))
 
@@ -294,8 +294,8 @@ def rvoneListEntry(name):
         res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(40, 40), png=loadPNG(pngx)))
         res.append(MultiContentEntryText(pos=(70, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(3, 10), size=(40, 40), png=loadPNG(pngx)))
-        res.append(MultiContentEntryText(pos=(50, 0), size=(500, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(3, 0), size=(40, 40), png=loadPNG(pngx)))
+        res.append(MultiContentEntryText(pos=(50, 0), size=(500, 40), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 
@@ -501,7 +501,7 @@ def getpics(names, pics, tmpfold, picfold):
 
         if os.path.exists(tpicf):
             try:
-                size = [150, 220]
+                size = [168, 223]
                 if screenwidth.width() == 2560:
                     size = [294, 440]
                 elif screenwidth.width() == 1920:
@@ -1088,16 +1088,16 @@ class GridMain(Screen):
             self.pos.append([1190, 522])
             self.pos.append([1546, 522])
         else:
-            self.pos.append([81, 28])
-            self.pos.append([319, 28])
-            self.pos.append([556, 28])
-            self.pos.append([793, 28])
-            self.pos.append([1031, 28])
-            self.pos.append([81, 348])
-            self.pos.append([319, 348])
-            self.pos.append([556, 348])
-            self.pos.append([793, 348])
-            self.pos.append([1031, 348])
+            self.pos.append([95, 22])
+            self.pos.append([335, 22])
+            self.pos.append([555, 22])
+            self.pos.append([795, 22])
+            self.pos.append([1035, 22])
+            self.pos.append([90, 342])
+            self.pos.append([330, 342])
+            self.pos.append([550, 342])
+            self.pos.append([790, 345])
+            self.pos.append([1030, 342])
 
         tmpfold = os.path.join(str(cfg.cachefold.value), "tvspro/tmp")
         picfold = os.path.join(str(cfg.cachefold.value), "tvspro/pic")
