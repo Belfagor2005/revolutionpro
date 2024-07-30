@@ -828,7 +828,7 @@ class AnimMain(Screen):
         self.urlx = self.nextlink[2]
         self.session.openWithCallback(self.filterChannels, VirtualKeyBoard, title=_("Filter this category..."), text='')
 
-    def filterChannels(self, result):
+    def filterChannels(self, result=None):
         if result:
             name = str(result)
             url = self.urlx + str(result)
@@ -1017,7 +1017,7 @@ class ConfigEx(ConfigListScreen, Screen):
         except Exception as e:
             print('openDirectoryBrowser get failed: ', e)
 
-    def openDirectoryBrowserCB(self, path):
+    def openDirectoryBrowserCB(self, path=None):
         if path is not None:
             if self.setting == 'cachefold':
                 cfg.cachefold.setValue(path)
@@ -1396,7 +1396,7 @@ class GridMain(Screen):
         self.urlx = url
         self.session.openWithCallback(self.filterChannels, VirtualKeyBoard, title=_("Filter this category..."), text=name)
 
-    def filterChannels(self, result):
+    def filterChannels(self, result=None):
         if result:
             name = str(result)
             url = self.urlx + str(result)
@@ -2182,7 +2182,7 @@ class Playstream1x(Screen):
                 self.downloading = False
                 self.session.open(MessageBox, _('Only VOD Movie allowed or not .ext Filtered!!!'), MessageBox.TYPE_INFO, timeout=5)
 
-    def download_m3u(self, result):
+    def download_m3u(self, result=None):
         if result:
             # if 'm3u8' not in self.urlm3u:
             path = urlparse(self.urlm3u).path
