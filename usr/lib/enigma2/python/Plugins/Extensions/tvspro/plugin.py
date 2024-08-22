@@ -661,7 +661,6 @@ class AnimMain(Screen):
         self.index = 0
         self.Update = False
         self['actions'] = ActionMap(['OkCancelActions',
-                                     'ColorActions',
                                      'HotkeyActions',
                                      'InfobarEPGActions',
                                      'MenuActions',
