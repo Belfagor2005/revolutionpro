@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: exodus\n"
-"POT-Creation-Date: 2023-01-31 18:44+0100\n"
+"POT-Creation-Date: 2024-09-05 20:28+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -9,236 +9,261 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4.4\n"
+"X-Generator: Poedit 3.5\n"
 "X-Poedit-Basepath: ../../..\n"
 "X-Poedit-SearchPath-0: plugin.py\n"
 
-#: plugin.py:266
-msgid "IPTV(4097)"
-msgstr ""
-
-#: plugin.py:267
-msgid "Dvb(1)"
-msgstr ""
-
-#: plugin.py:268
-msgid "eServiceUri(8193)"
-msgstr ""
-
-#: plugin.py:272
-msgid "Gstreamer(5001)"
-msgstr ""
-
-#: plugin.py:275
-msgid "Exteplayer3(5002)"
-msgstr ""
-
-#: plugin.py:284
+#: plugin.py:327
 msgid "yes"
 msgstr ""
 
-#: plugin.py:284
+#: plugin.py:327
 msgid "no"
 msgstr ""
 
-#: plugin.py:579 plugin.py:773 plugin.py:1421 plugin.py:1519 plugin.py:1609
-#: plugin.py:1697 plugin.py:1786 plugin.py:1877 plugin.py:1968 plugin.py:2059
+#: plugin.py:600 plugin.py:654 plugin.py:1427 plugin.py:1509 plugin.py:1586
+#: plugin.py:1662 plugin.py:1741 plugin.py:1819 plugin.py:1896 plugin.py:1972
 msgid "Cancel"
 msgstr "Annulla"
 
-#: plugin.py:580 plugin.py:774 plugin.py:1422 plugin.py:1520 plugin.py:1610
-#: plugin.py:1698 plugin.py:1787 plugin.py:1878 plugin.py:1969 plugin.py:2060
-#: plugin.py:2248
+#: plugin.py:601 plugin.py:1428 plugin.py:1510 plugin.py:1587 plugin.py:1663
+#: plugin.py:1742 plugin.py:1820 plugin.py:1897 plugin.py:1973 plugin.py:2146
 msgid "Select"
 msgstr "Seleziona"
 
-#: plugin.py:596 plugin.py:720 plugin.py:1283
+#: plugin.py:616 plugin.py:805 plugin.py:1283
 msgid "About"
 msgstr "Informazioni"
 
-#: plugin.py:596
+#: plugin.py:616
 msgid "Information Us"
 msgstr "Informazioni su"
 
-#: plugin.py:597 plugin.py:723 plugin.py:1280
+#: plugin.py:617 plugin.py:808 plugin.py:1280
 msgid "Config"
 msgstr "Impostazioni"
 
-#: plugin.py:597
+#: plugin.py:617
 msgid "Setup Plugin"
 msgstr "Configura Plugin"
 
-#: plugin.py:598 plugin.py:726
+#: plugin.py:618 plugin.py:811
 msgid "Live TV"
 msgstr ""
 
-#: plugin.py:598
+#: plugin.py:618
 msgid "Live TV Stream"
 msgstr ""
 
-#: plugin.py:599 plugin.py:726 plugin.py:1488
+#: plugin.py:619 plugin.py:811 plugin.py:1484
 msgid "Film"
 msgstr ""
 
-#: plugin.py:599
+#: plugin.py:619
 msgid "Film and Movie"
 msgstr ""
 
-#: plugin.py:600 plugin.py:726 plugin.py:1490
+#: plugin.py:620 plugin.py:811 plugin.py:1486
 msgid "Serie"
 msgstr ""
 
-#: plugin.py:600
+#: plugin.py:620
 msgid "Series"
 msgstr ""
 
-#: plugin.py:601 plugin.py:733 plugin.py:1286
+#: plugin.py:621 plugin.py:818 plugin.py:1286
 msgid "Search"
 msgstr "Cerca"
 
-#: plugin.py:601
+#: plugin.py:621
 msgid "Search your Movie"
 msgstr ""
 
-#: plugin.py:739 plugin.py:1388
+#: plugin.py:655
+msgid "Update"
+msgstr ""
+
+#: plugin.py:711
+#, python-format
+msgid ""
+"New version %s is available\n"
+"\n"
+"Changelog: %s\n"
+"\n"
+"Press info_long or yellow_long button to start force updating."
+msgstr ""
+
+#: plugin.py:716
+#, python-format
+msgid ""
+"New version %s is available.\n"
+"\n"
+"Changelog: %s \n"
+"\n"
+"Do you want to install it now?"
+msgstr ""
+
+#: plugin.py:718
+msgid "Congrats! You already have the latest version..."
+msgstr ""
+
+#: plugin.py:728
+#, python-format
+msgid "Do you want to install update ( %s ) now?"
+msgstr ""
+
+#: plugin.py:737
+msgid "Update Aborted!"
+msgstr ""
+
+#: plugin.py:824 plugin.py:1388
 msgid "Filter this category..."
 msgstr ""
 
-#: plugin.py:791
+#: plugin.py:871
 msgid "==  WELCOME to WWW.TIVUSTREAM.COM ==\n"
 msgstr ""
 
-#: plugin.py:792
-msgid "== SUPPORT ON: WWW.CORVOBOYS.COM http://t.me/tivustream ==\n"
+#: plugin.py:872
+msgid "== SUPPORT ON: WWW.CORVOBOYS.ORG http://t.me/tivustream ==\n"
 msgstr ""
 
-#: plugin.py:793
+#: plugin.py:873
 msgid "== thank's to @PCD @KIDDAC @MMARK @LINUXSAT-SUPPORT.COM\n"
 msgstr ""
 
-#: plugin.py:794 plugin.py:801
+#: plugin.py:874 plugin.py:881
 msgid "========================================\n"
 msgstr ""
 
-#: plugin.py:795
+#: plugin.py:875
 msgid "DISCLAIMER:\n"
 msgstr "NOTA BENE:\n"
 
-#: plugin.py:796
+#: plugin.py:876
 msgid "The lists created at HOC contain addresses freely and freely found on\n"
 msgstr "Le liste create ad HOC contengono indirizzi liberamente e gratuitamente\n"
 
-#: plugin.py:797
+#: plugin.py:877
 msgid "the net and not protected by subscription or subscription.\n"
 msgstr "trovati in rete e non protetti da sottoscrizione o abbonamento.\n"
 
-#: plugin.py:798
+#: plugin.py:878
 msgid "The structural reference server for projects released\n"
 msgstr "Il server di riferimento strutturale ai progetti rilasciati\n"
 
-#: plugin.py:799
+#: plugin.py:879
 msgid "is not a source of any stream/flow.\n"
 msgstr "non e' fonte di alcun stream/flusso.\n"
 
-#: plugin.py:800
+#: plugin.py:880
 msgid "Absolutely PROHIBITED to use this lists without authorization\n"
 msgstr "Assolutamente VIETATO utilizzare queste liste senza autorizzazione.\n"
 
-#: plugin.py:827
+#: plugin.py:904
 msgid "SETUP PLUGIN"
 msgstr "CONFIGURAZIONE PLUGIN"
 
-#: plugin.py:833 plugin.py:2247
+#: plugin.py:908 plugin.py:2145
 msgid "Exit"
 msgstr "Uscire"
 
-#: plugin.py:834
+#: plugin.py:909
 msgid "Save"
 msgstr "Salva"
 
-#: plugin.py:835
+#: plugin.py:910
 msgid "Empty Cache"
 msgstr "Vuota Cache"
 
-#: plugin.py:870
+#: plugin.py:911
+msgid "\"SETUP PLUGIN\""
+msgstr "\"CONFIGURAZIONE PLUGIN\""
+
+#: plugin.py:943
 msgid "All cache fold empty!"
 msgstr "Tutta la cache è vuota!"
 
-#: plugin.py:875 plugin.py:885
+#: plugin.py:948
 msgid "Services Player Reference type"
 msgstr ""
 
-#: plugin.py:876 plugin.py:893
-msgid "Cache folder"
-msgstr "Cartella cache"
-
-#: plugin.py:877
-msgid "Movie folder"
-msgstr "Cartella Film"
-
-#: plugin.py:886
+#: plugin.py:948
 msgid "Configure Service Player Reference, Enigma restart required"
 msgstr "Configura Service Player Reference, richiesto il riavvio di Enigma"
 
-#: plugin.py:889
-msgid "Movie folder ?"
-msgstr "Cartella Film?"
+#: plugin.py:949
+msgid "Cache folder"
+msgstr "Cartella cache"
 
-#: plugin.py:890
-msgid "Folder Movie Path (eg.: /media/hdd/movie), Enigma restart required"
-msgstr ""
-
-#: plugin.py:894
+#: plugin.py:949
 msgid "Folder Cache Path (eg.: /media/hdd), Enigma restart required"
 msgstr ""
 
-#: plugin.py:897
-msgid "Skin resolution-(restart e2 after change)"
-msgstr "Risoluzione Skin (riavvia e2 dopo la modifica)"
+#: plugin.py:950
+msgid "Movie folder"
+msgstr "Cartella Film"
 
-#: plugin.py:898
-msgid "Configure Skin Resolution Screen, Enigma restart required"
-msgstr "Configura risoluzione Skin, è necessario riavviare Enigma"
+#: plugin.py:950
+msgid "Folder Movie Path (eg.: /media/hdd/movie), Enigma restart required"
+msgstr ""
 
-#: plugin.py:943
+#: plugin.py:962
+msgid "SELECT YOUR CHOICE"
+msgstr ""
+
+#: plugin.py:1003
 msgid "Choose Directory:"
 msgstr "Scegli cartella:"
 
-#: plugin.py:944
+#: plugin.py:1004
 msgid "Choose Directory"
 msgstr "Scegli percorso"
 
-#: plugin.py:967
+#: plugin.py:1027
 msgid "Settings saved correctly!"
 msgstr "Settings salvati correttamente!"
 
-#: plugin.py:977
+#: plugin.py:1036
 msgid "Really close without saving settings?"
 msgstr ""
 
-#: plugin.py:1486
+#: plugin.py:1465 plugin.py:1698
+msgid "serie"
+msgstr ""
+
+#: plugin.py:1482
 msgid "Live"
 msgstr ""
 
-#: plugin.py:2276
+#: plugin.py:2173
 msgid "You are already downloading!!!"
 msgstr ""
 
-#: plugin.py:2280
+#: plugin.py:2177
 #, python-format
 msgid ""
 "DOWNLOAD VIDEO?\n"
 "%s"
 msgstr ""
 
-#: plugin.py:2283
+#: plugin.py:2180
 msgid "Only VOD Movie allowed or not .ext Filtered!!!"
 msgstr ""
 
-#: plugin.py:2305 plugin.py:2325
+#: plugin.py:2220
 msgid "Download Failed!!!"
 msgstr ""
 
-#: plugin.py:2437
+#: plugin.py:2325
 msgid "Install Streamlink first"
 msgstr ""
+
+#~ msgid "Movie folder ?"
+#~ msgstr "Cartella Film?"
+
+#~ msgid "Skin resolution-(restart e2 after change)"
+#~ msgstr "Risoluzione Skin (riavvia e2 dopo la modifica)"
+
+#~ msgid "Configure Skin Resolution Screen, Enigma restart required"
+#~ msgstr "Configura risoluzione Skin, è necessario riavviare Enigma"

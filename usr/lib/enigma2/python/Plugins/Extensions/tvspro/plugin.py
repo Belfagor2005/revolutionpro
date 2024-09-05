@@ -39,7 +39,7 @@ from Components.ServiceEventTracker import (ServiceEventTracker, InfoBarBase)
 from Components.Sources.List import List
 from Components.Sources.StaticText import StaticText
 from itertools import cycle, islice
-from os.path import splitext
+from os.path import (splitext, exists as file_exists)
 from Plugins.Plugin import PluginDescriptor
 from PIL import Image, ImageFile
 from Screens.InfoBarGenerics import (
@@ -80,7 +80,7 @@ import sys
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 _session = None
-THISPLUG = '/usr/lib/enigma2/python/Plugins/Extensions/tvspro/'
+THISPLUG = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/".format('tvspro'))
 PY3 = sys.version_info.major >= 3
 
 
@@ -98,7 +98,7 @@ global defpic, dblank
 _session = None
 name_plug = 'TVS Pro Revolution'
 currversion = getversioninfo()
-Version = currversion + ' - 18.07.2024'
+Version = currversion + ' - 05.09.2024'
 title_plug = '..:: TVS Pro Revolution V. %s ::..' % Version
 installer_url = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0JlbGZhZ29yMjAwNS9yZXZvbHV0aW9ucHJvL21haW4vaW5zdGFsbGVyLnNo'
 developer_url = 'aHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS9yZXBvcy9CZWxmYWdvcjIwMDUvcmV2b2x1dGlvbnBybw=='
@@ -309,51 +309,49 @@ def showlist(data, list):
         list.setList(plist)
 
 
-mdpchoices = [("4097", _("IPTV(4097)")),
-              ("1", _("Dvb(1)"))]
-
-if os.path.exists("/usr/bin/gstplayer"):
-    mdpchoices.append(("5001", _("Gstreamer(5001)")))
-
-if os.path.exists("/usr/bin/exteplayer3"):
-    mdpchoices.append(("5002", _("Exteplayer3(5002)")))
-
-if os.path.exists("/usr/bin/apt-get"):
-    mdpchoices.append(("8193", _("DreamOS GStreamer(8193)")))
+mdpchoices = [
+    ("4097", ("IPTV(4097)")),
+    ("1", ("Dvb(1)")),
+]
+players = [
+    ("/usr/bin/gstplayer", ("5001", "Gstreamer(5001)")),
+    ("/usr/bin/exteplayer3", ("5002", "Exteplayer3(5002)")),
+    ("/usr/bin/apt-get", ("8193", "DreamOS GStreamer(8193)"))
+]
+mdpchoices.extend(choice for path, choice in players if file_exists(path))
 
 config.plugins.tvspro = ConfigSubsection()
 cfg = config.plugins.tvspro
 
 cfg.services = ConfigSelection(default='4097', choices=mdpchoices)
 cfg.thumb = ConfigSelection(default="True", choices=[("True", _("yes")), ("False", _("no"))])
-cfg.cachefold = ConfigDirectory("/media/hdd", False)
 cfg.movie = ConfigDirectory("/media/hdd/movie")
+cfg.cachefold = ConfigDirectory("/media/hdd", False)
 
 
 try:
     from Components.UsageConfig import defaultMoviePath
     downloadpath = defaultMoviePath()
     cfg.movie = ConfigDirectory(default=downloadpath)
+    cfg.cachefold = ConfigDirectory(default=downloadpath)
 except:
     if os.path.exists("/usr/bin/apt-get"):
         cfg.movie = ConfigDirectory(default='/media/hdd/movie')
+        cfg.cachefold = ConfigDirectory(default='/media/hdd')
 
-
-global Path_Movies, Path_Cache
-
-Path_Movies = str(cfg.movie.value)
-Path_Cache = str(cfg.cachefold.value)
-print('Path Movies: ', Path_Movies)
-print('Path Cache: ', Path_Cache)
+Path_Movies = str(cfg.movie.value) + '/'
+Path_Cache = str(cfg.cachefold.value).replace('movie', 'tvspro')
+if not os.path.exists(Path_Cache):
+    os.makedirs(Path_Cache)
 
 
 def returnIMDB(text_clear):
     TMDB = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('TMDB'))
     IMDb = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('IMDb'))
+    text = html_conv.html_unescape(text_clear)
     if os.path.exists(TMDB):
         try:
             from Plugins.Extensions.TMBD.plugin import TMBD
-            text = html_conv.html_unescape(text_clear)
             _session.open(TMBD.tmdbScreen, text, 0)
         except Exception as e:
             print("[XCF] Tmdb: ", e)
@@ -361,13 +359,11 @@ def returnIMDB(text_clear):
     elif os.path.exists(IMDb):
         try:
             from Plugins.Extensions.IMDb.plugin import main as imdb
-            text = html_conv.html_unescape(text_clear)
             imdb(_session, text)
         except Exception as e:
             print("[XCF] imdb: ", e)
         return True
     else:
-        text_clear = html_conv.html_unescape(text_clear)
         _session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
         return True
     return False
@@ -376,9 +372,7 @@ def returnIMDB(text_clear):
 def threadGetPage(url=None, file=None, key=None, success=None, fail=None, *args, **kwargs):
     print('[threadGetPage] url, file, key, args, kwargs', url, "   ", file, "   ", key, "   ", args, "   ", kwargs)
     try:
-        url = url.rstrip('\r\n')
-        url = url.rstrip()
-        url = url.replace("%0A", "")
+        url = url.rstrip('\r\n').rstrip().replace("%0A", "")
         response = get(url, verify=False)
         response.raise_for_status()
         if file is None:
@@ -453,8 +447,10 @@ def getpics(names, pics, tmpfold, picfold):
                     url = url.replace("AxNxD", "&").replace("%0A", "")
                     poster = Utils.checkRedirect(url)
                     if poster:
+                        ''''
                         # if PY3:
                             # poster = poster.encode()
+                        '''
 
                         if "|" in url:
                             n3 = url.find("|", 0)
@@ -467,10 +463,12 @@ def getpics(names, pics, tmpfold, picfold):
                                 f1.write(p)
                         else:
                             try:
+                                '''
                                 # print("Going in urlopen url =", url)
                                 # p = Utils.gettUrl(url)
                                 # with open(tpicf, 'wb') as f1:
                                     # f1.write(p)
+                                '''
                                 try:
                                     with open(tpicf, 'wb') as f:
                                         f.write(requests.get(url, stream=True, allow_redirects=True).content)
@@ -478,8 +476,6 @@ def getpics(names, pics, tmpfold, picfold):
                                 except Exception as e:
                                     print("Error: Exception", e)
                                     print('===========2222222222=================\n')
-                                    # if PY3:
-                                        # poster = poster.encode()
                                     callInThread(threadGetPage, url=poster, file=tpicf, success=downloadPic, fail=downloadError)
 
                                     '''
@@ -495,11 +491,11 @@ def getpics(names, pics, tmpfold, picfold):
                     os.system(cmd)
                     print('cp defpic tpicf')
 
-        if not os.path.exists(tpicf):
+        if not file_exists(tpicf):
             cmd = "cp " + defpic + " " + tpicf
             os.system(cmd)
 
-        if os.path.exists(tpicf):
+        if file_exists(tpicf):
             try:
                 size = [168, 223]
                 if screenwidth.width() == 2560:
@@ -942,7 +938,7 @@ class ConfigEx(ConfigListScreen, Screen):
             self.session.openWithCallback(self.VirtualKeyBoardCallback, VirtualKeyBoard, title=self['config'].getCurrent()[0], text=self['config'].getCurrent()[1].value)
 
     def cachedel(self):
-        fold = os.path.join(str(cfg.cachefold.value), "tvspro/pic")
+        fold = os.path.join(Path_Cache, "pic")
         Utils.cachedel(fold)
         self.mbox = self.session.open(MessageBox, _('All cache fold empty!'), MessageBox.TYPE_INFO, timeout=5)
 
@@ -1098,35 +1094,38 @@ class GridMain(Screen):
             self.pos.append([790, 345])
             self.pos.append([1030, 342])
 
-        tmpfold = os.path.join(str(cfg.cachefold.value), "tvspro/tmp")
-        picfold = os.path.join(str(cfg.cachefold.value), "tvspro/pic")
+        tmpfold = os.path.join(Path_Cache, "tmp")
+        picfold = os.path.join(Path_Cache, "pic")
 
         picx = getpics(names, pics, tmpfold, picfold)
-        print("In Gridmain pics = ", pics)
+        # print("In Gridmain pics = ", pics)
 
         self.urls = urls
         self.pics = picx
         self.names = names
         self.infos = infos
-        self["info"] = Label()
 
         list = []
         list = names
+        
+        self["info"] = Label()
         self["menu"] = List(list)
         for x in list:
             print("x in list =", x)
         self["frame"] = MovingPixmap()
+
+        self.PIXMAPS_PER_PAGE = 10
         i = 0
-        while i < 20:
+        while i < self.PIXMAPS_PER_PAGE:
             self["label" + str(i + 1)] = StaticText()
             self["pixmap" + str(i + 1)] = Pixmap()
             i += 1
-        # i = 0
+        self.npics = len(self.names)
+        self.npage = int(float(self.npics // self.PIXMAPS_PER_PAGE)) + 1
         self.index = 0
+        self.maxentry = len(list) - 1
         self.ipage = 1
-        ln = len(self.names)
-        self.npage = int(float(ln / 10)) + 1
-        print("self.npage =", self.npage)
+
         self["actions"] = ActionMap(["OkCancelActions", "EPGSelectActions", "MenuActions", "DirectionActions", "NumberActions"], {
             "ok": self.okClicked,
             "epg": self.showIMDB,
@@ -1137,15 +1136,7 @@ class GridMain(Screen):
             "up": self.key_up,
             "down": self.key_down
         })
-
-        print("Going in openTest")
         self.onLayoutFinish.append(self.openTest)
-
-    def cancel(self):
-        self.close()
-
-    def exit(self):
-        self.close()
 
     def showIMDB(self):
         idx = self.index
@@ -1171,36 +1162,33 @@ class GridMain(Screen):
         print("In GridMain infos =", self.inf)
 
     def paintFrame(self):
-        # print("In paintFrame self.index, self.minentry, self.maxentry =", self.index, self.minentry, self.maxentry)
-        # print("In paintFrame self.ipage = ", self.ipage)
         try:
-            ifr = self.index - (10 * (self.ipage - 1))
+            # If the index exceeds the maximum number of items, it returns to the first item
+            if self.index > self.maxentry:
+                self.index = self.minentry
+            self.idx = self.index
+            name = self.names[self.idx]
+            self['info'].setText(str(name))
+            ifr = self.index - (self.PIXMAPS_PER_PAGE * (self.ipage - 1))
             ipos = self.pos[ifr]
             self["frame"].moveTo(ipos[0], ipos[1], 1)
             self["frame"].startMoving()
-            self.info()
         except Exception as e:
-            print('error  in paintframe: ', e)
+            print('Error in paintFrame: ', e)
 
     def openTest(self):
-        print("self.index, openTest self.ipage, self.npage =", self.index, self.ipage, self.npage)
         if self.ipage < self.npage:
-            self.maxentry = (10 * self.ipage) - 1
-            self.minentry = (self.ipage - 1) * 10
-            print("self.ipage , self.minentry, self.maxentry =", self.ipage, self.minentry, self.maxentry)
+            self.maxentry = (self.PIXMAPS_PER_PAGE * self.ipage) - 1
+            self.minentry = (self.ipage - 1) * self.PIXMAPS_PER_PAGE
 
         elif self.ipage == self.npage:
-            print("self.ipage , len(self.pics) =", self.ipage, len(self.pics))
             self.maxentry = len(self.pics) - 1
-            self.minentry = (self.ipage - 1) * 10
-            print("self.ipage , self.minentry, self.maxentry B=", self.ipage, self.minentry, self.maxentry)
+            self.minentry = (self.ipage - 1) * self.PIXMAPS_PER_PAGE
             i1 = 0
-            blpic = dblank
-            while i1 < 12:
+            while i1 < self.PIXMAPS_PER_PAGE:
                 self["label" + str(i1 + 1)].setText(" ")
-                self["pixmap" + str(i1 + 1)].instance.setPixmapFromFile(blpic)
+                self["pixmap" + str(i1 + 1)].instance.setPixmapFromFile(dblank)
                 i1 += 1
-        print("len(self.pics), self.minentry, self.maxentry =", len(self.pics), self.minentry, self.maxentry)
         self.npics = len(self.pics)
         i = 0
         i1 = 0
@@ -1208,77 +1196,81 @@ class GridMain(Screen):
         ln = self.maxentry - (self.minentry - 1)
         while i < ln:
             idx = self.minentry + i
-            self["label" + str(i + 1)].setText(self.names[idx])
+            # self["label" + str(i + 1)].setText(self.names[idx])  # this show label to bottom of png pixmap
             pic = self.pics[idx]
-            if os.path.exists(pic):
-                print("pic path exists")
-            else:
-                print("pic path not exists")
-            picd = defpic
-            file_name, file_extension = os.path.splitext(pic)
-            if file_extension != ".png":
-                pic = str(file_name) + ".png"
-            if self["pixmap" + str(i + 1)].instance:
-                try:
-                    self["pixmap" + str(i + 1)].instance.setPixmapFromFile(pic)  # ok
-                except Exception as e:
-                    print(e)
-                    self["pixmap" + str(i + 1)].instance.setPixmapFromFile(picd)
+            if not os.path.exists(self.pics[idx]):
+                pic = dblank
+            self["pixmap" + str(i + 1)].instance.setPixmapFromFile(pic)
             i += 1
-
         self.index = self.minentry
-        # print("self.minentry, self.index =", self.minentry, self.index)
         self.paintFrame()
 
     def key_left(self):
-        if not self.index <= 0:
+        # Decrement the index only if we are not at the first pixmap
+        if self.index >= 0:
             self.index -= 1
+        else:
+            # If we are at the first pixmap, go back to the last pixmap of the last page
+            self.ipage = self.npage
+            self.index = self.npics - 1
+        # Check if we need to change pages
+        if self.index < self.minentry:
+            self.ipage -= 1
+            if self.ipage < 1:  # If we go beyond the first page
+                self.ipage = self.npage
+                self.index = self.npics - 1  # Back to the last pixmap of the last page
+            self.openTest()
+        else:
             self.paintFrame()
-        # else:
-            # self.paintFrame()
 
     def key_right(self):
-        i = self.npics - 1
-        if self.index == i:
+        # Increment the index only if we are not at the last pixmap
+        if self.index < self.npics - 1:
+            self.index += 1
+        else:
+            # If we are at the last pixmap, go back to the first pixmap of the first page
             self.index = 0
             self.ipage = 1
             self.openTest()
-        self.index += 1
+        # Check if we need to change pages
         if self.index > self.maxentry:
-            # self.index = 0
-            self.key_down()
+            self.ipage += 1
+            if self.ipage > self.npage:  # If we exceed the number of pages
+                self.index = 0
+                self.ipage = 1  # Back to first page
+            self.openTest()
         else:
             self.paintFrame()
 
     def key_up(self):
-        self.index = self.index - 5
-        if self.index < (self.minentry):
-            if self.ipage > 1:
-                self.ipage = self.ipage - 1
-                self.openTest()
-            elif self.ipage == 1:
-                return
-            else:
-                self.index = 0
-            self.paintFrame()
+        if self.index >= 5:
+            self.index -= 5
         else:
-            self.paintFrame()
+            if self.ipage > 1:
+                self.ipage -= 1
+                self.index = self.maxentry  # Back to the last line of the previous page
+                self.openTest()
+            else:
+                # If we are on the first page, go back to the last pixmap of the last page
+                self.ipage = self.npage
+                self.index = self.npics - 1
+                self.openTest()
+        self.paintFrame()
 
     def key_down(self):
-        self.index = self.index + 5
-        if self.index > (self.maxentry):
+        if self.index <= self.maxentry - 5:
+            self.index += 5
+        else:
             if self.ipage < self.npage:
-                self.ipage = self.ipage + 1
+                self.ipage += 1
+                self.index = self.minentry  # Back to the top of the next page
                 self.openTest()
-            elif self.ipage == self.npage:
+            else:
+                # If we are on the last page, go back to the first pixmap of the first page
                 self.index = 0
                 self.ipage = 1
                 self.openTest()
-            else:
-                self.index = 0
-            self.paintFrame()
-        else:
-            self.paintFrame()
+        self.paintFrame()
 
     def okClicked(self):
         itype = self.index
@@ -1412,6 +1404,12 @@ class GridMain(Screen):
         search = False
         return
 
+    def cancel(self):
+        self.close()
+
+    def exit(self):
+        self.close()
+
 
 class Videos2(Screen):
     def __init__(self, session, name, url):
@@ -1457,7 +1455,7 @@ class Videos2(Screen):
             try:
                 # if "title" in response["items"][i]:
                 name = str(response["items"][i]["title"])
-                name = re.sub('\[.*?\]', "", name)
+                name = re.sub(r'\[.*?\]', "", name)
                 name = Utils.cleanName(name)
 
                 url = str(response["items"][i]["externallink"])
@@ -1541,7 +1539,7 @@ class Videos6(Screen):
             try:
                 # if "title" in y["items"][i]:
                 name = str(y["items"][i]["title"])
-                name = re.sub('\[.*?\]', "", name)
+                name = re.sub(r'\[.*?\]', "", name)
                 name = Utils.cleanName(name)
 
                 url = (y["items"][i]["link"])
@@ -1616,7 +1614,7 @@ class Videos1(Screen):
             try:
                 # if "title" in y["items"][i]:
                 name = str(y["items"][i]["title"])
-                name = re.sub('\[.*?\]', "", name)
+                name = re.sub(r'\[.*?\]', "", name)
                 name = Utils.cleanName(name)
 
                 url = (y["items"][i]["link"])
@@ -1692,7 +1690,7 @@ class nextVideos1(Screen):
             pic = ""
             try:
                 name = str(y["items"][i]["title"])
-                name = re.sub('\[.*?\]', "", name)
+                name = re.sub(r'\[.*?\]', "", name)
                 name = Utils.cleanName(name)
                 url = (y["items"][i]["link"])
                 pic = (y["items"][i]["thumbnail"])
@@ -1773,7 +1771,7 @@ class Videos3(Screen):
             pic = ""
             try:
                 name = str(y["items"][i]["title"])
-                name = re.sub('\[.*?\]', "", name)
+                name = re.sub(r'\[.*?\]', "", name)
                 name = Utils.cleanName(name)
 
                 url = (y["items"][i]["link"])
@@ -1850,7 +1848,7 @@ class Videos4(Screen):
             pic = ""
             try:
                 name = str(y["items"][i]["title"])
-                name = re.sub('\[.*?\]', "", name)
+                name = re.sub(r'\[.*?\]', "", name)
                 name = Utils.cleanName(name)
 
                 url = str(y["items"][i]["externallink"])
@@ -1927,7 +1925,7 @@ class nextVideos4(Screen):
             pic = ""
             try:
                 name = str(y["items"][i]["title"])
-                name = re.sub('\[.*?\]', "", name)
+                name = re.sub(r'\[.*?\]', "", name)
                 name = Utils.cleanName(name)
                 url = str(y["items"][i]["externallink"])
                 pic = str(y["items"][i]["thumbnail"])
@@ -2003,7 +2001,7 @@ class Videos5(Screen):
             pic = ""
             try:
                 name = str(y["items"][i]["title"])
-                name = re.sub('\[.*?\]', "", name)
+                name = re.sub(r'\[.*?\]', "", name)
                 name = Utils.cleanName(name)
 
                 url = (y["items"][i]["link"])
@@ -2199,9 +2197,7 @@ class Playstream1x(Screen):
             self.download = downloadWithProgress(self.urlm3u, self.in_tmp)
             self.download.addProgress(self.downloadProgress)
             self.download.start().addCallback(self.check).addErrback(self.showError)
-            # else:
-                # self.downloading = False
-                # self.session.open(MessageBox, _('Download Failed!!!'), MessageBox.TYPE_INFO, timeout=5)
+
         else:
             self.downloading = False
 
@@ -2244,22 +2240,26 @@ class Playstream1x(Screen):
         if idx is not None or idx != -1:
             self.name = self.names[idx]
             self.url = self.urls[idx]
-            # if "youtube" in str(self.url):
-                # desc = self.name
-                # try:
-                    # from Plugins.Extensions.tvspro.youtube_dl import YoutubeDL
-                    # '''
-                    # ydl_opts = {'format': 'best'}
-                    # ydl_opts = {'format': 'bestaudio/best'}
-                    # '''
-                    # ydl_opts = {'format': 'best'}
-                    # ydl = YoutubeDL(ydl_opts)
-                    # ydl.add_default_info_extractors()
-                    # result = ydl.extract_info(self.url, download=False)
-                    # self.url = result["url"]
-                # except:
-                    # pass
-                # self.session.open(Playstream2, self.name, self.url, desc)
+            '''
+            if "youtube" in str(self.url):
+                desc = self.name
+                try:
+                    from Plugins.Extensions.tvspro.youtube_dl import YoutubeDL
+            '''
+            '''
+                    ydl_opts = {'format': 'best'}
+                    ydl_opts = {'format': 'bestaudio/best'}
+            '''
+            '''
+                    ydl_opts = {'format': 'best'}
+                    ydl = YoutubeDL(ydl_opts)
+                    ydl.add_default_info_extractors()
+                    result = ydl.extract_info(self.url, download=False)
+                    self.url = result["url"]
+                except:
+                    pass
+                self.session.open(Playstream2, self.name, self.url, desc)
+            '''
 
             if idx == 0:
                 print('In playVideo url D=', self.url)
@@ -2520,22 +2520,22 @@ def main(session, **kwargs):
         _session = session
 
         try:
-            os.mkdir(os.path.join(str(cfg.cachefold.value), "tvspro"))
+            os.mkdir(os.path.join(Path_Cache, ""))
         except:
             pass
 
         try:
-            os.mkdir(os.path.join(str(cfg.cachefold.value), "tvspro/vid"))
+            os.mkdir(os.path.join(Path_Cache, "pic"))
         except:
             pass
 
         try:
-            os.mkdir(os.path.join(str(cfg.cachefold.value), "tvspro/pic"))
+            os.mkdir(os.path.join(Path_Cache, "tmp"))
         except:
             pass
 
         try:
-            os.mkdir(os.path.join(str(cfg.cachefold.value), "tvspro/tmp"))
+            os.mkdir(os.path.join(Path_Cache, "vid"))
         except:
             pass
 
