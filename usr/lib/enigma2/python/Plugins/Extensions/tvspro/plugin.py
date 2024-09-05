@@ -100,6 +100,7 @@ name_plug = 'TVS Pro Revolution'
 currversion = getversioninfo()
 Version = currversion + ' - 05.09.2024'
 title_plug = '..:: TVS Pro Revolution V. %s ::..' % Version
+referer = 'https://tivustream.website'
 installer_url = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0JlbGZhZ29yMjAwNS9yZXZvbHV0aW9ucHJvL21haW4vaW5zdGFsbGVyLnNo'
 developer_url = 'aHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS9yZXBvcy9CZWxmYWdvcjIwMDUvcmV2b2x1dGlvbnBybw=='
 skin_path = THISPLUG
@@ -337,7 +338,7 @@ try:
 except:
     if os.path.exists("/usr/bin/apt-get"):
         cfg.movie = ConfigDirectory(default='/media/hdd/movie')
-        cfg.cachefold = ConfigDirectory(default='/media/hdd')
+        cfg.cachefold = str(cfg.movie.value)  # ConfigDirectory(default='/media/hdd')
 
 Path_Movies = str(cfg.movie.value) + '/'
 Path_Cache = str(cfg.cachefold.value).replace('movie', 'tvspro')
@@ -1441,7 +1442,6 @@ class Videos2(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-        referer = 'https://tivustream.website'
         url = self.url
         content = Utils.ReadUrl2(url, referer)
         if PY3:
@@ -1525,7 +1525,6 @@ class Videos6(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-        referer = 'https://tivustream.website'
         url = self.url
         content = Utils.ReadUrl2(url, referer)
         if PY3:
@@ -1600,7 +1599,6 @@ class Videos1(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-        referer = 'https://tivustream.website'
         url = self.url
         content = Utils.ReadUrl2(url, referer)
         if PY3:
@@ -1677,7 +1675,6 @@ class nextVideos1(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-        referer = 'https://tivustream.website'
         url = self.url
         content = Utils.ReadUrl2(url, referer)
         if PY3:
@@ -1757,8 +1754,6 @@ class Videos3(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-
-        referer = 'https://tivustream.website'
         url = self.url
         content = Utils.ReadUrl2(url, referer)
         if PY3:
@@ -1835,7 +1830,6 @@ class Videos4(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-        referer = 'https://tivustream.website'
         url = self.url
         content = Utils.ReadUrl2(url, referer)
         if PY3:
@@ -1912,7 +1906,6 @@ class nextVideos4(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-        referer = 'https://tivustream.website'
         url = self.url
         content = Utils.ReadUrl2(url, referer)
         if PY3:
@@ -1988,7 +1981,6 @@ class Videos5(Screen):
         self.urls = []
         self.pics = []
         self.infos = []
-        referer = 'https://tivustream.website'
         url = self.url
         content = Utils.ReadUrl2(url, referer)
         if PY3:
@@ -2519,10 +2511,10 @@ def main(session, **kwargs):
     try:
         _session = session
 
-        try:
-            os.mkdir(os.path.join(Path_Cache, ""))
-        except:
-            pass
+        # try:
+            # os.mkdir(os.path.join(Path_Cache, ""))
+        # except:
+            # pass
 
         try:
             os.mkdir(os.path.join(Path_Cache, "pic"))
@@ -2531,11 +2523,6 @@ def main(session, **kwargs):
 
         try:
             os.mkdir(os.path.join(Path_Cache, "tmp"))
-        except:
-            pass
-
-        try:
-            os.mkdir(os.path.join(Path_Cache, "vid"))
         except:
             pass
 
