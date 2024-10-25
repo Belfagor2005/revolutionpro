@@ -917,7 +917,7 @@ class ConfigEx(ConfigListScreen, Screen):
         self.list = []
         ConfigListScreen.__init__(self, self.list, session=self.session, on_change=self.changedEntry)
         self['key_red'] = Label(_('Exit'))
-        self['key_green'] = Label(_('Save'))
+        self['key_green'] = Label(_('- - - -'))
         self['key_yellow'] = Button(_('Empty Cache'))
         self['title'] = Label(_('"SETUP PLUGIN"'))
         self["description"] = Label('')
@@ -976,6 +976,7 @@ class ConfigEx(ConfigListScreen, Screen):
             print("Error ", e)
 
     def changedEntry(self):
+        self['key_green'].instance.setText(_('Save') if self['config'].isChanged() else '- - - -')
         for x in self.onChangedEntry:
             x()
         try:
@@ -1050,7 +1051,6 @@ class ConfigEx(ConfigListScreen, Screen):
         elif answer:
             for x in self["config"].list:
                 x[1].cancel()
-
             self.close()
         return
 
