@@ -697,8 +697,8 @@ class AnimMain(Screen):
     def check_vers(self):
         remote_version = '0.0'
         remote_changelog = ''
-        req = Utils.Request(Utils.b64decoder(installer_url), headers={'User-Agent': 'Mozilla/5.0'})
-        page = Utils.urlopen(req).read()
+        req = Request(b64decoder(installer_url), headers=headers)
+        page = urlopen(req).read()
         if PY3:
             data = page.decode("utf-8")
         else:
@@ -718,9 +718,7 @@ class AnimMain(Screen):
         if currversion < remote_version:
             self.Update = True
             self['key_yellow'].show()
-            # self['key_green'].show()
             self.session.open(MessageBox, _('New version %s is available\n\nChangelog: %s\n\nPress info_long or yellow_long button to start force updating.') % (self.new_version, self.new_changelog), MessageBox.TYPE_INFO, timeout=5)
-        # self.update_me()
 
     def update_me(self):
         if self.Update is True:
@@ -996,7 +994,6 @@ class ConfigEx(ConfigListScreen, Screen):
         return SetupSummary
 
     def Ok_edit(self):
-        # ConfigListScreen.keyOK(self)
         sel = self['config'].getCurrent()[1]
         if sel and sel == cfg.cachefold:
             self.setting = 'cachefold'
@@ -1110,7 +1107,6 @@ class GridMain(Screen):
 
         picx = getpics(names, pics, tmpfold, picfold)
         # print("In Gridmain pics = ", pics)
-
         self.urls = urls
         self.pics = picx
         self.names = names
@@ -1118,7 +1114,7 @@ class GridMain(Screen):
 
         list = []
         list = names
-        
+
         self["info"] = Label()
         self["menu"] = List(list)
         for x in list:
@@ -1463,25 +1459,19 @@ class Videos2(Screen):
             url = ""
             pic = ""
             try:
-                # if "title" in response["items"][i]:
                 name = str(response["items"][i]["title"])
                 name = re.sub(r'\[.*?\]', "", name)
                 name = Utils.cleanName(name)
-
                 url = str(response["items"][i]["externallink"])
-
                 pic = str(response["items"][i]["thumbnail"])
-
                 if _('serie') not in self.name.lower():
                     pic = piconlocal(name)
-
                 info = str(response["items"][i]["info"])
                 info = re.sub(r'\r\n', '', info)
                 info = info.replace('---', ' ')
                 self.names.append(name)
                 self.urls.append(url)
                 self.pics.append(pic)
-
                 self.infos.append(html_conv.html_unescape(info))
                 i += 1
             except Exception as e:
@@ -1546,7 +1536,6 @@ class Videos6(Screen):
             url = ""
             pic = ""
             try:
-                # if "title" in y["items"][i]:
                 name = str(y["items"][i]["title"])
                 name = re.sub(r'\[.*?\]', "", name)
                 name = Utils.cleanName(name)
@@ -1565,15 +1554,9 @@ class Videos6(Screen):
                 print(e)
                 break
 
-        # nextmodule = "Play"
         nextmodule = "Videos1"
         if cfg.thumb.value == "True":
-            # print("In Videos6 Going in GridMain")
             self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics=self.pics)
-        """
-        else:
-            self.session.open(AnimMain, title, nextmodule, self.names, self.urls)
-            """
 
     def okClicked(self):
         pass
@@ -1620,7 +1603,6 @@ class Videos1(Screen):
             url = ""
             pic = ""
             try:
-                # if "title" in y["items"][i]:
                 name = str(y["items"][i]["title"])
                 name = re.sub(r'\[.*?\]', "", name)
                 name = Utils.cleanName(name)
@@ -1640,15 +1622,9 @@ class Videos1(Screen):
                 break
 
         title = name_plug
-        # nextmodule = "Play"
         nextmodule = "Videos1"
         if cfg.thumb.value == "True":
-            # print("In Videos1 Going in GridMain")
             self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics=self.pics)
-        """
-        else:
-            self.session.open(AnimMain, title, nextmodule, self.names, self.urls)
-            """
 
     def okClicked(self):
         pass
@@ -1718,15 +1694,10 @@ class nextVideos1(Screen):
                 break
 
         title = name_plug
-        # nextmodule = "Play"
         nextmodule = "Videos1"
         if cfg.thumb.value == "True":
             print("In nextVideos1 Going in GridMain")
             self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics=self.pics)
-        """
-        else:
-            self.session.open(AnimMain, title, nextmodule, self.names, self.urls)
-            """
 
     def okClicked(self):
         pass
@@ -1795,14 +1766,9 @@ class Videos3(Screen):
 
         title = name_plug
         nextmodule = "Play"
-        # print("In Videos3 nextmodule =", nextmodule)
         if cfg.thumb.value == "True":
             print("In Videos3 Going in GridMain")
             self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics=self.pics)
-        """
-        else:
-            self.session.open(AnimMain, title, nextmodule, self.names, self.urls)
-            """
 
     def okClicked(self):
         pass
@@ -1871,14 +1837,8 @@ class Videos4(Screen):
 
         title = name_plug
         nextmodule = "Videos5"
-        # print("In Videos4 nextmodule =", nextmodule)
         if cfg.thumb.value == "True":
-            # print("In Videos4 Going in GridMain")
             self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics=self.pics)
-        """
-        else:
-            self.session.open(AnimMain, title, nextmodule, self.names, self.urls)
-            """
 
     def okClicked(self):
         pass
@@ -1946,14 +1906,8 @@ class nextVideos4(Screen):
 
         title = name_plug
         nextmodule = "Videos4"
-        # print("In nextVideos4 nextmodule =", nextmodule)
         if cfg.thumb.value == "True":
-            # print("In nextVideos4 Going in GridMain")
             self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics=self.pics)
-        """
-        else:
-            self.session.open(AnimMain, title, nextmodule, self.names, self.urls)
-            """
 
     def okClicked(self):
         pass
@@ -2026,10 +1980,6 @@ class Videos5(Screen):
         if cfg.thumb.value == "True":
             print("In Videos5 Going in GridMain")
             self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics=self.pics)
-        """
-        else:
-            self.session.open(AnimMain, title, nextmodule, self.names, self.urls)
-            """
 
     def okClicked(self):
         pass
@@ -2183,7 +2133,6 @@ class Playstream1x(Screen):
 
     def download_m3u(self, result=None):
         if result:
-            # if 'm3u8' not in self.urlm3u:
             path = urlparse(self.urlm3u).path
             ext = splitext(path)[1]
             if ext != '.mp4' or ext != '.mkv' or ext != '.avi' or ext != '.flv':  # or ext != 'm3u8':
@@ -2242,26 +2191,6 @@ class Playstream1x(Screen):
         if idx is not None or idx != -1:
             self.name = self.names[idx]
             self.url = self.urls[idx]
-            '''
-            if "youtube" in str(self.url):
-                desc = self.name
-                try:
-                    from Plugins.Extensions.tvspro.youtube_dl import YoutubeDL
-            '''
-            '''
-                    ydl_opts = {'format': 'best'}
-                    ydl_opts = {'format': 'bestaudio/best'}
-            '''
-            '''
-                    ydl_opts = {'format': 'best'}
-                    ydl = YoutubeDL(ydl_opts)
-                    ydl.add_default_info_extractors()
-                    result = ydl.extract_info(self.url, download=False)
-                    self.url = result["url"]
-                except:
-                    pass
-                self.session.open(Playstream2, self.name, self.url, desc)
-            '''
 
             if idx == 0:
                 print('In playVideo url D=', self.url)
@@ -2373,16 +2302,13 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
             'leavePlayer': self.cancel,
             'epg': self.showIMDB,
             'info': self.showIMDB,
-            # 'info': self.cicleStreamType,
             'tv': self.cicleStreamType,
             'stop': self.leavePlayer,
             'cancel': self.cancel,
             'back': self.cancel
         }, -1)
         InfoBarSeek.__init__(self, actionmap='InfobarSeekActions')
-        # self.onLayoutFinish.append(self.cicleStreamType)
-        # self.onClose.append(self.cancel)
-        # self.onClose.append(self.__onClose)
+
         if '8088' in str(self.url):
             self.onFirstExecBegin.append(self.slinkPlay)
         else:
@@ -2520,11 +2446,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
 def main(session, **kwargs):
     try:
         _session = session
-
-        # try:
-            # os.mkdir(os.path.join(Path_Cache, ""))
-        # except:
-            # pass
 
         try:
             os.mkdir(os.path.join(Path_Cache, "pic"))
