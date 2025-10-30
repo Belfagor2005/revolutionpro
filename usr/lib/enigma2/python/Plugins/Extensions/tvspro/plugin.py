@@ -32,7 +32,9 @@ from Components.config import (
 from Components.ConfigList import ConfigListScreen
 from Components.Label import Label
 from Components.MenuList import MenuList
-from Components.MultiContent import (MultiContentEntryPixmapAlphaTest, MultiContentEntryText)
+from Components.MultiContent import (
+    MultiContentEntryPixmapAlphaTest,
+    MultiContentEntryText)
 from Components.Pixmap import (Pixmap, MovingPixmap)
 from Components.ProgressBar import ProgressBar
 from Components.ServiceEventTracker import (ServiceEventTracker, InfoBarBase)
@@ -142,7 +144,7 @@ if sys.version_info >= (2, 7, 9):
     try:
         import ssl
         sslContext = ssl._create_unverified_context()
-    except:
+    except BaseException:
         sslContext = None
 
 # https twisted client hack #
@@ -289,14 +291,59 @@ def rvoneListEntry(name):
     res = [name]
     pngx = os.path.join(res_plugin_path, 'pics/setting2.png')
     if screenwidth.width() == 2560:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(50, 50), png=loadPNG(pngx)))
-        res.append(MultiContentEntryText(pos=(90, 0), size=(1200, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(
+            MultiContentEntryPixmapAlphaTest(
+                pos=(
+                    5, 5), size=(
+                    50, 50), png=loadPNG(pngx)))
+        res.append(
+            MultiContentEntryText(
+                pos=(
+                    90,
+                    0),
+                size=(
+                    1200,
+                    50),
+                font=0,
+                text=name,
+                color=0xa6d1fe,
+                flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     elif screenwidth.width() == 1920:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(40, 40), png=loadPNG(pngx)))
-        res.append(MultiContentEntryText(pos=(70, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(
+            MultiContentEntryPixmapAlphaTest(
+                pos=(
+                    5, 5), size=(
+                    40, 40), png=loadPNG(pngx)))
+        res.append(
+            MultiContentEntryText(
+                pos=(
+                    70,
+                    0),
+                size=(
+                    1000,
+                    50),
+                font=0,
+                text=name,
+                color=0xa6d1fe,
+                flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(3, 0), size=(40, 40), png=loadPNG(pngx)))
-        res.append(MultiContentEntryText(pos=(50, 0), size=(500, 40), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(
+            MultiContentEntryPixmapAlphaTest(
+                pos=(
+                    3, 0), size=(
+                    40, 40), png=loadPNG(pngx)))
+        res.append(
+            MultiContentEntryText(
+                pos=(
+                    50,
+                    0),
+                size=(
+                    500,
+                    40),
+                font=0,
+                text=name,
+                color=0xa6d1fe,
+                flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 
@@ -334,7 +381,9 @@ config.plugins.tvspro = ConfigSubsection()
 cfg = config.plugins.tvspro
 
 cfg.services = ConfigSelection(default='4097', choices=mdpchoices)
-cfg.thumb = ConfigSelection(default="True", choices=[("True", _("yes")), ("False", _("no"))])
+cfg.thumb = ConfigSelection(
+    default="True", choices=[
+        ("True", _("yes")), ("False", _("no"))])
 cfg.movie = ConfigDirectory("/media/hdd/movie")
 cfg.cachefold = ConfigDirectory("/media/hdd", False)
 
@@ -344,10 +393,11 @@ try:
     downloadpath = defaultMoviePath()
     cfg.movie = ConfigDirectory(default=downloadpath)
     cfg.cachefold = ConfigDirectory(default=downloadpath)
-except:
+except BaseException:
     if os.path.exists("/usr/bin/apt-get"):
         cfg.movie = ConfigDirectory(default='/media/hdd/movie')
-        cfg.cachefold = str(cfg.movie.value)  # ConfigDirectory(default='/media/hdd')
+        # ConfigDirectory(default='/media/hdd')
+        cfg.cachefold = str(cfg.movie.value)
 
 Path_Movies = str(cfg.movie.value) + '/'
 Path_Cache = str(cfg.cachefold.value).replace('movie', 'tvspro')
@@ -389,8 +439,16 @@ def returnIMDB(text_clear):
     return False
 
 
-def threadGetPage(url=None, file=None, key=None, success=None, fail=None, *args, **kwargs):
-    print('[threadGetPage] url, file, key, args, kwargs', url, "   ", file, "   ", key, "   ", args, "   ", kwargs)
+def threadGetPage(
+        url=None,
+        file=None,
+        key=None,
+        success=None,
+        fail=None,
+        *args,
+        **kwargs):
+    print('[threadGetPage] url, file, key, args, kwargs', url,
+          "   ", file, "   ", key, "   ", args, "   ", kwargs)
     try:
         url = url.rstrip('\r\n').rstrip().replace("%0A", "")
         response = get(url, verify=False)
@@ -458,7 +516,7 @@ def getpics(names, pics, tmpfold, picfold):
                     cmd = "cp " + url + " " + tpicf
                     print("In getpics not fileExists(picf) cmd =", cmd)
                     os.system(cmd)
-                except:
+                except BaseException:
                     pass
             else:
                 # now download image
@@ -491,12 +549,23 @@ def getpics(names, pics, tmpfold, picfold):
                                 '''
                                 try:
                                     with open(tpicf, 'wb') as f:
-                                        f.write(requests.get(url, stream=True, allow_redirects=True).content)
-                                    print('=============11111111=================\n')
+                                        f.write(
+                                            requests.get(
+                                                url,
+                                                stream=True,
+                                                allow_redirects=True).content)
+                                    print(
+                                        '=============11111111=================\n')
                                 except Exception as e:
                                     print("Error: Exception", e)
-                                    print('===========2222222222=================\n')
-                                    callInThread(threadGetPage, url=poster, file=tpicf, success=downloadPic, fail=downloadError)
+                                    print(
+                                        '===========2222222222=================\n')
+                                    callInThread(
+                                        threadGetPage,
+                                        url=poster,
+                                        file=tpicf,
+                                        success=downloadPic,
+                                        fail=downloadError)
 
                                     '''
                                     print(e)
@@ -506,7 +575,7 @@ def getpics(names, pics, tmpfold, picfold):
                                 print("Error: Exception 2")
                                 print(e)
 
-                except:
+                except BaseException:
                     cmd = "cp " + defpic + " " + tpicf
                     os.system(cmd)
                     print('cp defpic tpicf')
@@ -529,7 +598,7 @@ def getpics(names, pics, tmpfold, picfold):
                     # shrink if larger
                     try:
                         im.thumbnail(size, Image.Resampling.LANCZOS)
-                    except:
+                    except BaseException:
                         im.thumbnail(size, Image.ANTIALIAS)
                     imagew, imageh = im.size
                     # enlarge if smaller
@@ -537,9 +606,11 @@ def getpics(names, pics, tmpfold, picfold):
                         if imagew < size[0]:
                             ratio = size[0] / imagew
                             try:
-                                im = im.resize((int(imagew * ratio), int(imageh * ratio)), Image.Resampling.LANCZOS)
-                            except:
-                                im = im.resize((int(imagew * ratio), int(imageh * ratio)), Image.ANTIALIAS)
+                                im = im.resize(
+                                    (int(imagew * ratio), int(imageh * ratio)), Image.Resampling.LANCZOS)
+                            except BaseException:
+                                im = im.resize(
+                                    (int(imagew * ratio), int(imageh * ratio)), Image.ANTIALIAS)
 
                             imagew, imageh = im.size
                     except Exception as e:
@@ -561,7 +632,7 @@ def getpics(names, pics, tmpfold, picfold):
                     im = Image.open(tpicf)
                     try:
                         im.thumbnail(size, Image.Resampling.LANCZOS)
-                    except:
+                    except BaseException:
                         im.thumbnail(size, Image.ANTIALIAS)
                     im.save(tpicf)
             except Exception as e:
@@ -602,7 +673,11 @@ def downloadError(output):
 
 def savePoster(dwn_poster, url_poster):
     with open(dwn_poster, 'wb') as f:
-        f.write(requests.get(url_poster, stream=True, allow_redirects=True).content)
+        f.write(
+            requests.get(
+                url_poster,
+                stream=True,
+                allow_redirects=True).content)
         f.close()
 
 
@@ -727,32 +802,66 @@ class AnimMain(Screen):
         if currversion < remote_version:
             self.Update = True
             self['key_yellow'].show()
-            self.session.open(MessageBox, _('New version %s is available\n\nChangelog: %s\n\nPress info_long or yellow_long button to start force updating.') % (self.new_version, self.new_changelog), MessageBox.TYPE_INFO, timeout=5)
+            self.session.open(
+                MessageBox,
+                _('New version %s is available\n\nChangelog: %s\n\nPress info_long or yellow_long button to start force updating.') %
+                (self.new_version,
+                 self.new_changelog),
+                MessageBox.TYPE_INFO,
+                timeout=5)
 
     def update_me(self):
         if self.Update is True:
-            self.session.openWithCallback(self.install_update, MessageBox, _("New version %s is available.\n\nChangelog: %s \n\nDo you want to install it now?") % (self.new_version, self.new_changelog), MessageBox.TYPE_YESNO)
+            self.session.openWithCallback(
+                self.install_update,
+                MessageBox,
+                _("New version %s is available.\n\nChangelog: %s \n\nDo you want to install it now?") %
+                (self.new_version,
+                 self.new_changelog),
+                MessageBox.TYPE_YESNO)
         else:
-            self.session.open(MessageBox, _("Congrats! You already have the latest version..."),  MessageBox.TYPE_INFO, timeout=4)
+            self.session.open(
+                MessageBox,
+                _("Congrats! You already have the latest version..."),
+                MessageBox.TYPE_INFO,
+                timeout=4)
 
     def update_dev(self):
         try:
-            req = Utils.Request(Utils.b64decoder(developer_url), headers={'User-Agent': 'Mozilla/5.0'})
+            req = Utils.Request(
+                Utils.b64decoder(developer_url), headers={
+                    'User-Agent': 'Mozilla/5.0'})
             page = Utils.urlopen(req).read()
             data = json.loads(page)
             remote_date = data['pushed_at']
-            strp_remote_date = datetime.strptime(remote_date, '%Y-%m-%dT%H:%M:%SZ')
+            strp_remote_date = datetime.strptime(
+                remote_date, '%Y-%m-%dT%H:%M:%SZ')
             remote_date = strp_remote_date.strftime('%Y-%m-%d')
-            self.session.openWithCallback(self.install_update, MessageBox, _("Do you want to install update ( %s ) now?") % (remote_date), MessageBox.TYPE_YESNO)
+            self.session.openWithCallback(
+                self.install_update,
+                MessageBox,
+                _("Do you want to install update ( %s ) now?") %
+                (remote_date),
+                MessageBox.TYPE_YESNO)
         except Exception as e:
             print('error xcons:', e)
 
     def install_update(self, answer=False):
         if answer:
-            cmd1 = 'wget -q "--no-check-certificate" ' + Utils.b64decoder(installer_url) + ' -O - | /bin/sh'
-            self.session.open(xConsole, 'Upgrading...', cmdlist=[cmd1], finishedCallback=self.myCallback, closeOnSuccess=False)
+            cmd1 = 'wget -q "--no-check-certificate" ' + \
+                Utils.b64decoder(installer_url) + ' -O - | /bin/sh'
+            self.session.open(
+                xConsole,
+                'Upgrading...',
+                cmdlist=[cmd1],
+                finishedCallback=self.myCallback,
+                closeOnSuccess=False)
         else:
-            self.session.open(MessageBox, _("Update Aborted!"),  MessageBox.TYPE_INFO, timeout=3)
+            self.session.open(
+                MessageBox,
+                _("Update Aborted!"),
+                MessageBox.TYPE_INFO,
+                timeout=3)
 
     def myCallback(self, result=None):
         print('result:', result)
@@ -765,12 +874,12 @@ class AnimMain(Screen):
         self.inf = " "
         try:
             self.inf = self.nextlink[1]
-        except:
+        except BaseException:
             pass
         if self.inf:
             try:
                 self["info"].setText(self.inf)
-            except:
+            except BaseException:
                 self["info"].setText('')
         print("In AnimMain infos nextlink[1] =", self.inf)
 
@@ -830,7 +939,7 @@ class AnimMain(Screen):
             try:
                 vid2 = Videos2(self.session, name, url)
                 vid2.startSession()
-            except:
+            except BaseException:
                 pass
 
         elif self.nextlink[0] == _("Search"):
@@ -839,7 +948,11 @@ class AnimMain(Screen):
     def search_text(self):
         self.namex = self.nextlink[0]
         self.urlx = self.nextlink[2]
-        self.session.openWithCallback(self.filterChannels, VirtualKeyBoard, title=_("Filter this category..."), text='')
+        self.session.openWithCallback(
+            self.filterChannels,
+            VirtualKeyBoard,
+            title=_("Filter this category..."),
+            text='')
 
     def filterChannels(self, result=None):
         if result:
@@ -848,7 +961,7 @@ class AnimMain(Screen):
             try:
                 vid2 = nextVideos4(self.session, name, url)
                 vid2.startSession()
-            except:
+            except BaseException:
                 return
         else:
             self.resetSearch()
@@ -870,13 +983,17 @@ class Abouttvr(Screen):
         self["title"] = Button(title)
         self["info"] = Label()
         self["info"].setText(title_plug)
-        self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", 'ButtonSetupActions', "DirectionActions"], {
-            "ok": self.okClicked,
-            "back": self.close,
-            "cancel": self.cancel,
-            "red": self.close,
-            "green": self.okClicked
-        }, -1)
+        self["actions"] = ActionMap(["WizardActions",
+                                     "InputActions",
+                                     "ColorActions",
+                                     'ButtonSetupActions',
+                                     "DirectionActions"],
+                                    {"ok": self.okClicked,
+                                     "back": self.close,
+                                     "cancel": self.cancel,
+                                     "red": self.close,
+                                     "green": self.okClicked},
+                                    -1)
         self.onLayoutFinish.append(self.startSession)
 
     def startSession(self):
@@ -922,7 +1039,11 @@ class ConfigEx(ConfigListScreen, Screen):
         self.setup_title = _("SETUP PLUGIN")
         self.onChangedEntry = []
         self.list = []
-        ConfigListScreen.__init__(self, self.list, session=self.session, on_change=self.changedEntry)
+        ConfigListScreen.__init__(
+            self,
+            self.list,
+            session=self.session,
+            on_change=self.changedEntry)
         self['key_red'] = Label(_('Exit'))
         self['key_green'] = Label(_('- - - -'))
         self['key_yellow'] = Button(_('Empty Cache'))
@@ -953,19 +1074,33 @@ class ConfigEx(ConfigListScreen, Screen):
     def KeyText(self):
         sel = self['config'].getCurrent()
         if sel:
-            self.session.openWithCallback(self.VirtualKeyBoardCallback, VirtualKeyBoard, title=self['config'].getCurrent()[0], text=self['config'].getCurrent()[1].value)
+            self.session.openWithCallback(
+                self.VirtualKeyBoardCallback,
+                VirtualKeyBoard,
+                title=self['config'].getCurrent()[0],
+                text=self['config'].getCurrent()[1].value)
 
     def cachedel(self):
         fold = os.path.join(Path_Cache, "pic")
         Utils.cachedel(fold)
-        self.mbox = self.session.open(MessageBox, _('All cache fold empty!'), MessageBox.TYPE_INFO, timeout=5)
+        self.mbox = self.session.open(
+            MessageBox,
+            _('All cache fold empty!'),
+            MessageBox.TYPE_INFO,
+            timeout=5)
 
     def createSetup(self):
         self.editListEntry = None
         self.list = []
-        self.list.append(getConfigListEntry(_('Services Player Reference type'), cfg.services, _("Configure Service Player Reference, Enigma restart required")))
-        self.list.append(getConfigListEntry(_("Cache folder"), cfg.cachefold, _("Folder Cache Path (eg.: /media/hdd), Enigma restart required")))
-        self.list.append(getConfigListEntry(_("Movie folder"), cfg.movie, _("Folder Movie Path (eg.: /media/hdd/movie), Enigma restart required")))
+        self.list.append(
+            getConfigListEntry(
+                _('Services Player Reference type'),
+                cfg.services,
+                _("Configure Service Player Reference, Enigma restart required")))
+        self.list.append(getConfigListEntry(_("Cache folder"), cfg.cachefold, _(
+            "Folder Cache Path (eg.: /media/hdd), Enigma restart required")))
+        self.list.append(getConfigListEntry(_("Movie folder"), cfg.movie, _(
+            "Folder Movie Path (eg.: /media/hdd/movie), Enigma restart required")))
         # self.list.append(getConfigListEntry(_("Show thumbpic ?"), cfg.thumb, _("Show Thumbpics ? Enigma restart required")))
         self['config'].list = self.list
         self["config"].l.setList(self.list)
@@ -983,20 +1118,29 @@ class ConfigEx(ConfigListScreen, Screen):
             print("Error ", e)
 
     def changedEntry(self):
-        self['key_green'].instance.setText(_('Save') if self['config'].isChanged() else '- - - -')
+        self['key_green'].instance.setText(
+            _('Save') if self['config'].isChanged() else '- - - -')
         for x in self.onChangedEntry:
             x()
         try:
-            if isinstance(self['config'].getCurrent()[1], ConfigEnableDisable) or isinstance(self['config'].getCurrent()[1], ConfigYesNo) or isinstance(self['config'].getCurrent()[1], ConfigSelection):
+            if isinstance(
+                self['config'].getCurrent()[1],
+                ConfigEnableDisable) or isinstance(
+                self['config'].getCurrent()[1],
+                ConfigYesNo) or isinstance(
+                self['config'].getCurrent()[1],
+                    ConfigSelection):
                 self.createSetup()
-        except:
+        except BaseException:
             pass
 
     def getCurrentEntry(self):
-        return self['config'].getCurrent() and self['config'].getCurrent()[0] or ''
+        return self['config'].getCurrent() and self['config'].getCurrent()[
+            0] or ''
 
     def getCurrentValue(self):
-        return self['config'].getCurrent() and str(self['config'].getCurrent()[1].getText()) or ''
+        return self['config'].getCurrent() and str(
+            self['config'].getCurrent()[1].getText()) or ''
 
     def createSummary(self):
         from Screens.Setup import SetupSummary
@@ -1024,9 +1168,18 @@ class ConfigEx(ConfigListScreen, Screen):
                 bookmarks=config.movielist.videodirs,
                 autoAdd=False,
                 editDir=True,
-                inhibitDirs=['/bin', '/boot', '/dev', '/home', '/lib', '/proc', '/run', '/sbin', '/sys', '/var'],
-                minFree=15
-            )
+                inhibitDirs=[
+                    '/bin',
+                    '/boot',
+                    '/dev',
+                    '/home',
+                    '/lib',
+                    '/proc',
+                    '/run',
+                    '/sbin',
+                    '/sys',
+                    '/var'],
+                minFree=15)
         except Exception as e:
             print('openDirectoryBrowser get failed: ', e)
 
@@ -1042,7 +1195,11 @@ class ConfigEx(ConfigListScreen, Screen):
         if self['config'].isChanged():
             for x in self['config'].list:
                 x[1].save()
-            self.mbox = self.session.open(MessageBox, _('Settings saved correctly!'), MessageBox.TYPE_INFO, timeout=5)
+            self.mbox = self.session.open(
+                MessageBox,
+                _('Settings saved correctly!'),
+                MessageBox.TYPE_INFO,
+                timeout=5)
             cfg.save()
             configfile.save()
         self.close()
@@ -1051,7 +1208,8 @@ class ConfigEx(ConfigListScreen, Screen):
         from Screens.MessageBox import MessageBox
         if answer is None:
             if self["config"].isChanged():
-                self.session.openWithCallback(self.extnok, MessageBox, _("Really close without saving settings?"))
+                self.session.openWithCallback(
+                    self.extnok, MessageBox, _("Really close without saving settings?"))
             else:
                 self.close()
         elif answer:
@@ -1062,7 +1220,15 @@ class ConfigEx(ConfigListScreen, Screen):
 
 
 class GridMain(Screen):
-    def __init__(self, session, menuTitle, nextmodule, names, urls, infos, pics=[]):
+    def __init__(
+            self,
+            session,
+            menuTitle,
+            nextmodule,
+            names,
+            urls,
+            infos,
+            pics=[]):
         Screen.__init__(self, session)
         self.session = session
         global _session
@@ -1142,16 +1308,19 @@ class GridMain(Screen):
         self.maxentry = len(list) - 1
         self.ipage = 1
 
-        self["actions"] = ActionMap(["OkCancelActions", "EPGSelectActions", "MenuActions", "DirectionActions", "NumberActions"], {
-            "ok": self.okClicked,
-            "epg": self.showIMDB,
-            "info": self.showIMDB,
-            "cancel": self.cancel,
-            "left": self.key_left,
-            "right": self.key_right,
-            "up": self.key_up,
-            "down": self.key_down
-        })
+        self["actions"] = ActionMap(["OkCancelActions",
+                                     "EPGSelectActions",
+                                     "MenuActions",
+                                     "DirectionActions",
+                                     "NumberActions"],
+                                    {"ok": self.okClicked,
+                                     "epg": self.showIMDB,
+                                     "info": self.showIMDB,
+                                     "cancel": self.cancel,
+                                     "left": self.key_left,
+                                     "right": self.key_right,
+                                     "up": self.key_up,
+                                     "down": self.key_down})
         self.onLayoutFinish.append(self.openTest)
 
     def showIMDB(self):
@@ -1166,20 +1335,21 @@ class GridMain(Screen):
         # self.inf = ''
         try:
             self.inf = self.infos[itype]
-        except:
+        except BaseException:
             pass
         if self.inf:
             try:
                 self["info"].setText(self.inf)
                 # print('infos: ', self.inf)
-            except:
+            except BaseException:
                 self["info"].setText('')
                 # print('except info')
         print("In GridMain infos =", self.inf)
 
     def paintFrame(self):
         try:
-            # If the index exceeds the maximum number of items, it returns to the first item
+            # If the index exceeds the maximum number of items, it returns to
+            # the first item
             if self.index > self.maxentry:
                 self.index = self.minentry
             self.idx = self.index
@@ -1212,7 +1382,8 @@ class GridMain(Screen):
         ln = self.maxentry - (self.minentry - 1)
         while i < ln:
             idx = self.minentry + i
-            # self["label" + str(i + 1)].setText(self.names[idx])  # this show label to bottom of png pixmap
+            # self["label" + str(i + 1)].setText(self.names[idx])  # this show
+            # label to bottom of png pixmap
             pic = self.pics[idx]
             if not os.path.exists(self.pics[idx]):
                 pic = dblank
@@ -1226,7 +1397,8 @@ class GridMain(Screen):
         if self.index >= 0:
             self.index -= 1
         else:
-            # If we are at the first pixmap, go back to the last pixmap of the last page
+            # If we are at the first pixmap, go back to the last pixmap of the
+            # last page
             self.ipage = self.npage
             self.index = self.npics - 1
         # Check if we need to change pages
@@ -1244,7 +1416,8 @@ class GridMain(Screen):
         if self.index < self.npics - 1:
             self.index += 1
         else:
-            # If we are at the last pixmap, go back to the first pixmap of the first page
+            # If we are at the last pixmap, go back to the first pixmap of the
+            # first page
             self.index = 0
             self.ipage = 1
             self.openTest()
@@ -1267,7 +1440,8 @@ class GridMain(Screen):
                 self.index = self.maxentry  # Back to the last line of the previous page
                 self.openTest()
             else:
-                # If we are on the first page, go back to the last pixmap of the last page
+                # If we are on the first page, go back to the last pixmap of
+                # the last page
                 self.ipage = self.npage
                 self.index = self.npics - 1
                 self.openTest()
@@ -1282,7 +1456,8 @@ class GridMain(Screen):
                 self.index = self.minentry  # Back to the top of the next page
                 self.openTest()
             else:
-                # If we are on the last page, go back to the first pixmap of the first page
+                # If we are on the last page, go back to the first pixmap of
+                # the first page
                 self.index = 0
                 self.ipage = 1
                 self.openTest()
@@ -1310,7 +1485,7 @@ class GridMain(Screen):
             try:
                 vid2 = nextVideos1(self.session, name, url)
                 vid2.startSession()
-            except:
+            except BaseException:
                 pass
         elif '&page' not in str(url) and self.nextmodule == 'Videos1':
             # print('In GridMain video1 and play next sss  ', self.nextmodule)
@@ -1318,7 +1493,7 @@ class GridMain(Screen):
                 try:
                     vid2 = Videos6(self.session, name, url)  # atv 6.5
                     vid2.startSession()
-                except:
+                except BaseException:
                     pass
             else:
                 # print('In GridMain video1 and play next xx : ', self.nextmodule)
@@ -1329,7 +1504,7 @@ class GridMain(Screen):
             try:
                 vid2 = nextVideos4(self.session, name, url)
                 vid2.startSession()
-            except:
+            except BaseException:
                 pass
 
         elif 'listMovie' in str(url) and self.nextmodule == 'Videos4':
@@ -1337,7 +1512,7 @@ class GridMain(Screen):
             try:
                 vid2 = Videos4(self.session, name, url)
                 vid2.startSession()
-            except:
+            except BaseException:
                 pass
 
         elif 'movieId' in str(url):  # and self.nextmodule == 'Videos4':
@@ -1345,14 +1520,14 @@ class GridMain(Screen):
             try:
                 vid2 = Videos5(self.session, name, url)
                 vid2.startSession()
-            except:
+            except BaseException:
                 pass
 
         elif self.nextmodule == "Play":
             # print("In GridMain Going in Playstream1x")
             try:
                 self.session.open(Playstream1x, name, url)
-            except:
+            except BaseException:
                 pass
 
         elif self.nextmodule == "PlaySeries":
@@ -1360,7 +1535,7 @@ class GridMain(Screen):
             try:
                 vid2 = Videos4(self.session, name, url)
                 vid2.startSession()
-            except:
+            except BaseException:
                 pass
 
         elif self.nextmodule == "Videos2":
@@ -1369,7 +1544,7 @@ class GridMain(Screen):
             try:
                 vid2 = Videos2(self.session, name, url)
                 vid2.startSession()
-            except:
+            except BaseException:
                 pass
 
         elif self.nextmodule == "Videos3":
@@ -1377,7 +1552,7 @@ class GridMain(Screen):
             try:
                 vid2 = Videos3(self.session, name, url)
                 vid2.startSession()
-            except:
+            except BaseException:
                 pass
 
         elif self.nextmodule == "Videos4":
@@ -1385,7 +1560,7 @@ class GridMain(Screen):
             try:
                 vid2 = Videos4(self.session, name, url)
                 vid2.startSession()
-            except:
+            except BaseException:
                 pass
 
         elif self.nextmodule == "Videos5":
@@ -1393,7 +1568,7 @@ class GridMain(Screen):
             try:
                 vid2 = Videos5(self.session, name, url)
                 vid2.startSession()
-            except:
+            except BaseException:
                 pass
         else:
             self.close()
@@ -1401,7 +1576,11 @@ class GridMain(Screen):
     def search_text(self, name, url):
         self.namex = name
         self.urlx = url
-        self.session.openWithCallback(self.filterChannels, VirtualKeyBoard, title=_("Filter this category..."), text=name)
+        self.session.openWithCallback(
+            self.filterChannels,
+            VirtualKeyBoard,
+            title=_("Filter this category..."),
+            text=name)
 
     def filterChannels(self, result=None):
         if result:
@@ -1410,7 +1589,7 @@ class GridMain(Screen):
             try:
                 vid2 = nextVideos4(self.session, name, url)
                 vid2.startSession()
-            except:
+            except BaseException:
                 return
         else:
             self.resetSearch()
@@ -1443,11 +1622,7 @@ class Videos2(Screen):
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", 'ButtonSetupActions', "DirectionActions"], {
-            "ok": self.okClicked,
-            "back": self.close,
-            "red": self.close,
-            "green": self.okClicked
-        }, -1)
+                                    "ok": self.okClicked, "back": self.close, "red": self.close, "green": self.okClicked}, -1)
         self.name = name
         self.url = url
         self.onLayoutFinish.append(self.startSession)
@@ -1496,7 +1671,14 @@ class Videos2(Screen):
             nextmodule = "Videos1"
 
         if cfg.thumb.value == "True":
-            self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics=self.pics)
+            self.session.open(
+                GridMain,
+                title,
+                nextmodule,
+                self.names,
+                self.urls,
+                self.infos,
+                pics=self.pics)
 
     def okClicked(self):
         pass
@@ -1518,11 +1700,7 @@ class Videos6(Screen):
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", 'ButtonSetupActions', "DirectionActions"], {
-            "ok": self.okClicked,
-            "back": self.close,
-            "red": self.close,
-            "green": self.okClicked
-        }, -1)
+                                    "ok": self.okClicked, "back": self.close, "red": self.close, "green": self.okClicked}, -1)
 
         self.name = name
         self.url = url
@@ -1565,7 +1743,14 @@ class Videos6(Screen):
 
         nextmodule = "Videos1"
         if cfg.thumb.value == "True":
-            self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics=self.pics)
+            self.session.open(
+                GridMain,
+                title,
+                nextmodule,
+                self.names,
+                self.urls,
+                self.infos,
+                pics=self.pics)
 
     def okClicked(self):
         pass
@@ -1587,11 +1772,7 @@ class Videos1(Screen):
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", 'ButtonSetupActions', "DirectionActions"], {
-            "ok": self.okClicked,
-            "back": self.close,
-            "red": self.close,
-            "green": self.okClicked
-        }, -1)
+                                    "ok": self.okClicked, "back": self.close, "red": self.close, "green": self.okClicked}, -1)
         self.name = name
         self.url = url
         self.onLayoutFinish.append(self.startSession)
@@ -1633,7 +1814,14 @@ class Videos1(Screen):
         title = name_plug
         nextmodule = "Videos1"
         if cfg.thumb.value == "True":
-            self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics=self.pics)
+            self.session.open(
+                GridMain,
+                title,
+                nextmodule,
+                self.names,
+                self.urls,
+                self.infos,
+                pics=self.pics)
 
     def okClicked(self):
         pass
@@ -1655,11 +1843,7 @@ class nextVideos1(Screen):
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", 'ButtonSetupActions', "DirectionActions"], {
-            "ok": self.okClicked,
-            "back": self.close,
-            "red": self.close,
-            "green": self.okClicked
-        }, -1)
+                                    "ok": self.okClicked, "back": self.close, "red": self.close, "green": self.okClicked}, -1)
 
         self.name = name
         self.url = url
@@ -1706,7 +1890,14 @@ class nextVideos1(Screen):
         nextmodule = "Videos1"
         if cfg.thumb.value == "True":
             print("In nextVideos1 Going in GridMain")
-            self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics=self.pics)
+            self.session.open(
+                GridMain,
+                title,
+                nextmodule,
+                self.names,
+                self.urls,
+                self.infos,
+                pics=self.pics)
 
     def okClicked(self):
         pass
@@ -1728,11 +1919,7 @@ class Videos3(Screen):
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", 'ButtonSetupActions', "DirectionActions"], {
-            "ok": self.okClicked,
-            "back": self.close,
-            "red": self.close,
-            "green": self.okClicked
-        }, -1)
+                                    "ok": self.okClicked, "back": self.close, "red": self.close, "green": self.okClicked}, -1)
 
         self.name = name
         self.url = url
@@ -1777,7 +1964,14 @@ class Videos3(Screen):
         nextmodule = "Play"
         if cfg.thumb.value == "True":
             print("In Videos3 Going in GridMain")
-            self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics=self.pics)
+            self.session.open(
+                GridMain,
+                title,
+                nextmodule,
+                self.names,
+                self.urls,
+                self.infos,
+                pics=self.pics)
 
     def okClicked(self):
         pass
@@ -1799,11 +1993,7 @@ class Videos4(Screen):
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", 'ButtonSetupActions', "DirectionActions"], {
-            "ok": self.okClicked,
-            "back": self.close,
-            "red": self.close,
-            "green": self.okClicked
-        }, -1)
+                                    "ok": self.okClicked, "back": self.close, "red": self.close, "green": self.okClicked}, -1)
 
         self.name = name
         self.url = url
@@ -1847,7 +2037,14 @@ class Videos4(Screen):
         title = name_plug
         nextmodule = "Videos5"
         if cfg.thumb.value == "True":
-            self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics=self.pics)
+            self.session.open(
+                GridMain,
+                title,
+                nextmodule,
+                self.names,
+                self.urls,
+                self.infos,
+                pics=self.pics)
 
     def okClicked(self):
         pass
@@ -1869,11 +2066,7 @@ class nextVideos4(Screen):
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", 'ButtonSetupActions', "DirectionActions"], {
-            "ok": self.okClicked,
-            "back": self.close,
-            "red": self.close,
-            "green": self.okClicked
-        }, -1)
+                                    "ok": self.okClicked, "back": self.close, "red": self.close, "green": self.okClicked}, -1)
 
         self.name = name
         self.url = url
@@ -1916,7 +2109,14 @@ class nextVideos4(Screen):
         title = name_plug
         nextmodule = "Videos4"
         if cfg.thumb.value == "True":
-            self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics=self.pics)
+            self.session.open(
+                GridMain,
+                title,
+                nextmodule,
+                self.names,
+                self.urls,
+                self.infos,
+                pics=self.pics)
 
     def okClicked(self):
         pass
@@ -1938,11 +2138,7 @@ class Videos5(Screen):
         self["key_red"] = Button(_("Cancel"))
         self["key_green"] = Button(_("Select"))
         self["actions"] = ActionMap(["WizardActions", "InputActions", "ColorActions", 'ButtonSetupActions', "DirectionActions"], {
-            "ok": self.okClicked,
-            "back": self.close,
-            "red": self.close,
-            "green": self.okClicked
-        }, -1)
+                                    "ok": self.okClicked, "back": self.close, "red": self.close, "green": self.okClicked}, -1)
 
         self.name = name
         self.url = url
@@ -1988,7 +2184,14 @@ class Videos5(Screen):
         print("In Videos5 nextmodule =", nextmodule)
         if cfg.thumb.value == "True":
             print("In Videos5 Going in GridMain")
-            self.session.open(GridMain, title, nextmodule, self.names, self.urls, self.infos, pics=self.pics)
+            self.session.open(
+                GridMain,
+                title,
+                nextmodule,
+                self.names,
+                self.urls,
+                self.infos,
+                pics=self.pics)
 
     def okClicked(self):
         pass
@@ -2016,8 +2219,9 @@ class TvInfoBarShowHide():
         self.__locked = 0
         self.hideTimer = eTimer()
         try:
-            self.hideTimer_conn = self.hideTimer.timeout.connect(self.doTimerHide)
-        except:
+            self.hideTimer_conn = self.hideTimer.timeout.connect(
+                self.doTimerHide)
+        except BaseException:
             self.hideTimer.callback.append(self.doTimerHide)
         self.hideTimer.start(5000, True)
         self.onShow.append(self.__onShow)
@@ -2068,7 +2272,7 @@ class TvInfoBarShowHide():
     def lockShow(self):
         try:
             self.__locked += 1
-        except:
+        except BaseException:
             self.__locked = 0
         if self.execing:
             self.show()
@@ -2078,7 +2282,7 @@ class TvInfoBarShowHide():
     def unlockShow(self):
         try:
             self.__locked -= 1
-        except:
+        except BaseException:
             self.__locked = 0
         if self.__locked < 0:
             self.__locked = 0
@@ -2109,17 +2313,22 @@ class Playstream1x(Screen):
         self['progresstext'] = StaticText()
         self["progress"].hide()
         self.downloading = False
-        self['actions'] = ActionMap(['MoviePlayerActions', 'MovieSelectionActions', 'ColorActions', 'DirectionActions', 'ButtonSetupActions', 'OkCancelActions'], {
-            'red': self.cancel,
-            'green': self.okClicked,
-            'back': self.cancel,
-            'cancel': self.cancel,
-            'leavePlayer': self.cancel,
-            'rec': self.runRec,
-            'instantRecord': self.runRec,
-            'ShortRecord': self.runRec,
-            'ok': self.okClicked
-        }, -2)
+        self['actions'] = ActionMap(['MoviePlayerActions',
+                                     'MovieSelectionActions',
+                                     'ColorActions',
+                                     'DirectionActions',
+                                     'ButtonSetupActions',
+                                     'OkCancelActions'],
+                                    {'red': self.cancel,
+                                     'green': self.okClicked,
+                                     'back': self.cancel,
+                                     'cancel': self.cancel,
+                                     'leavePlayer': self.cancel,
+                                     'rec': self.runRec,
+                                     'instantRecord': self.runRec,
+                                     'ShortRecord': self.runRec,
+                                     'ok': self.okClicked},
+                                    -2)
 
         self.name1 = name
         self.url = url
@@ -2131,14 +2340,25 @@ class Playstream1x(Screen):
         self.namem3u = self.name1
         self.urlm3u = self.url
         if self.downloading is True:
-            self.session.open(MessageBox, _('You are already downloading!!!'), MessageBox.TYPE_INFO, timeout=5)
+            self.session.open(
+                MessageBox,
+                _('You are already downloading!!!'),
+                MessageBox.TYPE_INFO,
+                timeout=5)
             return
         else:
             if '.mp4' or '.mkv' or '.flv' or '.avi' in self.urlm3u:
-                self.session.openWithCallback(self.download_m3u, MessageBox, _("DOWNLOAD VIDEO?\n%s" % self.namem3u), type=MessageBox.TYPE_YESNO, timeout=10, default=False)
+                self.session.openWithCallback(
+                    self.download_m3u, MessageBox, _(
+                        "DOWNLOAD VIDEO?\n%s" %
+                        self.namem3u), type=MessageBox.TYPE_YESNO, timeout=10, default=False)
             else:
                 self.downloading = False
-                self.session.open(MessageBox, _('Only VOD Movie allowed or not .ext Filtered!!!'), MessageBox.TYPE_INFO, timeout=5)
+                self.session.open(
+                    MessageBox,
+                    _('Only VOD Movie allowed or not .ext Filtered!!!'),
+                    MessageBox.TYPE_INFO,
+                    timeout=5)
 
     def download_m3u(self, result=None):
         if result:
@@ -2149,8 +2369,36 @@ class Playstream1x(Screen):
             fileTitle = re.sub(r'[\<\>\:\"\/\\\|\?\*\[\]]', '_', self.namem3u)
             fileTitle = re.sub(r' ', '_', fileTitle)
             fileTitle = re.sub(r'_+', '_', fileTitle)
-            fileTitle = fileTitle.replace("(", "_").replace(")", "_").replace("#", "").replace("+", "_").replace("\'", "_").replace("'", "_").replace("!", "_").replace("&", "_")
-            fileTitle = fileTitle.replace(" ", "_").replace(":", "").replace("[", "").replace("]", "").replace("!", "_").replace("&", "_")
+            fileTitle = fileTitle.replace(
+                "(",
+                "_").replace(
+                ")",
+                "_").replace(
+                "#",
+                "").replace(
+                "+",
+                "_").replace(
+                    "\'",
+                    "_").replace(
+                        "'",
+                        "_").replace(
+                            "!",
+                            "_").replace(
+                                "&",
+                "_")
+            fileTitle = fileTitle.replace(
+                " ",
+                "_").replace(
+                ":",
+                "").replace(
+                "[",
+                "").replace(
+                "]",
+                "").replace(
+                    "!",
+                    "_").replace(
+                        "&",
+                "_")
             fileTitle = fileTitle.lower() + ext
             self.in_tmp = os.path.join(Path_Movies, fileTitle)
             self.downloading = True
@@ -2164,7 +2412,8 @@ class Playstream1x(Screen):
     def downloadProgress(self, recvbytes, totalbytes):
         self["progress"].show()
         self['progress'].value = int(100 * recvbytes / float(totalbytes))
-        self['progresstext'].text = '%d of %d kBytes (%.2f%%)' % (recvbytes / 1024, totalbytes / 1024, 100 * recvbytes / float(totalbytes))
+        self['progresstext'].text = '%d of %d kBytes (%.2f%%)' % (
+            recvbytes / 1024, totalbytes / 1024, 100 * recvbytes / float(totalbytes))
 
     def check(self, fplug):
         checkfile = self.in_tmp
@@ -2177,7 +2426,11 @@ class Playstream1x(Screen):
 
     def showError(self, error):
         self.downloading = False
-        self.session.open(MessageBox, _('Download Failed!!!'), MessageBox.TYPE_INFO, timeout=5)
+        self.session.open(
+            MessageBox,
+            _('Download Failed!!!'),
+            MessageBox.TYPE_INFO,
+            timeout=5)
 
     def openTest(self):
         url = self.url
@@ -2212,10 +2465,11 @@ class Playstream1x(Screen):
             elif idx == 2:
                 try:
                     os.remove('/tmp/hls.avi')
-                except:
+                except BaseException:
                     pass
                 header = ''
-                cmd = 'python "/usr/lib/enigma2/python/Plugins/Extensions/tvspro/lib/hlsclient.py" "' + self.url + '" "1" "' + header + '" + &'
+                cmd = 'python "/usr/lib/enigma2/python/Plugins/Extensions/tvspro/lib/hlsclient.py" "' + \
+                    self.url + '" "1" "' + header + '" + &'
                 print('In playVideo cmd =', cmd)
                 os.system(cmd)
                 os.system('sleep 3')
@@ -2225,7 +2479,7 @@ class Playstream1x(Screen):
                 url = self.url
                 try:
                     os.remove('/tmp/hls.avi')
-                except:
+                except BaseException:
                     pass
                 cmd = 'python "/usr/lib/enigma2/python/Plugins/Extensions/tvspro/l/tsclient.py" "' + url + '" "1" + &'
                 print('hls cmd = ', cmd)
@@ -2255,25 +2509,38 @@ class Playstream1x(Screen):
             name = self.name1
             url = self.url
             url = url.replace(':', '%3a')
-            ref = '5002:0:1:0:0:0:0:0:0:0:' + 'http%3a//127.0.0.1%3a8088/' + str(url)
+            ref = '5002:0:1:0:0:0:0:0:0:0:' + \
+                'http%3a//127.0.0.1%3a8088/' + str(url)
             sref = eServiceReference(ref)
             print('SREF: ', sref)
             sref.setName(self.name1)
             self.session.open(Playstream2, name, sref, desc)
             self.close()
         else:
-            self.session.open(MessageBox, _('Install Streamlink first'), MessageBox.TYPE_INFO, timeout=5)
+            self.session.open(
+                MessageBox,
+                _('Install Streamlink first'),
+                MessageBox.TYPE_INFO,
+                timeout=5)
 
     def cancel(self):
         try:
             self.session.nav.stopService()
             self.session.nav.playService(self.srefInit)
             self.close()
-        except:
+        except BaseException:
             pass
 
 
-class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarAudioSelection, TvInfoBarShowHide, InfoBarSubtitleSupport):
+class Playstream2(
+        Screen,
+        InfoBarMenu,
+        InfoBarBase,
+        InfoBarSeek,
+        InfoBarNotifications,
+        InfoBarAudioSelection,
+        TvInfoBarShowHide,
+        InfoBarSubtitleSupport):
     STATE_IDLE = 0
     STATE_PLAYING = 1
     STATE_PAUSED = 2
@@ -2296,7 +2563,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         InfoBarAudioSelection.__init__(self)
         try:
             self.init_aspect = int(self.getAspect())
-        except:
+        except BaseException:
             self.init_aspect = 0
         self.new_aspect = self.init_aspect
         self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
@@ -2306,16 +2573,25 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.url = url
         self.name = name
         self.state = self.STATE_PLAYING
-        self['actions'] = ActionMap(['WizardActions', 'MoviePlayerActions', 'MovieSelectionActions', 'MediaPlayerActions', 'EPGSelectActions', 'MediaPlayerSeekActions', 'ColorActions',
-                                     'ButtonSetupActions', 'InfobarShowHideActions', 'InfobarActions', 'InfobarSeekActions'], {
-            'leavePlayer': self.cancel,
-            'epg': self.showIMDB,
-            'info': self.showIMDB,
-            'tv': self.cicleStreamType,
-            'stop': self.leavePlayer,
-            'cancel': self.cancel,
-            'back': self.cancel
-        }, -1)
+        self['actions'] = ActionMap(['WizardActions',
+                                     'MoviePlayerActions',
+                                     'MovieSelectionActions',
+                                     'MediaPlayerActions',
+                                     'EPGSelectActions',
+                                     'MediaPlayerSeekActions',
+                                     'ColorActions',
+                                     'ButtonSetupActions',
+                                     'InfobarShowHideActions',
+                                     'InfobarActions',
+                                     'InfobarSeekActions'],
+                                    {'leavePlayer': self.cancel,
+                                     'epg': self.showIMDB,
+                                     'info': self.showIMDB,
+                                     'tv': self.cicleStreamType,
+                                     'stop': self.leavePlayer,
+                                     'cancel': self.cancel,
+                                     'back': self.cancel},
+                                    -1)
         InfoBarSeek.__init__(self, actionmap='InfobarSeekActions')
 
         if '8088' in str(self.url):
@@ -2327,7 +2603,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
     def getAspect(self):
         try:
             aspect = AVSwitch().getAspectRatioSetting()
-        except:
+        except BaseException:
             pass
         return aspect
 
@@ -2353,7 +2629,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         config.av.aspectratio.setValue(map[aspect])
         try:
             AVSwitch.setAspectRatio(aspect)
-        except:
+        except BaseException:
             pass
 
     def av(self):
@@ -2381,9 +2657,11 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
 
     def openPlay(self, servicetype, url):
         url = url.replace(':', '%3a').replace(' ', '%20')
-        ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:' + str(url)  # + ':' + self.name
+        ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:' + \
+            str(url)  # + ':' + self.name
         if streaml is True:
-            ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + str(url) + ':' + self.name
+            ref = str(servicetype) + ':0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + \
+                str(url) + ':' + self.name
         print('final reference 2:   ', ref)
         sref = eServiceReference(ref)
         sref.setName(self.name)
@@ -2444,7 +2722,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         if not self.new_aspect == self.init_aspect:
             try:
                 self.setAspect(self.init_aspect)
-            except:
+            except BaseException:
                 pass
         self.close()
 
@@ -2458,17 +2736,17 @@ def main(session, **kwargs):
 
         try:
             os.mkdir(os.path.join(Path_Cache, "pic"))
-        except:
+        except BaseException:
             pass
 
         try:
             os.mkdir(os.path.join(Path_Cache, "tmp"))
-        except:
+        except BaseException:
             pass
 
         exo = tvspromain(_session)
         exo.startSession()
-    except:
+    except BaseException:
         import traceback
         traceback.print_exc()
         pass
@@ -2476,7 +2754,18 @@ def main(session, **kwargs):
 
 def Plugins(**kwargs):
     icona = 'icon.png'
-    extDescriptor = PluginDescriptor(name=name_plug, description=_(title_plug), where=PluginDescriptor.WHERE_EXTENSIONSMENU, icon=icona, fnc=main)
-    result = [PluginDescriptor(name=name_plug, description=title_plug, where=PluginDescriptor.WHERE_PLUGINMENU, icon=icona, fnc=main)]
+    extDescriptor = PluginDescriptor(
+        name=name_plug,
+        description=_(title_plug),
+        where=PluginDescriptor.WHERE_EXTENSIONSMENU,
+        icon=icona,
+        fnc=main)
+    result = [
+        PluginDescriptor(
+            name=name_plug,
+            description=title_plug,
+            where=PluginDescriptor.WHERE_PLUGINMENU,
+            icon=icona,
+            fnc=main)]
     result.append(extDescriptor)
     return result
