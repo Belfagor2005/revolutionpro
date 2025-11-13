@@ -79,6 +79,9 @@ import re
 import requests
 import six
 import sys
+from six.moves.urllib.request import urlopen
+from six.moves.urllib.request import Request
+from six.moves.urllib.parse import urlparse
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 _session = None
@@ -350,7 +353,7 @@ def rvoneListEntry(name):
 def showlist(datal, list):
     plist = []
     for name in datal:  # Iterazione più pythonica
-        plist.append(show_list_1(name))
+        plist.append(rvoneListEntry(name))
     list.setList(plist)
 
 
@@ -781,7 +784,7 @@ class AnimMain(Screen):
     def check_vers(self):
         remote_version = '0.0'
         remote_changelog = ''
-        req = Request(b64decoder(installer_url), headers=headers)
+        req = Request(Utils.b64decoder(installer_url), headers=headers)
         page = urlopen(req).read()
         if PY3:
             data = page.decode("utf-8")
@@ -828,10 +831,10 @@ class AnimMain(Screen):
 
     def update_dev(self):
         try:
-            req = Utils.Request(
+            req = Request(
                 Utils.b64decoder(developer_url), headers={
                     'User-Agent': 'Mozilla/5.0'})
-            page = Utils.urlopen(req).read()
+            page = urlopen(req).read()
             data = json.loads(page)
             remote_date = data['pushed_at']
             strp_remote_date = datetime.strptime(
@@ -2669,8 +2672,7 @@ class Playstream2(
         self.session.nav.playService(sref)
 
     def cicleStreamType(self):
-        global streaml
-        # streaml = False
+        # global streaml
         from itertools import cycle, islice
         self.servicetype = str(cfg.services.value)
         print('servicetype1: ', self.servicetype)
