@@ -11,10 +11,6 @@
 # '''
 
 from __future__ import print_function
-from . import _, getversioninfo
-from .lib import Utils
-from .lib import html_conv
-from .lib.Console import Console as xConsole
 
 from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap
@@ -83,6 +79,11 @@ from six.moves.urllib.request import urlopen
 from six.moves.urllib.request import Request
 from six.moves.urllib.parse import urlparse
 
+from . import _, getversioninfo
+from .lib import Utils
+from .lib import html_conv
+from .lib.Console import Console as xConsole
+
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 _session = None
 THISPLUG = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/".format('tvspro'))
@@ -91,11 +92,9 @@ PY3 = sys.version_info.major >= 3
 
 if PY3:
     from http.client import HTTPConnection
-    from urllib.parse import urlparse
     PY3 = True
 else:
     from httplib import HTTPConnection
-    from urlparse import urlparse
 
 HTTPConnection.debuglevel = 1
 
@@ -108,6 +107,8 @@ title_plug = '..:: TVS Pro Revolution V. %s ::..' % Version
 referer = 'https://tivustream.website'
 installer_url = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0JlbGZhZ29yMjAwNS9yZXZvbHV0aW9ucHJvL21haW4vaW5zdGFsbGVyLnNo'
 developer_url = 'aHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS9yZXBvcy9CZWxmYWdvcjIwMDUvcmV2b2x1dGlvbnBybw=='
+HEADERS = {'User-Agent': 'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2.6) Gecko/20100627 Firefox/3.6.6'}
+
 skin_path = THISPLUG
 res_plugin_path = os.path.join(THISPLUG, 'res/')
 pngx = os.path.join(res_plugin_path, 'pics/setting2.png')
@@ -355,18 +356,6 @@ def showlist(datal, list):
     for name in datal:  # Iterazione più pythonica
         plist.append(rvoneListEntry(name))
     list.setList(plist)
-
-
-"""
-def showlist(data, list):
-    icount = 0
-    plist = []
-    for line in data:
-        name = data[icount]
-        plist.append(rvoneListEntry(name))
-        icount += 1
-        list.setList(plist)
-"""
 
 
 mdpchoices = [
@@ -784,7 +773,7 @@ class AnimMain(Screen):
     def check_vers(self):
         remote_version = '0.0'
         remote_changelog = ''
-        req = Request(Utils.b64decoder(installer_url), headers=headers)
+        req = Request(Utils.b64decoder(installer_url), headers=HEADERS)
         page = urlopen(req).read()
         if PY3:
             data = page.decode("utf-8")
