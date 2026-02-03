@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 ###########################################################
-revolution for Enigma2
+tvspro for Enigma2
 Created by: Lululla
 ###########################################################
 Last Updated: 2026-01-31
@@ -16,7 +16,7 @@ import re
 import subprocess
 from xml.etree import ElementTree as ET
 
-PLUGIN_NAME = "revolution"
+PLUGIN_NAME = "tvspro"
 PLUGIN_DIR = os.path.dirname(os.path.abspath(__file__))
 LOCALE_DIR = os.path.join(PLUGIN_DIR, "locale")
 POT_FILE = os.path.join(LOCALE_DIR, "{}.pot".format(PLUGIN_NAME))
