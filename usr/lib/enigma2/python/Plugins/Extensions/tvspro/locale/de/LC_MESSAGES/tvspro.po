@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: exodus\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-19 10:22+0200\n"
+"POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
 "Last-Translator: ))^^(( <>\n"
 "Language-Team: *\n"
@@ -16,268 +16,173 @@ msgstr ""
 "X-Poedit-Basepath: ../../..\n"
 "X-Poedit-SearchPath-0: plugin.py\n"
 
-#: plugin.py:312
-msgid "IPTV(4097)"
-msgstr ""
-
-#: plugin.py:313
-msgid "Dvb(1)"
-msgstr ""
-
-#: plugin.py:316
-msgid "Gstreamer(5001)"
-msgstr ""
-
-#: plugin.py:319
-msgid "Exteplayer3(5002)"
-msgstr ""
-
-#: plugin.py:322
-msgid "DreamOS GStreamer(8193)"
-msgstr ""
-
-#: plugin.py:328
-msgid "yes"
-msgstr ""
-
-#: plugin.py:328
-msgid "no"
-msgstr ""
-
-#: plugin.py:604 plugin.py:659 plugin.py:1451 plugin.py:1544 plugin.py:1628
-#: plugin.py:1710 plugin.py:1795 plugin.py:1881 plugin.py:1966 plugin.py:2051
-msgid "Cancel"
-msgstr ""
-
-#: plugin.py:605 plugin.py:1452 plugin.py:1545 plugin.py:1629 plugin.py:1711
-#: plugin.py:1796 plugin.py:1882 plugin.py:1967 plugin.py:2052 plugin.py:2232
-msgid "Select"
-msgstr "Wählen"
-
-#: plugin.py:621 plugin.py:811 plugin.py:1313
-msgid "About"
-msgstr ""
-
-#: plugin.py:621
-msgid "Information Us"
-msgstr ""
-
-#: plugin.py:622 plugin.py:814 plugin.py:1310
-msgid "Config"
-msgstr ""
-
-#: plugin.py:622
-msgid "Setup Plugin"
-msgstr ""
-
-#: plugin.py:623 plugin.py:817
-msgid "Live TV"
-msgstr ""
-
-#: plugin.py:623
-msgid "Live TV Stream"
-msgstr ""
-
-#: plugin.py:624 plugin.py:817 plugin.py:1513
-msgid "Film"
-msgstr ""
-
-#: plugin.py:624
-msgid "Film and Movie"
-msgstr ""
-
-#: plugin.py:625 plugin.py:817 plugin.py:1515
-msgid "Serie"
-msgstr ""
-
-#: plugin.py:625
-msgid "Series"
-msgstr ""
-
-#: plugin.py:626 plugin.py:824 plugin.py:1316
-msgid "Search"
-msgstr ""
-
-#: plugin.py:626
-msgid "Search your Movie"
-msgstr ""
-
-#: plugin.py:660
-msgid "Update"
-msgstr ""
-
-#: plugin.py:717
-#, python-format
-msgid ""
-"New version %s is available\n"
-"\n"
-"Changelog: %s\n"
-"\n"
-"Press info_long or yellow_long button to start force updating."
-msgstr ""
-
-#: plugin.py:722
-#, python-format
-msgid ""
-"New version %s is available.\n"
-"\n"
-"Changelog: %s \n"
-"\n"
-"Do you want to install it now?"
-msgstr ""
-
-#: plugin.py:724
-msgid "Congrats! You already have the latest version..."
-msgstr ""
-
-#: plugin.py:734
-#, python-format
-msgid "Do you want to install update ( %s ) now?"
-msgstr ""
-
-#: plugin.py:743
-msgid "Update Aborted!"
-msgstr ""
-
-#: plugin.py:830 plugin.py:1418
-msgid "Filter this category..."
-msgstr ""
-
-#: plugin.py:877
 msgid "==  WELCOME to WWW.TIVUSTREAM.COM ==\n"
 msgstr ""
 
-#: plugin.py:878
 msgid "== SUPPORT ON: WWW.CORVOBOYS.ORG http://t.me/tivustream ==\n"
 msgstr ""
 
-#: plugin.py:879
 msgid "== thank's to @PCD @KIDDAC @MMARK @LINUXSAT-SUPPORT.COM\n"
 msgstr ""
 
-#: plugin.py:880 plugin.py:887
 msgid "========================================\n"
 msgstr ""
 
-#: plugin.py:881
-msgid "DISCLAIMER:\n"
+msgid "About"
 msgstr ""
 
-#: plugin.py:882
-msgid "The lists created at HOC contain addresses freely and freely found on\n"
-msgstr ""
-
-#: plugin.py:883
-msgid "the net and not protected by subscription or subscription.\n"
-msgstr ""
-
-#: plugin.py:884
-msgid "The structural reference server for projects released\n"
-msgstr ""
-
-#: plugin.py:885
-msgid "is not a source of any stream/flow.\n"
-msgstr ""
-
-#: plugin.py:886
 msgid "Absolutely PROHIBITED to use this lists without authorization\n"
 msgstr ""
 
-#: plugin.py:910
-msgid "SETUP PLUGIN"
-msgstr ""
-
-#: plugin.py:914 plugin.py:2231
-msgid "Exit"
-msgstr "Ausfahrt"
-
-#: plugin.py:915
-msgid "Save"
-msgstr ""
-
-#: plugin.py:916
-msgid "Empty Cache"
-msgstr ""
-
-#: plugin.py:917
-msgid "\"SETUP PLUGIN\""
-msgstr ""
-
-#: plugin.py:949
 msgid "All cache fold empty!"
 msgstr ""
 
-#: plugin.py:954
-msgid "Services Player Reference type"
-msgstr ""
-
-#: plugin.py:954
-msgid "Configure Service Player Reference, Enigma restart required"
-msgstr ""
-
-#: plugin.py:955
 msgid "Cache folder"
 msgstr ""
 
-#: plugin.py:955
-msgid "Folder Cache Path (eg.: /media/hdd), Enigma restart required"
+msgid "Cancel"
 msgstr ""
 
-#: plugin.py:956
-msgid "Movie folder"
+msgid "Cancel execution?"
 msgstr ""
 
-#: plugin.py:956
-msgid "Folder Movie Path (eg.: /media/hdd/movie), Enigma restart required"
-msgstr ""
-
-#: plugin.py:969
-msgid "SELECT YOUR CHOICE"
-msgstr ""
-
-#: plugin.py:1010
-msgid "Choose Directory:"
-msgstr ""
-
-#: plugin.py:1011
 msgid "Choose Directory"
 msgstr ""
 
-#: plugin.py:1034
-msgid "Settings saved correctly!"
+msgid "Choose Directory:"
 msgstr ""
 
-#: plugin.py:1043
-msgid "Really close without saving settings?"
+msgid "Config"
 msgstr ""
 
-#: plugin.py:1492 plugin.py:1752
-msgid "serie"
+msgid "Configure Service Player Reference, Enigma restart required"
 msgstr ""
 
-#: plugin.py:1511
-msgid "Live"
+msgid "Congrats! You already have the latest version..."
 msgstr ""
 
-#: plugin.py:2259
-msgid "You are already downloading!!!"
+msgid "Console"
 msgstr ""
 
-#: plugin.py:2263
-#, python-format
-msgid ""
-"DOWNLOAD VIDEO?\n"
-"%s"
+msgid "DISCLAIMER:\n"
 msgstr ""
 
-#: plugin.py:2266
-msgid "Only VOD Movie allowed or not .ext Filtered!!!"
+msgid "Do you want to install update ( %s ) now?"
 msgstr ""
 
-#: plugin.py:2308
 msgid "Download Failed!!!"
 msgstr ""
 
-#: plugin.py:2409
+msgid "Empty Cache"
+msgstr ""
+
+msgid "Exit"
+msgstr "Ausfahrt"
+
+msgid "Film"
+msgstr ""
+
+msgid "Film and Movie"
+msgstr ""
+
+msgid "Filter this category..."
+msgstr ""
+
+msgid "Folder Cache Path (eg.: /media/hdd), Enigma restart required"
+msgstr ""
+
+msgid "Folder Movie Path (eg.: /media/hdd/movie), Enigma restart required"
+msgstr ""
+
+msgid "Hide/Show"
+msgstr ""
+
+msgid "Information Us"
+msgstr ""
+
 msgid "Install Streamlink first"
+msgstr ""
+
+msgid "Live"
+msgstr ""
+
+msgid "Live TV"
+msgstr ""
+
+msgid "Live TV Stream"
+msgstr ""
+
+msgid "Movie folder"
+msgstr ""
+
+msgid "Only VOD Movie allowed or not .ext Filtered!!!"
+msgstr ""
+
+msgid "Really close without saving settings?"
+msgstr ""
+
+msgid "Restart"
+msgstr ""
+
+msgid "SELECT YOUR CHOICE"
+msgstr ""
+
+msgid "SETUP PLUGIN"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "Search"
+msgstr ""
+
+msgid "Search your Movie"
+msgstr ""
+
+msgid "Select"
+msgstr "Wählen"
+
+msgid "Serie"
+msgstr ""
+
+msgid "Series"
+msgstr ""
+
+msgid "Services Player Reference type"
+msgstr ""
+
+msgid "Settings saved correctly!"
+msgstr ""
+
+msgid "Setup Plugin"
+msgstr ""
+
+msgid "The lists created at HOC contain addresses freely and freely found on\n"
+msgstr ""
+
+msgid "The structural reference server for projects released\n"
+msgstr ""
+
+msgid "Update"
+msgstr ""
+
+msgid "Update Aborted!"
+msgstr ""
+
+msgid "You are already downloading!!!"
+msgstr ""
+
+msgid "is not a source of any stream/flow.\n"
+msgstr ""
+
+msgid "no"
+msgstr ""
+
+msgid "serie"
+msgstr ""
+
+msgid "the net and not protected by subscription or subscription.\n"
+msgstr ""
+
+msgid "yes"
 msgstr ""
