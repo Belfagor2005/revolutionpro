@@ -5,7 +5,7 @@ from Components.Language import language
 from Tools.Directories import resolveFilename, SCOPE_PLUGINS
 import gettext
 import os
-
+__version__ = "1.9"
 PluginLanguageDomain = 'tvspro'
 PluginLanguagePath = 'Extensions/tvspro/locale'
 THISPLUG = '/usr/lib/enigma2/python/Plugins/Extensions/tvspro/'
@@ -15,17 +15,16 @@ if os.path.exists("/var/lib/dpkg/status"):
 
 
 def getversioninfo():
-    currversion = '1.9'
     version_file = os.path.join(THISPLUG, 'version')
     if os.path.exists(version_file):
         try:
             fp = open(version_file, 'r').readlines()
             for line in fp:
                 if 'version' in line:
-                    currversion = line.split('=')[1].strip()
+                    __version__ = line.split('=')[1].strip()
         except BaseException:
             pass
-    return (currversion)
+    return (__version__)
 
 
 def localeInit():
